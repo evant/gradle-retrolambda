@@ -1,5 +1,6 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
 repositories {
     mavenCentral()
@@ -11,4 +12,66 @@ version = '1.0.0'
 dependencies {
     compile gradleApi()
     compile localGroovy()
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+  from sourceSets.main.allSource
+  classifier = 'sources'
+}
+
+artifacts {
+  archives jar
+  archives javadocJar
+  archives sourcesJar
+}
+
+signing {
+  sign configurations.archives
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(
+            userName: project.getProperty('sonatype.username'),
+            password: project.getProperty('sonatype.password'))
+      }
+
+      pom.project {
+        name 'gradle-retrolambda'
+        packaging 'jar'
+        description 'A gradle plugin for getting java lambda support in java 6, 7 and android'
+        url 'https://github.com/evant/gradle-retrolambda'
+
+        scm {
+          url 'git@github.com:evant/gradle-retrolambda.git'
+          connection 'scm:git:git@github.com:evant/gradle-retrolambda.git'
+          developerConnection 'scm:git:git@github.com:evant/gradle-retrolambda.git'
+        }
+
+        licenses {
+          license {
+            name 'The Apache Software License, Version 2.0'
+              url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+              distribution 'repo'
+          }
+        }
+
+        developers {
+          developer {
+            id 'evant'
+            name 'Evan Tatarka'
+          }
+        }
+      }
+    }
+  }
 }
