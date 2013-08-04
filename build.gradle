@@ -1,0 +1,14 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+repositories {
+    mavenCentral()
+}
+
+group = 'me.tatarka'
+version = '1.0.0'
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+}
