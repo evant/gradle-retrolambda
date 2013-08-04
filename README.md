@@ -2,7 +2,9 @@ Gradle Retrolamba Plugin
 ========================
 
 This plugin will automatically build your java or *android* project with
-retrolamba, giving you lambda goodness on java 6 or 7.
+retrolamba, giving you lambda goodness on java 6 or 7. It relies on the
+wonderful [retrolambda](https://github.com/orfjackal/retrolambda) by Esko
+Luontola.
 
 Usage
 ----
