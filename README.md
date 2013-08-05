@@ -18,10 +18,14 @@ https://jdk8.java.net/lambda/
 buildscript {
   repositories {
     mavenCentral()
+
+    maven {
+      url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
   }
 
   dependencies {
-    classpath 'me.tatarka:gradle-retrolambda:1.0.0'
+    classpath 'me.tatarka:gradle-retrolambda:1.0-SNAPSHOT'
   }
 }
 
