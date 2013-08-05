@@ -49,12 +49,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             }
 
             project.task('patchAndroidJar') {
-                def rt
-                if (Os.FAMILY_MAC) {
-                    rt = "${project.retrolambda.jdk}/bundle/Classes/classes.jar"
-                } else {
-                    rt = "${project.retrolambda.jdk}/jre/lib/rt.jar"
-                }
+                def rt = "${project.retrolambda.jdk}/jre/lib/rt.jar"
 
                 project.copy {
                     from project.file(androidJar)
@@ -62,7 +57,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                 }
 
                 if (!project.file(rt).exists()) {
-                    throw new RuntimeException("${rt} does not exists, make sure either JAVA_HOE or retrolambda.jdk is set.")
+                    throw new JdkPathException(rt)
                 }
 
                 project.copy {
@@ -74,7 +69,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                 }
 
                 if (!project.file("$buildPath/classes").isDirectory()) {
-                    throw new RuntimeException("$buildPath/classes does not exist, make sure that JAVE_HOME or retrolambda.jdk points to a valid version of java8\n You can download java8 from https://jdk8.java.net/lambda")
+                    throw new JdkPathException("$buildPath/classes")
                 }
 
                 project.ant.jar(update: true, destFile: "$jarPath/android.jar") {
