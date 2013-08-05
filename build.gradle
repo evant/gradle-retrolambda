@@ -7,7 +7,7 @@ repositories {
 }
 
 group = 'me.tatarka'
-version = '1.0.0'
+version = '1.0-SNAPSHOT'
 
 dependencies {
     compile gradleApi()
@@ -39,7 +39,14 @@ uploadArchives {
     mavenDeployer {
       beforeDeployment { deployment -> signing.signPom(deployment) }
 
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+      def repoUrl
+      if (project.version.endsWith("SNAPSHOT")) {
+        repoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+      } else {
+        repoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+      }
+
+      repository(url: repoUrl) {
         authentication(
             userName: project.getProperty('sonatype.username'),
             password: project.getProperty('sonatype.password'))

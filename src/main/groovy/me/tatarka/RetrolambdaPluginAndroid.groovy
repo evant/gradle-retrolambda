@@ -1,5 +1,6 @@
 package me.tatarka
 
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.JavaExec
@@ -48,17 +49,32 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             }
 
             project.task('patchAndroidJar') {
+                def rt
+                if (Os.FAMILY_MAC) {
+                    rt = "${project.retrolambda.jdk}/bundle/Classes/classes.jar"
+                } else {
+                    rt = "${project.retrolambda.jdk}/jre/lib/rt.jar"
+                }
+
                 project.copy {
                     from project.file(androidJar)
                     into project.file(jarPath)
                 }
 
+                if (!project.file(rt).exists()) {
+                    throw new RuntimeException("${rt} does not exists, make sure either JAVA_HOE or retrolambda.jdk is set.")
+                }
+
                 project.copy {
-                    from(project.zipTree(project.file("${project.retrolambda.jdk}/jre/lib/rt.jar"))) {
+                    from(project.zipTree(project.file(rt))) {
                         include("java/lang/invoke/**/*.class")
                     }
 
                     into project.file("$buildPath/classes")
+                }
+
+                if (!project.file("$buildPath/classes").isDirectory()) {
+                    throw new RuntimeException("$buildPath/classes does not exist, make sure that JAVE_HOME or retrolambda.jdk points to a valid version of java8\n You can download java8 from https://jdk8.java.net/lambda")
                 }
 
                 project.ant.jar(update: true, destFile: "$jarPath/android.jar") {
