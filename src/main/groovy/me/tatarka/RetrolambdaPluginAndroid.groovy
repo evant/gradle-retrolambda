@@ -51,13 +51,15 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             project.task('patchAndroidJar') {
                 def rt = "${project.retrolambda.jdk}/jre/lib/rt.jar"
 
+                def jdkPathError = " does not exist, make sure that JAVE_HOME or retrolambda.jdk points to a valid version of java8\n You can download java8 from https://jdk8.java.net/download.html"
+
                 project.copy {
                     from project.file(androidJar)
                     into project.file(jarPath)
                 }
 
                 if (!project.file(rt).exists()) {
-                    throw new JdkPathException(rt)
+                    throw new RuntimeException(rt + jdkPathError)
                 }
 
                 project.copy {
@@ -69,7 +71,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                 }
 
                 if (!project.file("$buildPath/classes").isDirectory()) {
-                    throw new JdkPathException("$buildPath/classes")
+                    throw new RuntimeException("$buildPath/classes" + jdkPathError)
                 }
 
                 project.ant.jar(update: true, destFile: "$jarPath/android.jar") {
