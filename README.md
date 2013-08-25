@@ -15,28 +15,28 @@ Usage
 2. Add the following to your build.gradle
 
    ```groovy
-    buildscript {
+   buildscript {
       repositories {
-        mavenCentral()
+         mavenCentral()
 
-        maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots"
+         maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots"
+         }
       }
-    }
 
-    dependencies {
-      classpath 'me.tatarka:gradle-retrolambda:1.0-SNAPSHOT'
-    }
-  }
+      dependencies {
+         classpath 'me.tatarka:gradle-retrolambda:1.0-SNAPSHOT'
+      }
+   }
 
-  // Required because retrolambda is on maven central
-  repositories {
-    mavenCentral()
-  }
+   // Required because retrolambda is on maven central
+   repositories {
+      mavenCentral()
+   }
 
-  apply plugin: 'android' //or apply plugin: 'java'
-  apply plugin: 'retrolambda'
-  ```
+   apply plugin: 'android' //or apply plugin: 'java'
+   apply plugin: 'retrolambda'
+   ```
 3. There is no step three!
 
 The plugin will compile the source code with java8 and then replace the class
