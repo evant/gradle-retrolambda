@@ -7,7 +7,7 @@ package me.tatarka
  * To change this template use File | Settings | File Templates.
  */
 public class RetrolambdaExtension {
-    Object compile = "net.orfjackal.retrolambda:retrolambda:1.1.0"
+    Object compile = "net.orfjackal.retrolambda:retrolambda:1.1.2"
     String jdk = System.getenv("JAVA_HOME")
     int bytecodeVersion = 50
     List<String> excludes = []
