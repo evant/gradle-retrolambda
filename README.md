@@ -1,8 +1,8 @@
-Gradle Retrolamba Plugin
+Gradle Retrolambda Plugin
 ========================
 
 This plugin will automatically build your java or *android* project with
-retrolamba, giving you lambda goodness on java 6 or 7. It relies on the
+retrolambda, giving you lambda goodness on java 6 or 7. It relies on the
 wonderful [retrolambda](https://github.com/orfjackal/retrolambda) by Esko
 Luontola.
 
@@ -88,7 +88,7 @@ android {
 What Black Magic did you use to get this to work on Android?
 ------------------------------------------------------------
 
-There were two hurdles to overcome when compileing for android. The gradle
+There were two hurdles to overcome when compiling for android. The gradle
 android plugin forces a compile targeting java 6 and uses a custom
 bootclasspath that doesn't include necessary java8 files. To overcome this, the
 plugin:
