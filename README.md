@@ -49,7 +49,7 @@ You can add a block like the following to configure the plugin:
 
 ```groovy
 retrolambda {
-  compile "net.orfjackal.retrolambda:retrolambda:1.1.0"
+  compile "net.orfjackal.retrolambda:retrolambda:1.1.2"
   jdk System.getenv("JAVA_HOME")
   javaVersion JavaVersion.VERSION_1_6
 }
