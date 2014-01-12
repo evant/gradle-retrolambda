@@ -28,12 +28,13 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     def inputDir = var.javaCompile.destinationDir
                     def retroClasspath = CollectionUtils.join(File.pathSeparator,
                             (var.javaCompile.classpath + project.files(var.javaCompile.destinationDir) + project.files(androidJar)).files)
+                    def name = var.name.capitalize()
 
                     var.javaCompile.sourceCompatibility = "1.8"
                     var.javaCompile.targetCompatibility = "1.8"
                     var.javaCompile.options.compilerArgs += ["-bootclasspath", "$jarPath/android.jar"]
 
-                    project.task("compileRetrolambda${var.name}", dependsOn: ["compile${var.name}", "patchAndroidJar"], type: JavaExec) {
+                    project.task("compileRetrolambda${name}", dependsOn: ["compile${name}Java", "patchAndroidJar"], type: JavaExec) {
                         classpath = project.files(project.configurations.retrolambdaConfig)
                         main = 'net.orfjackal.retrolambda.Main'
                         jvmArgs = [
@@ -44,7 +45,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         ]
                     }
 
-                    project.tasks.getByName("dex${var.name}").dependsOn("compileRetrolambda${var.name}")
+                    project.tasks.getByName("dex${name}").dependsOn("compileRetrolambda${name}")
                 }
             }
 
