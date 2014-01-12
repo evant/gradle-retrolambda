@@ -34,6 +34,7 @@ signing {
   sign configurations.archives
 }
 
+if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.password'))
 uploadArchives {
   repositories {
     mavenDeployer {
