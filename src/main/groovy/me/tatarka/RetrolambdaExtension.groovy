@@ -1,4 +1,6 @@
 package me.tatarka
+
+import org.gradle.api.JavaVersion
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -29,12 +31,10 @@ public class RetrolambdaExtension {
         bytecodeVersion = v
     }
 
-    public void setJavaVersion(Object v) {
-        switch (v.toString()) {
-            case '1.6':
+    public void setJavaVersion(JavaVersion v) {
+        switch (v.majorVersion) {
             case '6': bytecodeVersion = 50
                 break
-            case '1.8':
             case '7': bytecodeVersion = 51
                 break
             default:
