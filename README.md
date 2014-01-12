@@ -9,8 +9,7 @@ Luontola.
 Usage
 ----
 
-1. Download openjdk8 early access with lambda support from
-   https://jdk8.java.net/lambda/
+1. Download openjdk8 early from https://jdk8.java.net/download.html
 
 2. Add the following to your build.gradle
 
