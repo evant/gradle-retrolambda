@@ -17,18 +17,31 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
         project.afterEvaluate {
             project.sourceSets.all { set ->
                 if (project.retrolambda.isIncluded(set.name)) {
-                    def inputDir = set.output.classesDir
+                    def name = set.name.capitalize()
+                    def inputDir = "$project.buildDir/retrolambda/$set.name"
+                    def outputDir = set.output.classesDir
                     def retroClasspath = set.runtimeClasspath.getAsPath()
+                    def taskName = "compileRetrolambda$name"
 
-                    project.task("compileRetrolambda${set.name}", dependsOn: 'classes', type: JavaExec) {
+                    set.output.classesDir = inputDir
+
+                    project.task(taskName, dependsOn: 'classes', type: JavaExec) {
+                        inputs.dir inputDir
+                        outputs.dir outputDir
                         classpath = project.files(project.configurations.retrolambdaConfig)
                         main = 'net.orfjackal.retrolambda.Main'
                         jvmArgs = [
                                 "-Dretrolambda.inputDir=$inputDir",
+                                "-Dretrolambda.outputDir=$outputDir",
                                 "-Dretrolambda.classpath=$retroClasspath",
                                 "-Dretrolambda.bytecodeVersion=${project.retrolambda.bytecodeVersion}",
                                 "-javaagent:${classpath.getAsPath()}"
                         ]
+                    }
+
+                    // Set the output dir back so subsequent tasks use it
+                    project.tasks.getByName("classes").doLast {
+                        set.output.classesDir = outputDir
                     }
                 }
             }

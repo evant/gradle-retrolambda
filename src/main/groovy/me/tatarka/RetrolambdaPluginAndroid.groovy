@@ -25,24 +25,37 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
 
             project.android.applicationVariants.each { var ->
                 if (project.retrolambda.isIncluded(var.name)) {
-                    def inputDir = var.javaCompile.destinationDir
-                    def retroClasspath = CollectionUtils.join(File.pathSeparator,
-                            (var.javaCompile.classpath + project.files(var.javaCompile.destinationDir) + project.files(androidJar)).files)
                     def name = var.name.capitalize()
+
+                    def inputDir = "$project.buildDir/retrolambda/$var.name"
+                    def outputDir = var.javaCompile.destinationDir
+
+                    def retroClasspath = CollectionUtils.join(File.pathSeparator,
+                            (var.javaCompile.classpath + project.files(inputDir) + project.files(androidJar)).files)
+
+                    var.javaCompile.destinationDir = project.file(inputDir)
 
                     var.javaCompile.sourceCompatibility = "1.8"
                     var.javaCompile.targetCompatibility = "1.8"
                     var.javaCompile.options.compilerArgs += ["-bootclasspath", "$jarPath/android.jar"]
 
                     project.task("compileRetrolambda${name}", dependsOn: ["compile${name}Java", "patchAndroidJar"], type: JavaExec) {
+                        inputs.dir inputDir
+                        outputs.dir outputDir
                         classpath = project.files(project.configurations.retrolambdaConfig)
                         main = 'net.orfjackal.retrolambda.Main'
                         jvmArgs = [
                                 "-Dretrolambda.inputDir=$inputDir",
+                                "-Dretrolambda.outputDir=$outputDir",
                                 "-Dretrolambda.classpath=$retroClasspath",
                                 "-Dretrolambda.bytecodeVersion=${project.retrolambda.bytecodeVersion}",
                                 "-javaagent:${classpath.asPath}"
                         ]
+                    }
+
+                    // Set the output dir back so subsequent tasks use it
+                    project.tasks.getByName("compile${name}Java").doLast {
+                        var.javaCompile.destinationDir = outputDir
                     }
 
                     project.tasks.getByName("dex${name}").dependsOn("compileRetrolambda${name}")
