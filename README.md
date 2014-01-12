@@ -51,7 +51,7 @@ You can add a block like the following to configure the plugin:
 retrolambda {
   compile "net.orfjackal.retrolambda:retrolambda:1.1.0"
   jdk System.getenv("JAVA_HOME")
-  javaVersion 6
+  javaVersion JavaVersion.VERSION_1_6
 }
 ```
 
@@ -72,6 +72,18 @@ Android Studio Setup
 Luckily Android Studio already has built-in lambda support! Enable it for your
 android project by going to `File -> Project Structure -> Project` and selecting
 `8.0 - Lambdas, type annotations etc.` under `Project language level`.
+
+You should also add these lines to you `build.gradle` so it doesn't try to change
+the language level on you when you refresh.
+
+```groovy
+android {
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+}
+```
 
 What Black Magic did you use to get this to work on Android?
 ------------------------------------------------------------
