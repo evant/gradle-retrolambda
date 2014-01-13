@@ -36,10 +36,10 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                     def name = set.name.capitalize()
                     def inputDir = "$project.buildDir/retrolambda/$set.name"
                     def outputDir = set.output.classesDir
-                    def retroClasspath = set.runtimeClasspath.getAsPath()
                     def taskName = "compileRetrolambda$name"
 
                     set.output.classesDir = inputDir
+                    def retroClasspath = set.runtimeClasspath.getAsPath()
 
                     project.task(taskName, dependsOn: 'classes', type: JavaExec) {
                         inputs.dir inputDir
