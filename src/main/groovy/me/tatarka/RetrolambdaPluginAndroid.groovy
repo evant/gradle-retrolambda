@@ -34,28 +34,28 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
     void apply(Project project) {
         project.afterEvaluate {
             def sdkDir = project.android.plugin.sdkDirectory
-            def androidJar = "$sdkDir/platforms/${project.android.compileSdkVersion}/android.jar"
+            def androidJar = "$sdkDir/platforms/$project.android.compileSdkVersion/android.jar"
 
-            def buildPath = "${project.buildDir}/retrolambda"
-            def jarPath = "$buildPath/${project.android.compileSdkVersion}"
+            def buildPath = "$project.buildDir/retrolambda"
+            def jarPath = "$buildPath/$project.android.compileSdkVersion"
+
 
             project.android.applicationVariants.each { var ->
                 if (project.retrolambda.isIncluded(var.name)) {
                     def name = var.name.capitalize()
 
-                    def inputDir = "$project.buildDir/retrolambda/$var.name"
+                    def inputDir = "$buildPath/$var.name"
                     def outputDir = var.javaCompile.destinationDir
 
                     def retroClasspath = CollectionUtils.join(File.pathSeparator,
                             (var.javaCompile.classpath + project.files(inputDir) + project.files(androidJar)).files)
-
                     var.javaCompile.destinationDir = project.file(inputDir)
 
                     var.javaCompile.sourceCompatibility = "1.8"
                     var.javaCompile.targetCompatibility = "1.8"
                     var.javaCompile.options.compilerArgs += ["-bootclasspath", "$jarPath/android.jar"]
 
-                    project.task("compileRetrolambda${name}", dependsOn: ["compile${name}Java", "patchAndroidJar"], type: JavaExec) {
+                    project.task("compileRetrolambda${name}", dependsOn: ["compile${name}Java"], type: JavaExec) {
                         inputs.dir inputDir
                         outputs.dir outputDir
                         classpath = project.files(project.configurations.retrolambdaConfig)
@@ -72,40 +72,47 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     // Set the output dir back so subsequent tasks use it
                     project.tasks.getByName("compile${name}Java").doLast {
                         var.javaCompile.destinationDir = outputDir
-                    }
+                    }.dependsOn("patchAndroidJar")
 
                     project.tasks.getByName("dex${name}").dependsOn("compileRetrolambda${name}")
                 }
             }
 
-            project.task('patchAndroidJar') {
-                def rt = "${project.retrolambda.jdk}/jre/lib/rt.jar"
-
+            project.task("patchAndroidJar") {
+                def rt = "$project.retrolambda.jdk/jre/lib/rt.jar"
+                def classesPath = "$buildPath/classes"
                 def jdkPathError = " does not exist, make sure that JAVE_HOME or retrolambda.jdk points to a valid version of java8\n You can download java8 from https://jdk8.java.net/download.html"
 
-                project.copy {
-                    from project.file(androidJar)
-                    into project.file(jarPath)
-                }
+                inputs.dir androidJar
+                inputs.dir rt
+                outputs.dir jarPath
+                outputs.dir classesPath
 
-                if (!project.file(rt).exists()) {
-                    throw new RuntimeException(rt + jdkPathError)
-                }
-
-                project.copy {
-                    from(project.zipTree(project.file(rt))) {
-                        include("java/lang/invoke/**/*.class")
+                doLast {
+                    project.copy {
+                        from project.file(androidJar)
+                        into project.file(jarPath)
                     }
 
-                    into project.file("$buildPath/classes")
-                }
+                    if (!project.file(rt).exists()) {
+                        throw new RuntimeException(rt + jdkPathError)
+                    }
 
-                if (!project.file("$buildPath/classes").isDirectory()) {
-                    throw new RuntimeException("$buildPath/classes" + jdkPathError)
-                }
+                    project.copy {
+                        from(project.zipTree(project.file(rt))) {
+                            include("java/lang/invoke/**/*.class")
+                        }
 
-                project.ant.jar(update: true, destFile: "$jarPath/android.jar") {
-                    fileset(dir: "$buildPath/classes")
+                        into project.file(classesPath)
+                    }
+
+                    if (!project.file(classesPath).isDirectory()) {
+                        throw new RuntimeException("$buildPath/classes" + jdkPathError)
+                    }
+
+                    project.ant.jar(update: true, destFile: "$jarPath/android.jar") {
+                        fileset(dir: "$buildPath/classes")
+                    }
                 }
             }
         }
