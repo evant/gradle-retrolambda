@@ -19,7 +19,9 @@ package me.tatarka
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.util.CollectionUtils
 
 /**
@@ -39,6 +41,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             def buildPath = "$project.buildDir/retrolambda"
             def jarPath = "$buildPath/$project.android.compileSdkVersion"
 
+            def compileTasks = project.tasks.withType(JavaCompile.class);
 
             project.android.applicationVariants.each { var ->
                 if (project.retrolambda.isIncluded(var.name)) {
@@ -46,6 +49,11 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
 
                     def inputDir = "$buildPath/$var.name"
                     def outputDir = var.javaCompile.destinationDir
+
+                    def compileTask = compileTasks.findAll {it.name.startsWith ("compile${name}")}.findResult {(JavaCompile)it}
+                    if(compileTask == null) {
+                        throw new ProjectConfigurationException("Retrolambda: Can't find task matching following pattern 'compile${name}*'",null)
+                    }
 
                     def retroClasspath = CollectionUtils.join(File.pathSeparator,
                             (var.javaCompile.classpath + project.files(inputDir) + project.files(androidJar)).files)
@@ -55,7 +63,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     var.javaCompile.targetCompatibility = "1.8"
                     var.javaCompile.options.compilerArgs += ["-bootclasspath", "$jarPath/android.jar"]
 
-                    project.task("compileRetrolambda${name}", dependsOn: ["compile${name}Java"], type: JavaExec) {
+                    project.task("compileRetrolambda${name}", dependsOn: [compileTask], type: JavaExec) {
                         inputs.dir inputDir
                         outputs.dir outputDir
                         classpath = project.files(project.configurations.retrolambdaConfig)
@@ -70,7 +78,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     }
 
                     // Set the output dir back so subsequent tasks use it
-                    project.tasks.getByName("compile${name}Java").doLast {
+                    compileTask.doLast {
                         var.javaCompile.destinationDir = outputDir
                     }.dependsOn("patchAndroidJar")
 
