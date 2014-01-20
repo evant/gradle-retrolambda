@@ -51,8 +51,9 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     def outputDir = var.javaCompile.destinationDir
 
                     def compileTask = compileTasks.findAll {it.name.startsWith ("compile${name}")}.findResult {(JavaCompile)it}
+                    System.out.println("depend on task: " + compileTask.name)
                     if(compileTask == null) {
-                        throw new ProjectConfigurationException("Retrolambda: Can't find task matching following pattern 'compile${name}*'",null)
+                        throw new ProjectConfigurationException("Retrolambda: Can't find task matching following pattern 'compile${name}*'", null)
                     }
 
                     def retroClasspath = CollectionUtils.join(File.pathSeparator,
@@ -103,7 +104,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     }
 
                     if (!project.file(rt).exists()) {
-                        throw new RuntimeException(rt + jdkPathError)
+                        throw new ProjectConfigurationException("Retrolambda: " + rt + jdkPathError, null)
                     }
 
                     project.copy {
@@ -115,7 +116,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     }
 
                     if (!project.file(classesPath).isDirectory()) {
-                        throw new RuntimeException("$buildPath/classes" + jdkPathError)
+                        throw new ProjectConfigurationException("Retrolambda: " + "$buildPath/classes" + jdkPathError, null)
                     }
 
                     project.ant.jar(update: true, destFile: "$jarPath/android.jar") {
