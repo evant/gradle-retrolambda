@@ -41,7 +41,7 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                     set.output.classesDir = inputDir
                     def retroClasspath = set.runtimeClasspath.getAsPath()
 
-                    project.task(taskName, dependsOn: 'classes', type: JavaExec) {
+                    project.task(taskName, dependsOn: set.classesTaskName, type: JavaExec) {
                         inputs.dir inputDir
                         outputs.dir outputDir
                         classpath = project.files(project.configurations.retrolambdaConfig)
