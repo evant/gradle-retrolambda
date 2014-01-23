@@ -56,7 +56,7 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                     }
 
                     // Set the output dir back so subsequent tasks use it
-                    project.tasks.getByName("classes").doLast {
+                    project.tasks.getByName(set.classesTaskName).doLast {
                         set.output.classesDir = outputDir
                     }
                 }
