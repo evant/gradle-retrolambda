@@ -22,6 +22,8 @@ import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.tasks.JavaExec
 import org.gradle.util.CollectionUtils
 
+import static me.tatarka.RetrolambdaPlugin.isOnJava8
+
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -46,7 +48,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     def inputDir = "$buildPath/$var.name"
                     def outputDir = var.javaCompile.destinationDir
 
-                    System.out.println("depend on task: " +  var.javaCompile.name)
+                    System.out.println("depend on task: " + var.javaCompile.name)
 
                     def retroClasspath = CollectionUtils.join(File.pathSeparator,
                             (var.javaCompile.classpath + project.files(inputDir) + project.files(androidJar)).files)
@@ -57,8 +59,8 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     var.javaCompile.options.compilerArgs += ["-bootclasspath", "$jarPath/android.jar"]
 
                     project.task("compileRetrolambda${name}", dependsOn: [var.javaCompile], type: JavaExec) {
-                        if(!System.properties.'java.version'.startsWith("1.8"))    //todo add regex to check for java> 1.8, convert to double, etc
-                            executable "$project.retrolambda.jdk/bin/java" // running retrolambda from JDK 8
+                        // Ensure retrolambda runs on java8
+                        if (!project.retrolambda.onJava8) executable "$project.retrolambda.jdk/bin/java"
 
                         inputs.dir inputDir
                         outputs.dir outputDir
@@ -79,11 +81,13 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     }.dependsOn("patchAndroidJar")
 
 
-                    if(!System.properties.'java.version'.startsWith("1.8"))// set JDK 8 for compiler task
+                    if (!project.retrolambda.onJava8) {
+                        // Set JDK 8 for compiler task
                         var.javaCompile.doFirst {
-                             var.javaCompile.options.fork = true
+                            var.javaCompile.options.fork = true
                             var.javaCompile.options.forkOptions.executable = "$project.retrolambda.jdk/bin/javac"
                         }
+                    }
 
                     project.tasks.getByName("dex${name}").dependsOn("compileRetrolambda${name}")
                 }

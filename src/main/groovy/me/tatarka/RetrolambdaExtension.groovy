@@ -30,6 +30,7 @@ public class RetrolambdaExtension {
     int bytecodeVersion = 50
     List<String> excludes = []
     List<String> includes = []
+    boolean isOnJava8 = System.properties.'java.version'.startsWith('1.8')
 
     public void exclude(Object... e) {
         excludes.addAll(e.collect {i -> i.toString()})
@@ -67,5 +68,9 @@ public class RetrolambdaExtension {
         if (excludes.isEmpty() && excludes.contains(name)) return false;
         if (includes.isEmpty() && !includes.contains(name)) return false;
         return true
+    }
+
+    public boolean isOnJava8() {
+        return isOnJava8;
     }
 }

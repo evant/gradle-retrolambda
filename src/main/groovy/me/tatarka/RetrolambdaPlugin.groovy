@@ -57,5 +57,4 @@ public class RetrolambdaPlugin implements Plugin<Project> {
             project.tasks.findByName('run').dependsOn('compileRetrolambda')
         }
     }
-
 }
