@@ -19,10 +19,7 @@ package me.tatarka
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
-import org.gradle.api.internal.tasks.compile.CommandLineJavaCompiler
-import org.gradle.api.internal.tasks.compile.DefaultJavaCompileSpec
 import org.gradle.api.tasks.JavaExec
-import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.util.CollectionUtils
 
 /**
