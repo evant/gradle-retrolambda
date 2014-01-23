@@ -19,6 +19,8 @@ package me.tatarka
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.internal.tasks.compile.CommandLineJavaCompiler
+import org.gradle.api.internal.tasks.compile.DefaultJavaCompileSpec
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.util.CollectionUtils
@@ -40,8 +42,6 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             def buildPath = "$project.buildDir/retrolambda"
             def jarPath = "$buildPath/$project.android.compileSdkVersion"
 
-            def compileTasks = project.tasks.withType(JavaCompile.class);
-
             project.android.applicationVariants.each { var ->
                 if (project.retrolambda.isIncluded(var.name)) {
                     def name = var.name.capitalize()
@@ -49,11 +49,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     def inputDir = "$buildPath/$var.name"
                     def outputDir = var.javaCompile.destinationDir
 
-                    def compileTask = compileTasks.findAll {it.name.startsWith ("compile${name}")}.findResult {(JavaCompile)it}
-                    System.out.println("depend on task: " + compileTask.name)
-                    if(compileTask == null) {
-                        throw new ProjectConfigurationException("Retrolambda: Can't find task matching following pattern 'compile${name}*'", null)
-                    }
+                    System.out.println("depend on task: " +  var.javaCompile.name)
 
                     def retroClasspath = CollectionUtils.join(File.pathSeparator,
                             (var.javaCompile.classpath + project.files(inputDir) + project.files(androidJar)).files)
@@ -63,7 +59,10 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     var.javaCompile.targetCompatibility = "1.8"
                     var.javaCompile.options.compilerArgs += ["-bootclasspath", "$jarPath/android.jar"]
 
-                    project.task("compileRetrolambda${name}", dependsOn: [compileTask], type: JavaExec) {
+                    project.task("compileRetrolambda${name}", dependsOn: [var.javaCompile], type: JavaExec) {
+                        if(!System.properties.'java.version'.startsWith("1.8"))    //todo add regex to check for java> 1.8, convert to double, etc
+                            executable "$project.retrolambda.jdk/bin/java" // running retrolambda from JDK 8
+
                         inputs.dir inputDir
                         outputs.dir outputDir
                         classpath = project.files(project.configurations.retrolambdaConfig)
@@ -78,9 +77,16 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     }
 
                     // Set the output dir back so subsequent tasks use it
-                    compileTask.doLast {
+                    var.javaCompile.doLast {
                         var.javaCompile.destinationDir = outputDir
                     }.dependsOn("patchAndroidJar")
+
+
+                    if(!System.properties.'java.version'.startsWith("1.8"))// set JDK 8 for compiler task
+                        var.javaCompile.doFirst {
+                             var.javaCompile.options.fork = true
+                            var.javaCompile.options.forkOptions.executable = "$project.retrolambda.jdk/bin/javac"
+                        }
 
                     project.tasks.getByName("dex${name}").dependsOn("compileRetrolambda${name}")
                 }

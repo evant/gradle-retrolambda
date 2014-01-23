@@ -42,6 +42,8 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                     def retroClasspath = set.runtimeClasspath.getAsPath()
 
                     project.task(taskName, dependsOn: set.classesTaskName, type: JavaExec) {
+                        if(!System.properties.'java.version'.startsWith("1.8"))
+                            executable "$project.retrolambda.jdk/bin/java"  // running retrolambda from JDK 8
                         inputs.dir inputDir
                         outputs.dir outputDir
                         classpath = project.files(project.configurations.retrolambdaConfig)
@@ -59,6 +61,12 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                     project.tasks.getByName(set.classesTaskName).doLast {
                         set.output.classesDir = outputDir
                     }
+
+                    if(!System.properties.'java.version'.startsWith("1.8"))// set JDK 8 for compiler task
+                        project.tasks.getByName(set.compileJavaTaskName).doFirst {
+                            it.options.fork = true
+                            it.options.forkOptions.executable = "$project.retrolambda.jdk/bin/javac"
+                        }
                 }
             }
 
