@@ -56,7 +56,11 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
 
                     project.task("compileRetrolambda${name}", dependsOn: [var.javaCompile], type: JavaExec) {
                         // Ensure retrolambda runs on java8
-                        if (!project.retrolambda.onJava8) executable "$project.retrolambda.jdk/bin/java"
+                        if (!project.retrolambda.onJava8) {
+                            def java = "${project.retrolambda.tryGetJdk()}/bin/java"
+                            if (!new File(java).exists()) throw new ProjectConfigurationException("Cannot find executable: $java", null)
+                            executable java
+                        }
 
                         inputs.dir inputDir
                         outputs.dir outputDir
@@ -80,8 +84,10 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     if (!project.retrolambda.onJava8) {
                         // Set JDK 8 for compiler task
                         var.javaCompile.doFirst {
-                            var.javaCompile.options.fork = true
-                            var.javaCompile.options.forkOptions.executable = "$project.retrolambda.jdk/bin/javac"
+                            it.options.fork = true
+                            def javac = "${project.retrolambda.tryGetJdk()}/bin/javac"
+                            if (!new File(javac).exists()) throw new ProjectConfigurationException("Cannot find executable: $javac", null)
+                            it.options.forkOptions.executable = javac
                         }
                     }
 

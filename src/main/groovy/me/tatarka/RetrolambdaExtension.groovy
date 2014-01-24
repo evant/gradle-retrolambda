@@ -17,6 +17,8 @@
 package me.tatarka
 
 import org.gradle.api.JavaVersion
+import org.gradle.api.ProjectConfigurationException
+
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -26,18 +28,26 @@ import org.gradle.api.JavaVersion
  */
 public class RetrolambdaExtension {
     Object compile = "net.orfjackal.retrolambda:retrolambda:1.1.2"
-    String jdk = System.getenv("JAVA_HOME")
     int bytecodeVersion = 50
     List<String> excludes = []
     List<String> includes = []
     boolean isOnJava8 = System.properties.'java.version'.startsWith('1.8')
 
+    private String jdk = null
+    private String oldJdk = null
+    private boolean oldJdkSet = false
+
+    public RetrolambdaExtension() {
+        jdk = findJdk()
+        oldJdk = findOldJdk()
+    }
+
     public void exclude(Object... e) {
-        excludes.addAll(e.collect {i -> i.toString()})
+        excludes.addAll(e.collect { i -> i.toString() })
     }
 
     public void include(Object... e) {
-        includes.addAll(e.collect {i -> i.toString()})
+        includes.addAll(e.collect { i -> i.toString() })
     }
 
     public void setCompile(Object c) {
@@ -46,6 +56,7 @@ public class RetrolambdaExtension {
 
     public void setBytecodeVersion(int v) {
         bytecodeVersion = v
+        if (!oldJdkSet) oldJdk = findOldJdk()
     }
 
     public void setJavaVersion(JavaVersion v) {
@@ -57,10 +68,38 @@ public class RetrolambdaExtension {
             default:
                 throw new RuntimeException("Unknown java version: $v, only 6 or 7 are accepted")
         }
+        if (!oldJdkSet) oldJdk = findOldJdk()
     }
 
     public void setJdk(String path) {
         jdk = path
+    }
+
+    public String getJdk() {
+        return jdk
+    }
+
+    String tryGetJdk() {
+        if (jdk == null) {
+            throw new ProjectConfigurationException("When running gradle with java 6 or 7, you must set the path to jdk8, either with property retrolambda.jdk or environment variable JAVA8_HOME", null)
+        }
+        return jdk
+    }
+
+    public void setOldJdk(String path) {
+        oldJdk = path
+        oldJdkSet = true
+    }
+
+    public String getOldJdk() {
+        return oldJdk
+    }
+
+    String tryGetOldJdk() {
+        if (oldJdk == null) {
+            throw new ProjectConfigurationException("When running gradle with java 8, you must set the path to the old jdk, either with property retrolambda.oldJdk or environment variable JAVA6_HOME/JAVA7_HOME", null)
+        }
+        return oldJdk
     }
 
     public boolean isIncluded(String name) {
@@ -72,5 +111,25 @@ public class RetrolambdaExtension {
 
     public boolean isOnJava8() {
         return isOnJava8;
+    }
+
+    private String findJdk() {
+        if (isOnJava8) {
+            return System.getenv("JAVA_HOME")
+        } else {
+            return System.getenv("JAVA8_HOME")
+        }
+    }
+
+    private String findOldJdk() {
+        if (!isOnJava8) {
+            return System.getenv("JAVA_HOME")
+        } else {
+            switch (bytecodeVersion) {
+                case 50: return System.getenv("JAVA6_HOME")
+                case 51: return System.getenv("JAVA7_HOME")
+            }
+            return null
+        }
     }
 }

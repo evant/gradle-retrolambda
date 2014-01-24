@@ -18,6 +18,7 @@ package me.tatarka
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.tasks.JavaExec
 
 /**
@@ -43,7 +44,11 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
 
                     project.task(taskName, dependsOn: set.classesTaskName, type: JavaExec) {
                         // Ensure retrolambda runs on java8
-                        if (!project.retrolambda.onJava8) executable "$project.retrolambda.jdk/bin/java"
+                        if (!project.retrolambda.onJava8) {
+                            def java = "${project.retrolambda.tryGetJdk()}/bin/java"
+                            if (!new File(java).exists()) throw new ProjectConfigurationException("Cannot find executable: $java", null)
+                            executable java
+                        }
 
                         inputs.dir inputDir
                         outputs.dir outputDir
@@ -67,7 +72,7 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                         // Set JDK 8 for compiler task
                         project.tasks.getByName(set.compileJavaTaskName).doFirst {
                             it.options.fork = true
-                            it.options.forkOptions.executable = "$project.retrolambda.jdk/bin/javac"
+                            it.options.forkOptions.executable = "${project.retrolambda.tryGetJdk()}/bin/javac"
                         }
                     }
                 }
@@ -75,7 +80,14 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
 
             project.tasks.getByName("jar").dependsOn("compileRetrolambda")
             project.tasks.getByName("javadoc").dependsOn("compileRetrolambda")
-            project.tasks.getByName("test").dependsOn("compileRetrolambda")
+            project.tasks.getByName("test").dependsOn("compileRetrolambda").doFirst {
+                if (project.retrolambda.onJava8) {
+                    //Ensure the tests run on java6/7
+                    def oldJava = "${project.retrolambda.tryGetOldJdk()}/bin/java"
+                    if (!new File(oldJava).exists()) throw new ProjectConfigurationException("Cannot find executable: $oldJava", null)
+                    executable oldJava
+                }
+            }
         }
     }
 }
