@@ -22,8 +22,6 @@ import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.tasks.JavaExec
 import org.gradle.util.CollectionUtils
 
-import static me.tatarka.RetrolambdaPlugin.isOnJava8
-
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -47,8 +45,6 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
 
                     def inputDir = "$buildPath/$var.name"
                     def outputDir = var.javaCompile.destinationDir
-
-                    System.out.println("depend on task: " + var.javaCompile.name)
 
                     def retroClasspath = CollectionUtils.join(File.pathSeparator,
                             (var.javaCompile.classpath + project.files(inputDir) + project.files(androidJar)).files)
