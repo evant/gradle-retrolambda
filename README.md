@@ -20,7 +20,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:1.0'
+         classpath 'me.tatarka:gradle-retrolambda:1.1'
       }
    }
 
@@ -45,16 +45,21 @@ You can add a block like the following to configure the plugin:
 ```groovy
 retrolambda {
   compile "net.orfjackal.retrolambda:retrolambda:1.1.2"
-  jdk System.getenv("JAVA_HOME")
+  jdk System.getenv("JAVA8_HOME")
+  oldJdk System.getenv("JAVA6_HOME")
   javaVersion JavaVersion.VERSION_1_6
 }
 ```
 
 - `compile` Set the path to retrolambda.jar. The default is the one on maven
   central.
-- `jdk` Set the path to the java8 jdk. The default is found using `JAVA_HOME`.
-  This setting is only used for finding the java runtime for android, not for
-  running the java compiler.
+- `jdk` Set the path to the java 8 jdk. The default is found using either
+  `JAVA8_HOME`. If you a running gradle with java 6 or 7, you must have either
+  `JAVA8_HOME` or this property set.
+- `oldJdk` Sets the path to the java 6 or 7 jdk. The default is found using
+  `JAVA6_HOME`/`JAVA7_HOME`. If you are running gradle with java 8 and wish
+  to run unit tests, you must have either `JAVA6_HOME`/`JAVA7_HOME` or this
+  property set. This is so the tests can be run with the correct java version.
 - `javaVersion` Set the java version to compile to. The default is 6. Only 6 or
   7 are accepted.
 - `include 'Debug', 'Release'` Sets which sets/variants to run through
@@ -92,3 +97,12 @@ plugin:
 2. Extracts the necessary files out of the java runtime (rt.jar), and patches
 android.jar with them.
 3. Sets `-bootclasspath` to point to the patched android.jar
+
+Updates
+-------
+
+### 1.1
+- Fixed bug where java unit tests were not being run through retrolambda
+- Allow gradle to be called with java 6 or 7, i.e. Java 8 no longer has to be 
+  your default java.
+- Thank you Mart-Bogdan for starting these fixes
