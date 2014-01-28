@@ -21,6 +21,8 @@ import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.tasks.JavaExec
 
+import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
+
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -46,7 +48,7 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                         // Ensure retrolambda runs on java8
                         if (!project.retrolambda.onJava8) {
                             def java = "${project.retrolambda.tryGetJdk()}/bin/java"
-                            if (!new File(java).exists()) throw new ProjectConfigurationException("Cannot find executable: $java", null)
+                            if (!checkIfExecutableExists(java)) throw new ProjectConfigurationException("Cannot find executable: $java", null)
                             executable java
                         }
 
@@ -84,7 +86,7 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                 if (project.retrolambda.onJava8) {
                     //Ensure the tests run on java6/7
                     def oldJava = "${project.retrolambda.tryGetOldJdk()}/bin/java"
-                    if (!new File(oldJava).exists()) throw new ProjectConfigurationException("Cannot find executable: $oldJava", null)
+                    if (!checkIfExecutableExists(oldJava)) throw new ProjectConfigurationException("Cannot find executable: $oldJava", null)
                     executable oldJava
                 }
             }

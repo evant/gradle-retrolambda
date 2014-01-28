@@ -57,4 +57,13 @@ public class RetrolambdaPlugin implements Plugin<Project> {
             project.tasks.findByName('run').dependsOn('compileRetrolambda')
         }
     }
+
+    /**
+     * Checks if executable file exists, in MS Windows executables has suffix `.exe'
+     * @param file
+     * @return
+     */
+    static String checkIfExecutableExists(String file){
+        new File(file).exists()||new File(file+'.exe').exists()
+    }
 }
