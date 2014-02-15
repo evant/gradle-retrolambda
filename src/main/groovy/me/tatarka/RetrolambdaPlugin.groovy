@@ -49,7 +49,7 @@ public class RetrolambdaPlugin implements Plugin<Project> {
             project.apply plugin: RetrolambdaPluginJava
         }
 
-        if (project.plugins.hasPlugin('android')) {
+        if (project.plugins.hasPlugin('android') || project.plugins.hasPlugin('android-library')) {
             project.apply plugin: RetrolambdaPluginAndroid
         }
 
