@@ -20,7 +20,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:1.1.1'
+         classpath 'me.tatarka:gradle-retrolambda:1.2.0'
       }
    }
 
