@@ -43,13 +43,14 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
 
             def isLibrary = project.plugins.hasPlugin('android-library')
 
-            def variants = isLibrary ?
+            def variants = (isLibrary ?
                     project.android.libraryVariants :
-                    project.android.applicationVariants
+                    project.android.applicationVariants) + project.android.testVariants
 
             variants.each { var ->
                 if (project.retrolambda.isIncluded(var.name)) {
                     def name = var.name.capitalize()
+                    def isTest = var.name.endsWith('Test')
 
                     def inputDir = "$buildPath/$var.name"
                     def outputDir = var.javaCompile.destinationDir
@@ -99,7 +100,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         }
                     }
 
-                    def runBefore = isLibrary ? "bundle${name}" : "dex${name}"
+                    def runBefore = (isLibrary && !isTest) ? "bundle${name}" : "dex${name}"
                     project.tasks.getByName(runBefore).dependsOn("compileRetrolambda${name}")
                 }
             }
