@@ -20,7 +20,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:1.2.0'
+         classpath 'me.tatarka:gradle-retrolambda:1.3.0'
       }
    }
 
@@ -113,3 +113,6 @@ Updates
 
 ### 1.2.0
 - Support android-library projects
+
+### 1.3.0
+- Support android instrument tests
