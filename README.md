@@ -23,7 +23,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:1.2-SNAPSHOT'
+         classpath 'me.tatarka:gradle-retrolambda:1.3-SNAPSHOT'
       }
    }
 
@@ -113,3 +113,9 @@ Updates
 ### 1.1.1
 - Fixed not correctly finding java 8 executable when running from java 6 or 7 on
   windows. (Mart-Bogdan)
+
+### 1.2.0
+- Support android-library projects
+
+### 1.3.0
+- Support android instrument tests
