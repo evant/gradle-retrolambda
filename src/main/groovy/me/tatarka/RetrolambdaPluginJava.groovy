@@ -15,15 +15,12 @@
  */
 
 package me.tatarka
-
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
-import org.gradle.api.logging.LogLevel
-import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.SourceSet
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
-
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -35,42 +32,24 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.afterEvaluate {
-            project.sourceSets.all { set ->
+            project.sourceSets.all { SourceSet set ->
                 if (project.retrolambda.isIncluded(set.name)) {
                     def name = set.name.capitalize()
-                    def inputDir = "$project.buildDir/retrolambda/$set.name"
-                    def outputDir = set.output.classesDir
                     def taskName = "compileRetrolambda$name"
+                    def oldOutputDir = set.output.classesDir
 
-                    set.output.classesDir = inputDir
-                    def retroClasspath = set.runtimeClasspath.getAsPath()
+                    set.output.classesDir = "$project.buildDir/retrolambda/$set.name"
 
-                    project.task(taskName, dependsOn: set.classesTaskName, type: JavaExec) {
-                        // Ensure retrolambda runs on java8
-                        if (!project.retrolambda.onJava8) {
-                            def java = "${project.retrolambda.tryGetJdk()}/bin/java"
-                            if (!checkIfExecutableExists(java)) throw new ProjectConfigurationException("Cannot find executable: $java", null)
-                            executable java
-                        }
-
-                        inputs.dir inputDir
-                        outputs.dir outputDir
-                        classpath = project.files(project.configurations.retrolambdaConfig)
-                        main = 'net.orfjackal.retrolambda.Main'
-                        jvmArgs = [
-                                "-Dretrolambda.inputDir=$inputDir",
-                                "-Dretrolambda.outputDir=$outputDir",
-                                "-Dretrolambda.classpath=$retroClasspath",
-                                "-Dretrolambda.bytecodeVersion=${project.retrolambda.bytecodeVersion}",
-                                "-javaagent:${classpath.getAsPath()}"
-                        ]
-
-                        logging.captureStandardOutput(LogLevel.INFO)
+                    project.task(taskName, dependsOn: set.classesTaskName, type: RetrolambdaTask) {
+                        inputDir = set.output.classesDir
+                        outputDir = oldOutputDir
+                        classpath = set.compileClasspath + project.files(set.output.classesDir)
+                        javaVersion = project.retrolambda.javaVersion
                     }
 
                     // Set the output dir back so subsequent tasks use it
                     project.tasks.getByName(set.classesTaskName).doLast {
-                        set.output.classesDir = outputDir
+                        set.output.classesDir = oldOutputDir
                     }
 
                     if (!project.retrolambda.onJava8) {

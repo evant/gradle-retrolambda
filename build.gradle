@@ -13,6 +13,7 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
     compile 'com.android.tools.build:gradle:0.8+'
+    compile 'net.orfjackal.retrolambda:retrolambda:1.3.0'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {

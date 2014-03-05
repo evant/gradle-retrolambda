@@ -15,16 +15,11 @@
  */
 
 package me.tatarka
-
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
-import org.gradle.api.logging.LogLevel
-import org.gradle.api.tasks.JavaExec
-import org.gradle.util.CollectionUtils
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
-
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -66,44 +61,27 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                 if (project.retrolambda.isIncluded(var.name)) {
                     def name = var.name.capitalize()
                     def isTest = var.name.endsWith('Test')
+                    def oldDestDir = var.javaCompile.destinationDir
+                    def classpathFiles =
+                            var.javaCompile.classpath +
+                                    project.files("$buildPath/$var.name") +
+                                    project .files(androidJar)
 
-                    def inputDir = "$buildPath/$var.name"
-                    def outputDir = var.javaCompile.destinationDir
-
-                    def retroClasspath = CollectionUtils.join(File.pathSeparator,
-                            (var.javaCompile.classpath + project.files(inputDir) + project.files(androidJar)).files)
-                    var.javaCompile.destinationDir = project.file(inputDir)
-
+                    var.javaCompile.destinationDir = project.file("$buildPath/$var.name")
                     var.javaCompile.sourceCompatibility = "1.8"
                     var.javaCompile.targetCompatibility = "1.8"
                     var.javaCompile.options.compilerArgs += ["-bootclasspath", "$jarPath/android.jar"]
 
-                    project.task("compileRetrolambda${name}", dependsOn: [var.javaCompile], type: JavaExec) {
-                        // Ensure retrolambda runs on java8
-                        if (!project.retrolambda.onJava8) {
-                            def java = "${project.retrolambda.tryGetJdk()}/bin/java"
-                            if (!checkIfExecutableExists(java)) throw new ProjectConfigurationException("Cannot find executable: $java", null)
-                            executable java
-                        }
-
-                        inputs.dir inputDir
-                        outputs.dir outputDir
-                        classpath = project.files(project.configurations.retrolambdaConfig)
-                        main = 'net.orfjackal.retrolambda.Main'
-                        jvmArgs = [
-                                "-Dretrolambda.inputDir=$inputDir",
-                                "-Dretrolambda.outputDir=$outputDir",
-                                "-Dretrolambda.classpath=$retroClasspath",
-                                "-Dretrolambda.bytecodeVersion=${project.retrolambda.bytecodeVersion}",
-                                "-javaagent:${classpath.asPath}"
-                        ]
-
-                        logging.captureStandardOutput(LogLevel.INFO)
+                    project.task("compileRetrolambda${name}", dependsOn: [var.javaCompile],  type: RetrolambdaTask) {
+                        inputDir = project.file("$buildPath/$var.name")
+                        outputDir = oldDestDir
+                        classpath = classpathFiles
+                        javaVersion = project.retrolambda.javaVersion
                     }
 
                     // Set the output dir back so subsequent tasks use it
                     var.javaCompile.doLast {
-                        var.javaCompile.destinationDir = outputDir
+                        var.javaCompile.destinationDir = oldDestDir
                     }.dependsOn("patchAndroidJar")
 
 

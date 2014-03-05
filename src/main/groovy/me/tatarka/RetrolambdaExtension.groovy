@@ -19,6 +19,8 @@ package me.tatarka
 import org.gradle.api.JavaVersion
 import org.gradle.api.ProjectConfigurationException
 
+import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
+
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -55,15 +57,15 @@ public class RetrolambdaExtension {
     }
 
     public void setJavaVersion(JavaVersion v) {
-        switch (v.majorVersion) {
-            case '6': bytecodeVersion = 50
-                break
-            case '7': bytecodeVersion = 51
-                break
-            default:
-                throw new RuntimeException("Unknown java version: $v, only 6 or 7 are accepted")
-        }
+        bytecodeVersion = javaVersionToBytecode(v)
         if (!oldJdkSet) oldJdk = findOldJdk()
+    }
+
+    public JavaVersion getJavaVersion() {
+        switch (bytecodeVersion) {
+            case 50: return JavaVersion.VERSION_1_6
+            case 51: return JavaVersion.VERSION_1_7
+        }
     }
 
     public void setJdk(String path) {
