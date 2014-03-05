@@ -19,6 +19,7 @@ package me.tatarka
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.JavaExec
 import org.gradle.util.CollectionUtils
 
@@ -82,6 +83,8 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                                 "-Dretrolambda.bytecodeVersion=${project.retrolambda.bytecodeVersion}",
                                 "-javaagent:${classpath.asPath}"
                         ]
+
+                        logging.captureStandardOutput(LogLevel.INFO)
                     }
 
                     // Set the output dir back so subsequent tasks use it

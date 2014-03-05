@@ -19,6 +19,7 @@ package me.tatarka
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.JavaExec
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
@@ -63,6 +64,8 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                                 "-Dretrolambda.bytecodeVersion=${project.retrolambda.bytecodeVersion}",
                                 "-javaagent:${classpath.getAsPath()}"
                         ]
+
+                        logging.captureStandardOutput(LogLevel.INFO)
                     }
 
                     // Set the output dir back so subsequent tasks use it
