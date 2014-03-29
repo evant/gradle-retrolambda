@@ -136,4 +136,4 @@ Updates
 ### 1.3.1
 - Removed `compile` property, which didn't work anyway. Use `retrolambdaConfig`
   instead.
-- Minor error message improvment.
+- Minor error message improvement.
