@@ -9,7 +9,7 @@ Luontola.
 Usage
 ----
 
-1. Download openjdk8 early access from https://jdk8.java.net/download.html
+1. Download [jdk8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
 
 2. Add the following to your build.gradle
 
@@ -40,8 +40,8 @@ Usage
 The plugin will compile the source code with java8 and then replace the class
 files with the output of retrolambda.
 
-Configuation
-------------
+Configuration
+-------------
 
 You can add a block like the following to configure the plugin:
 
