@@ -71,13 +71,13 @@ retrolambda {
 ### Using a Different Version of the retrolambda.jar
 
 The default version of retrolambda used is
-`'net.orfjackal.retrolambda:retrolambda:1.1.2'`. If you want to use a different
+`'net.orfjackal.retrolambda:retrolambda:1.1.4'`. If you want to use a different
 one, you can configure it in your dependencies.
 
 ```groovy
 dependencies {
-  // Newer one on maven central
-  retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:1.1.4'
+  // Latest one on maven central
+  retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:1.+'
   // Or a local version
   // retrolambdaConfig files('libs/retrolambda.jar')
 }
