@@ -121,14 +121,19 @@ Updates
 - Fixed bug where java unit tests were not being run through retrolambda
 - Allow gradle to be called with java 6 or 7, i.e. Java 8 no longer has to be 
   your default java.
-- Thank you Mart-Bogdan for starting these fixes
+- Thank you Mart-Bogdan for starting these fixes.
 
 ### 1.1.1
 - Fixed not correctly finding java 8 executable when running from java 6 or 7 on
   windows. (Mart-Bogdan)
 
 ### 1.2.0
-- Support android-library projects
+- Support android-library projects.
 
 ### 1.3.0
-- Support android instrument tests
+- Support android instrument tests.
+
+### 1.3.1
+- Removed `compile` property, which didn't work anyway. Use `retrolambdaConfig`
+  instead.
+- Minor error message improvment.
