@@ -53,13 +53,14 @@ retrolambda {
 }
 ```
 
-- `jdk` Set the path to the java 8 jdk. The default is found using either
-  `JAVA8_HOME`. If you a running gradle with java 6 or 7, you must have either
-  `JAVA8_HOME` or this property set.
-- `oldJdk` Sets the path to the java 6 or 7 jdk. The default is found using
-  `JAVA6_HOME`/`JAVA7_HOME`. If you are running gradle with java 8 and wish
-  to run unit tests, you must have either `JAVA6_HOME`/`JAVA7_HOME` or this
-  property set. This is so the tests can be run with the correct java version.
+- `jdk` Set the path to the java 8 jdk. The default is found using the
+  environment variable `JAVA8_HOME`. If you a running gradle with java 6 or 7,
+  you must have either `JAVA8_HOME` or this property set.
+- `oldJdk` Sets the path to the java 6 or 7 jdk. The default is found using the
+  environment variable `JAVA6_HOME`/`JAVA7_HOME`. If you are running gradle with
+  java 8 and wish to run unit tests, you must have either
+  `JAVA6_HOME`/`JAVA7_HOME` or this property set. This is so the tests can be
+  run with the correct java version.
 - `javaVersion` Set the java version to compile to. The default is 6. Only 6 or
   7 are accepted.
 - `include 'Debug', 'Release'` Sets which sets/variants to run through
@@ -69,8 +70,9 @@ retrolambda {
 
 ### Using a Different Version of the retrolambda.jar
 
-The default version of retrolambda used is 'net.orfjackal.retrolambda:retrolambda:1.1.2'. If you
-want to use a different one, you can configure it in your dependencies.
+The default version of retrolambda used is
+`'net.orfjackal.retrolambda:retrolambda:1.1.2'`. If you want to use a different
+one, you can configure it in your dependencies.
 
 ```groovy
 dependencies {
