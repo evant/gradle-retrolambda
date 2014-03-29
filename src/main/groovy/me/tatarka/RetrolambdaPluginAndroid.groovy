@@ -19,6 +19,7 @@ package me.tatarka
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.JavaExec
 import org.gradle.util.CollectionUtils
 
@@ -82,6 +83,8 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                                 "-Dretrolambda.bytecodeVersion=${project.retrolambda.bytecodeVersion}",
                                 "-javaagent:${classpath.asPath}"
                         ]
+
+                        logging.captureStandardOutput(LogLevel.INFO)
                     }
 
                     // Set the output dir back so subsequent tasks use it
@@ -108,7 +111,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             project.task("patchAndroidJar") {
                 def rt = "$project.retrolambda.jdk/jre/lib/rt.jar"
                 def classesPath = "$buildPath/classes"
-                def jdkPathError = " does not exist, make sure that JAVE_HOME or retrolambda.jdk points to a valid version of java8\n You can download java8 from https://jdk8.java.net/download.html"
+                def jdkPathError = " does not exist, make sure that the environment variable JAVA_HOME or JAVA8_HOME, or the gradle property retrolambda.jdk points to a valid version of java8."
 
                 inputs.dir androidJar
                 inputs.dir rt

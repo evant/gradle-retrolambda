@@ -9,7 +9,7 @@ Luontola.
 Usage
 ----
 
-1. Download openjdk8 early access from https://jdk8.java.net/download.html
+1. Download [jdk8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
 
 2. Add the following to your build.gradle
 
@@ -20,7 +20,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:1.3.0'
+         classpath 'me.tatarka:gradle-retrolambda:1.3.1'
       }
    }
 
@@ -37,35 +37,48 @@ Usage
 The plugin will compile the source code with java8 and then replace the class
 files with the output of retrolambda.
 
-Configuation
-------------
+Configuration
+-------------
 
 You can add a block like the following to configure the plugin:
 
 ```groovy
 retrolambda {
-  compile "net.orfjackal.retrolambda:retrolambda:1.1.2"
   jdk System.getenv("JAVA8_HOME")
   oldJdk System.getenv("JAVA6_HOME")
   javaVersion JavaVersion.VERSION_1_6
 }
 ```
 
-- `compile` Set the path to retrolambda.jar. The default is the one on maven
-  central.
-- `jdk` Set the path to the java 8 jdk. The default is found using either
-  `JAVA8_HOME`. If you a running gradle with java 6 or 7, you must have either
-  `JAVA8_HOME` or this property set.
-- `oldJdk` Sets the path to the java 6 or 7 jdk. The default is found using
-  `JAVA6_HOME`/`JAVA7_HOME`. If you are running gradle with java 8 and wish
-  to run unit tests, you must have either `JAVA6_HOME`/`JAVA7_HOME` or this
-  property set. This is so the tests can be run with the correct java version.
+- `jdk` Set the path to the java 8 jdk. The default is found using the
+  environment variable `JAVA8_HOME`. If you a running gradle with java 6 or 7,
+  you must have either `JAVA8_HOME` or this property set.
+- `oldJdk` Sets the path to the java 6 or 7 jdk. The default is found using the
+  environment variable `JAVA6_HOME`/`JAVA7_HOME`. If you are running gradle with
+  java 8 and wish to run unit tests, you must have either
+  `JAVA6_HOME`/`JAVA7_HOME` or this property set. This is so the tests can be
+  run with the correct java version.
 - `javaVersion` Set the java version to compile to. The default is 6. Only 6 or
   7 are accepted.
 - `include 'Debug', 'Release'` Sets which sets/variants to run through
   retrolambda. The default is all of them.
 - `exclude 'Test'` Sets which sets/variants to not run through retrolambda. Only
   one of either `include` or `exclude` should be defined.
+
+### Using a Different Version of the retrolambda.jar
+
+The default version of retrolambda used is
+`'net.orfjackal.retrolambda:retrolambda:1.1.4'`. If you want to use a different
+one, you can configure it in your dependencies.
+
+```groovy
+dependencies {
+  // Latest one on maven central
+  retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:1.+'
+  // Or a local version
+  // retrolambdaConfig files('libs/retrolambda.jar')
+}
+```
 
 Android Studio Setup
 --------------------
@@ -105,14 +118,19 @@ Updates
 - Fixed bug where java unit tests were not being run through retrolambda
 - Allow gradle to be called with java 6 or 7, i.e. Java 8 no longer has to be 
   your default java.
-- Thank you Mart-Bogdan for starting these fixes
+- Thank you Mart-Bogdan for starting these fixes.
 
 ### 1.1.1
 - Fixed not correctly finding java 8 executable when running from java 6 or 7 on
   windows. (Mart-Bogdan)
 
 ### 1.2.0
-- Support android-library projects
+- Support android-library projects.
 
 ### 1.3.0
-- Support android instrument tests
+- Support android instrument tests.
+
+### 1.3.1
+- Removed `compile` property, which didn't work anyway. Use `retrolambdaConfig`
+  instead.
+- Minor error message improvement.

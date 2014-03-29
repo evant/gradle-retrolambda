@@ -27,7 +27,6 @@ import org.gradle.api.ProjectConfigurationException
  * To change this template use File | Settings | File Templates.
  */
 public class RetrolambdaExtension {
-    Object compile = "net.orfjackal.retrolambda:retrolambda:1.1.2"
     int bytecodeVersion = 50
     List<String> excludes = []
     List<String> includes = []
@@ -48,10 +47,6 @@ public class RetrolambdaExtension {
 
     public void include(Object... e) {
         includes.addAll(e.collect { i -> i.toString() })
-    }
-
-    public void setCompile(Object c) {
-        compile = c
     }
 
     public void setBytecodeVersion(int v) {
