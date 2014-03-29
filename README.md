@@ -47,15 +47,12 @@ You can add a block like the following to configure the plugin:
 
 ```groovy
 retrolambda {
-  compile "net.orfjackal.retrolambda:retrolambda:1.1.2"
   jdk System.getenv("JAVA8_HOME")
   oldJdk System.getenv("JAVA6_HOME")
   javaVersion JavaVersion.VERSION_1_6
 }
 ```
 
-- `compile` Set the path to retrolambda.jar. The default is the one on maven
-  central.
 - `jdk` Set the path to the java 8 jdk. The default is found using either
   `JAVA8_HOME`. If you a running gradle with java 6 or 7, you must have either
   `JAVA8_HOME` or this property set.
@@ -69,6 +66,20 @@ retrolambda {
   retrolambda. The default is all of them.
 - `exclude 'Test'` Sets which sets/variants to not run through retrolambda. Only
   one of either `include` or `exclude` should be defined.
+
+### Using a Different Version of the retrolambda.jar
+
+The default version of retrolambda used is 'net.orfjackal.retrolambda:retrolambda:1.1.2'. If you
+want to use a different one, you can configure it in your dependencies.
+
+```groovy
+dependencies {
+  // Newer one on maven central
+  retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:1.1.4'
+  // Or a local version
+  // retrolambdaConfig files('libs/retrolambda.jar')
+}
+```
 
 Android Studio Setup
 --------------------
