@@ -134,3 +134,6 @@ Updates
 - Removed `compile` property, which didn't work anyway. Use `retrolambdaConfig`
   instead.
 - Minor error message improvement.
+
+### 1.3.2
+- Fixed for android gradle plugin `0.10.+`
