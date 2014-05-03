@@ -36,7 +36,21 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.afterEvaluate {
-            def sdkDir = project.android.plugin.sdkDirectory
+            def sdkDir
+
+            Properties properties = new Properties()
+            File localProps = project.rootProject.file('local.properties')
+            if (localProps.exists()) {
+                properties.load(localProps.newDataInputStream())
+                sdkDir = properties.getProperty('sdk.dir')
+            } else {
+                sdkDir = System.getenv('ANDROID_HOME')
+            }
+
+            if (!sdkDir) {
+                throw new ProjectConfigurationException("Cannot find android sdk. Make sure sdk.dir is defined in local.properties or the environment variable ANDROID_HOME is set.", null)
+            }
+
             def androidJar = "$sdkDir/platforms/$project.android.compileSdkVersion/android.jar"
 
             def buildPath = "$project.buildDir/retrolambda"
