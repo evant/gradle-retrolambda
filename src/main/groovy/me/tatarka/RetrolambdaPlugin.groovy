@@ -15,10 +15,12 @@
  */
 
 package me.tatarka
-
+import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-
+import org.gradle.api.plugins.ApplicationPlugin
+import org.gradle.api.plugins.JavaPlugin
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -27,7 +29,7 @@ import org.gradle.api.Project
  * To change this template use File | Settings | File Templates.
  */
 public class RetrolambdaPlugin implements Plugin<Project> {
-    private static def retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:1.1.4"
+    private static def retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:1.3.0"
 
     @Override
     void apply(Project project) {
@@ -47,15 +49,19 @@ public class RetrolambdaPlugin implements Plugin<Project> {
             description = "Converts all java 8 class files to java 6 or 7"
         }
 
-        if (project.plugins.hasPlugin('java')) {
+        project.plugins.withType(JavaPlugin) {
             project.apply plugin: RetrolambdaPluginJava
         }
 
-        if (project.plugins.hasPlugin('android') || project.plugins.hasPlugin('android-library')) {
+        project.plugins.withType(AppPlugin) {
             project.apply plugin: RetrolambdaPluginAndroid
         }
 
-        if (project.plugins.hasPlugin('application')) {
+        project.plugins.withType(LibraryPlugin) {
+            project.apply plugin: RetrolambdaPluginAndroid
+        }
+
+        project.plugins.withType(ApplicationPlugin) {
             project.tasks.findByName('run').dependsOn('compileRetrolambda')
         }
     }

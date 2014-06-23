@@ -12,6 +12,7 @@ version = '1.3-SNAPSHOT'
 dependencies {
     compile gradleApi()
     compile localGroovy()
+    compile 'com.android.tools.build:gradle:0.8+'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
