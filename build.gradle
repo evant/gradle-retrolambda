@@ -7,11 +7,12 @@ repositories {
 }
 
 group = 'me.tatarka'
-version = '1.3.2'
+version = '1.3.3'
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
+    compile 'com.android.tools.build:gradle:0.8+'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
