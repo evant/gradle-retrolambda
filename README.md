@@ -6,6 +6,8 @@ retrolambda, giving you lambda goodness on java 6 or 7. It relies on the
 wonderful [retrolambda](https://github.com/orfjackal/retrolambda) by Esko
 Luontola.
 
+Note: The minimum android gradle plugin is `0.8+`.
+
 Usage
 ----
 
@@ -43,7 +45,12 @@ files with the output of retrolambda.
 Configuration
 -------------
 
-You can add a block like the following to configure the plugin:
+Configuration is entirely optional, the plugin will by default pick up the
+`JAVA6_HOME`/`JAVA7_HOME`/`JAVA8_HOME` environment variables. It's also smart
+enough to figure out what version of java you are running gradle with. For
+example, if you have java8 set as your default, you only need to define
+`JAVA6_HOME`/`JAVA7_HOME`. If you need to though, you can add a block like the
+following to configure the plugin:
 
 ```groovy
 retrolambda {
