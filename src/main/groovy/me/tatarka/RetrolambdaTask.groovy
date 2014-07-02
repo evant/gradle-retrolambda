@@ -38,11 +38,6 @@ class RetrolambdaTask extends DefaultTask {
             if (change.modified) deleteRelated(toOutput(change.file))
         }
 
-        if (!inputs.incremental) {
-          // Ensure directory is cleaned on fresh run
-          outputDir.deleteDir()
-        }
-
         if (!inputs.incremental || !changes.isEmpty()) {
             project.javaexec {
                 // Ensure retrolambda runs on java8
