@@ -15,15 +15,13 @@
  */
 
 package me.tatarka
-
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
-import org.gradle.api.logging.LogLevel
-import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.compile.JavaCompile
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
-
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -35,47 +33,28 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.afterEvaluate {
-            project.sourceSets.all { set ->
+            project.sourceSets.all { SourceSet set ->
                 if (project.retrolambda.isIncluded(set.name)) {
                     def name = set.name.capitalize()
-                    def inputDir = "$project.buildDir/retrolambda/$set.name"
-                    def outputDir = set.output.classesDir
                     def taskName = "compileRetrolambda$name"
+                    def oldOutputDir = set.output.classesDir
+                    def newOutputDir = project.file("$project.buildDir/retrolambda/$set.name")
 
-                    set.output.classesDir = inputDir
-                    def retroClasspath = set.runtimeClasspath.getAsPath()
+                    def compileJavaTask = project.tasks.getByName(set.compileJavaTaskName)
+                    compileJavaTask.destinationDir = newOutputDir
 
-                    project.task(taskName, dependsOn: set.classesTaskName, type: JavaExec) {
-                        // Ensure retrolambda runs on java8
-                        if (!project.retrolambda.onJava8) {
-                            def java = "${project.retrolambda.tryGetJdk()}/bin/java"
-                            if (!checkIfExecutableExists(java)) throw new ProjectConfigurationException("Cannot find executable: $java", null)
-                            executable java
-                        }
-
-                        inputs.dir inputDir
-                        outputs.dir outputDir
-                        classpath = project.files(project.configurations.retrolambdaConfig)
-                        main = 'net.orfjackal.retrolambda.Main'
-                        jvmArgs = [
-                                "-Dretrolambda.inputDir=$inputDir",
-                                "-Dretrolambda.outputDir=$outputDir",
-                                "-Dretrolambda.classpath=$retroClasspath",
-                                "-Dretrolambda.bytecodeVersion=${project.retrolambda.bytecodeVersion}",
-                                "-javaagent:${classpath.getAsPath()}"
-                        ]
-
-                        logging.captureStandardOutput(LogLevel.INFO)
+                    def retrolambdaTask = project.task(taskName, dependsOn: compileJavaTask, type: RetrolambdaTask) {
+                        inputDir = newOutputDir
+                        outputDir = oldOutputDir
+                        classpath = set.compileClasspath + project.files(newOutputDir)
+                        javaVersion = project.retrolambda.javaVersion
                     }
 
-                    // Set the output dir back so subsequent tasks use it
-                    project.tasks.getByName(set.classesTaskName).doLast {
-                        set.output.classesDir = outputDir
-                    }
+                    project.tasks.findByName(set.classesTaskName).dependsOn(retrolambdaTask)
 
                     if (!project.retrolambda.onJava8) {
                         // Set JDK 8 for compiler task
-                        project.tasks.getByName(set.compileJavaTaskName).doFirst {
+                        compileJavaTask.doFirst {
                             it.options.fork = true
                             it.options.forkOptions.executable = "${project.retrolambda.tryGetJdk()}/bin/javac"
                         }
@@ -83,9 +62,7 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                 }
             }
 
-            project.tasks.getByName("jar").dependsOn("compileRetrolambda")
-            project.tasks.getByName("javadoc").dependsOn("compileRetrolambda")
-            project.tasks.getByName("test").dependsOn("compileRetrolambda").doFirst {
+            project.tasks.getByName("test").doFirst {
                 if (project.retrolambda.onJava8) {
                     //Ensure the tests run on java6/7
                     def oldJava = "${project.retrolambda.tryGetOldJdk()}/bin/java"

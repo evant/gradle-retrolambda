@@ -17,6 +17,7 @@
 package me.tatarka
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
+import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ApplicationPlugin
@@ -29,7 +30,7 @@ import org.gradle.api.plugins.JavaPlugin
  * To change this template use File | Settings | File Templates.
  */
 public class RetrolambdaPlugin implements Plugin<Project> {
-    private static def retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:1.3.0"
+    private static def retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:1.4.0"
 
     @Override
     void apply(Project project) {
@@ -73,5 +74,16 @@ public class RetrolambdaPlugin implements Plugin<Project> {
      */
     static String checkIfExecutableExists(String file){
         new File(file).exists()||new File(file+'.exe').exists()
+    }
+
+    static int javaVersionToBytecode(JavaVersion v) {
+        switch (v.majorVersion) {
+            case '6': return 50
+                break
+            case '7': return 51
+                break
+            default:
+                throw new RuntimeException("Unknown java version: $v, only 6 or 7 are accepted")
+        }
     }
 }
