@@ -15,6 +15,8 @@
  */
 
 package me.tatarka
+
+import com.android.build.gradle.api.TestVariant
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
@@ -62,28 +64,37 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     def name = var.name.capitalize()
                     def isTest = var.name.endsWith('Test')
                     def oldDestDir = var.javaCompile.destinationDir
+                    def newDestDir = project.file("$buildPath/$var.name")
                     def classpathFiles =
                             var.javaCompile.classpath +
                                     project.files("$buildPath/$var.name") +
                                     project .files(androidJar)
 
-                    var.javaCompile.destinationDir = project.file("$buildPath/$var.name")
+                    var.javaCompile.destinationDir = newDestDir
                     var.javaCompile.sourceCompatibility = "1.8"
                     var.javaCompile.targetCompatibility = "1.8"
                     var.javaCompile.options.compilerArgs += ["-bootclasspath", "$jarPath/android.jar"]
+                    var.javaCompile.dependsOn("patchAndroidJar")
 
-                    project.task("compileRetrolambda${name}", dependsOn: [var.javaCompile],  type: RetrolambdaTask) {
-                        inputDir = project.file("$buildPath/$var.name")
+                    def retrolambdaTask = project.task("compileRetrolambda${name}", dependsOn: [var.javaCompile],  type: RetrolambdaTask) {
+                        inputDir = newDestDir
                         outputDir = oldDestDir
                         classpath = classpathFiles
                         javaVersion = project.retrolambda.javaVersion
                     }
 
-                    // Set the output dir back so subsequent tasks use it
-                    var.javaCompile.doLast {
-                        var.javaCompile.destinationDir = oldDestDir
-                    }.dependsOn("patchAndroidJar")
+                    if (isLibrary && !(var instanceof TestVariant)) {
+                        var.packageLibrary.dependsOn(retrolambdaTask)
+                    } else {
+                        var.dex.dependsOn(retrolambdaTask)
 
+                        // Dex gets it's input directory from javaCompile. Since we changed it, we
+                        // need to change dex to point back to the original output directory.
+                        def inputFiles = var.dex.inputFiles
+                        inputFiles.remove(newDestDir)
+                        inputFiles.add(oldDestDir)
+                        var.dex.inputFiles = inputFiles
+                    }
 
                     if (!project.retrolambda.onJava8) {
                         // Set JDK 8 for compiler task
@@ -94,9 +105,6 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                             it.options.forkOptions.executable = javac
                         }
                     }
-
-                    def runBefore = (isLibrary && !isTest) ? "bundle${name}" : "dex${name}"
-                    project.tasks.getByName(runBefore).dependsOn("compileRetrolambda${name}")
                 }
             }
 
