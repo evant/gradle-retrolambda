@@ -62,7 +62,7 @@ class RetrolambdaTask extends DefaultTask {
                 ]
 
                 if (inputs.incremental) {
-                    jvmArgs += "-Dretrolambda.changed=${changes*.file.join(File.pathSeparator)}"
+                    jvmArgs += "-Dretrolambda.includedFiles=${changes*.file.join(File.pathSeparator)}"
                 }
 
                 logging.captureStandardOutput(LogLevel.INFO)
