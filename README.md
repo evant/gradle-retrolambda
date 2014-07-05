@@ -122,7 +122,7 @@ Updates
 -------
 
 #### 2.0.0
-- Hooks into gradle's incremental compilcation support. This should mean faster build times and less
+- Hooks into gradle's incremental compilation support. This should mean faster build times and less
   inconsistencies when changing the build script without running `clean`. To fully take advantage of
   this you need to use retrolambda `1.4.0+` which is now the default.
 
