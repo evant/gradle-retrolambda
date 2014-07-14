@@ -19,6 +19,8 @@ package me.tatarka
 import org.gradle.api.JavaVersion
 import org.gradle.api.ProjectConfigurationException
 
+import java.util.regex.Pattern
+
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
 
 /**
@@ -32,6 +34,7 @@ public class RetrolambdaExtension {
     int bytecodeVersion = 50
     List<String> excludes = []
     List<String> includes = []
+    String javaHomeProp = System.properties.'java.home'.toString().split(Pattern.quote(System.properties.'file.separator'.toString() + "jre"))[0]
     boolean isOnJava8 = System.properties.'java.version'.startsWith('1.8')
 
     private String jdk = null
@@ -112,7 +115,11 @@ public class RetrolambdaExtension {
 
     private String findJdk() {
         if (isOnJava8) {
-            return System.getenv("JAVA_HOME")
+            if (javaHomeProp) {
+                return javaHomeProp
+            } else {
+                return System.getenv("JAVA_HOME")
+            }
         } else {
             return System.getenv("JAVA8_HOME")
         }
