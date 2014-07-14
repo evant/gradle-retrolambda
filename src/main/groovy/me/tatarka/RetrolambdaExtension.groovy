@@ -112,7 +112,7 @@ public class RetrolambdaExtension {
 
     private String findJdk() {
         if (isOnJava8) {
-            return System.getenv("JAVA_HOME")
+            return findCurrentJdk()
         } else {
             return System.getenv("JAVA8_HOME")
         }
@@ -120,13 +120,22 @@ public class RetrolambdaExtension {
 
     private String findOldJdk() {
         if (!isOnJava8) {
-            return System.getenv("JAVA_HOME")
+            return findCurrentJdk()
         } else {
             switch (bytecodeVersion) {
                 case 50: return System.getenv("JAVA6_HOME")
                 case 51: return System.getenv("JAVA7_HOME")
             }
             return null
+        }
+    }
+
+    private String findCurrentJdk() {
+        String javaHomeProp = System.properties.'java.home'
+        if (javaHomeProp) {
+            return javaHomeProp.substring(0, javaHomeProp.lastIndexOf("${File.separator}jre"))
+        } else {
+            return System.getenv("JAVA_HOME")
         }
     }
 }
