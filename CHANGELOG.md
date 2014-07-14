@@ -1,3 +1,7 @@
+#### 2.1.0
+- Also check system property 'java.home' for the current java location. IDEs set this but not
+JAVA_HOME, so checking here first is more robust. (aphexcx)
+
 #### 2.0.0
 - Hooks into gradle's incremental compilcation support. This should mean faster build times and less
   inconsistencies when changing the build script without running `clean`. To fully take advantage of
