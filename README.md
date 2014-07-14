@@ -22,7 +22,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:2.0.0'
+         classpath 'me.tatarka:gradle-retrolambda:2.1.0'
       }
    }
 
@@ -75,7 +75,7 @@ retrolambda {
 ### Using a Different Version of the retrolambda.jar
 
 The default version of retrolambda used is
-`'net.orfjackal.retrolambda:retrolambda:1.4.0'`. If you want to use a different
+`'net.orfjackal.retrolambda:retrolambda:1.3.0'`. If you want to use a different
 one, you can configure it in your dependencies.
 
 ```groovy
@@ -122,7 +122,7 @@ Updates
 -------
 
 #### 2.0.0
-- Hooks into gradle's incremental compilation support. This should mean faster build times and less
+- Hooks into gradle's incremental compilcation support. This should mean faster build times and less
   inconsistencies when changing the build script without running `clean`. To fully take advantage of
   this you need to use retrolambda `1.4.0+` which is now the default.
 
