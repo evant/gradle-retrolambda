@@ -86,6 +86,11 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         javaVersion = project.retrolambda.javaVersion
                     }
 
+                    def extractTask = project.tasks.findByName("extract${var.name.capitalize()}Annotations")
+                    if (extractTask != null) {
+                        println(extractTask.classDir)
+                    }
+
                     if (!isLibrary || var instanceof TestVariant) {
                         var.dex.dependsOn(retrolambdaTask)
 
