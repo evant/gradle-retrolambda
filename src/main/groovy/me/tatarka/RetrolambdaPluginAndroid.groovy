@@ -83,6 +83,13 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         jvmArgs = project.retrolambda.jvmArgs
                     }
 
+                    def extractTaskName = "extract${var.name.capitalize()}Annotations"
+                    def extractTask = project.tasks.findByName(extractTaskName)
+                    if (extractTask != null) {
+                        extractTask.deleteAllActions()
+                        project.logger.warn("$extractTaskName is incomaptible with java 8 sources and has been disabled.")
+                    }
+
                     if (!isLibrary || var instanceof TestVariant) {
                         var.dex.dependsOn(retrolambdaTask)
 
