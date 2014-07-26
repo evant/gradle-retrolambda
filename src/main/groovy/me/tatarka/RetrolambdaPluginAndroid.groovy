@@ -15,13 +15,10 @@
  */
 
 package me.tatarka
-
 import com.android.build.gradle.api.TestVariant
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
-import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.tasks.bundling.Jar
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
@@ -65,7 +62,6 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             variants.each { var ->
                 if (project.retrolambda.isIncluded(var.name)) {
                     def name = var.name.capitalize()
-                    def isTest = var.name.endsWith('Test')
                     def oldDestDir = var.javaCompile.destinationDir
                     def newDestDir = project.file("$buildPath/$var.name")
                     def classpathFiles =
@@ -84,11 +80,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         outputDir = oldDestDir
                         classpath = classpathFiles
                         javaVersion = project.retrolambda.javaVersion
-                    }
-
-                    def extractTask = project.tasks.findByName("extract${var.name.capitalize()}Annotations")
-                    if (extractTask != null) {
-                        println(extractTask.classDir)
+                        jvmArgs = project.retrolambda.jvmArgs
                     }
 
                     if (!isLibrary || var instanceof TestVariant) {

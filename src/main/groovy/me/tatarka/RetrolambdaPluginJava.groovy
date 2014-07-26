@@ -19,7 +19,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.tasks.SourceSet
-import org.gradle.api.tasks.compile.JavaCompile
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
 /**
@@ -48,6 +47,7 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                         outputDir = oldOutputDir
                         classpath = set.compileClasspath + project.files(newOutputDir)
                         javaVersion = project.retrolambda.javaVersion
+                        jvmArgs = project.retrolambda.jvmArgs
                     }
 
                     project.tasks.findByName(set.classesTaskName).dependsOn(retrolambdaTask)
