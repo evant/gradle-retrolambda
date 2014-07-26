@@ -29,6 +29,9 @@ class RetrolambdaTask extends DefaultTask {
     @Input
     JavaVersion javaVersion = JavaVersion.VERSION_1_6
 
+    @Input
+    List<String> jvmArgs = []
+
     @TaskAction
     def execute(IncrementalTaskInputs inputs) {
         def changes = []
@@ -64,6 +67,8 @@ class RetrolambdaTask extends DefaultTask {
                 if (inputs.incremental) {
                     jvmArgs += "-Dretrolambda.includedFiles=${changes*.file.join(File.pathSeparator)}"
                 }
+
+                this.jvmArgs.each { arg -> jvmArgs += arg }
 
                 logging.captureStandardOutput(LogLevel.INFO)
             }

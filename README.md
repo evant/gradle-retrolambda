@@ -54,6 +54,7 @@ retrolambda {
   jdk System.getenv("JAVA8_HOME")
   oldJdk System.getenv("JAVA6_HOME")
   javaVersion JavaVersion.VERSION_1_6
+  jvmArgs '-arg1', '-arg2'
 }
 ```
 
@@ -71,6 +72,7 @@ retrolambda {
   retrolambda. The default is all of them.
 - `exclude 'Test'` Sets which sets/variants to not run through retrolambda. Only
   one of either `include` or `exclude` should be defined.
+- `jvmArgs` Add additional jvm args when running retrolambda.
 
 ### Using a Different Version of the retrolambda.jar
 
@@ -102,6 +104,19 @@ android {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
   }
+}
+```
+
+Known Issues
+---------------
+### Using Google Play Services causes retrolambda to fail
+Version `5.0.77` contains bytecode that is incompatible with retrolambda. To work around this issue,
+you can either use an earlier version like `4.4.52` or add `-noverify` to the jvm args. See 
+[orfjackal/retrolambda#25](https://github.com/orfjackal/retrolambda/issues/25) for more information.
+
+```groovy
+retrolambda {
+  jvmArgs '-noverify'
 }
 ```
 

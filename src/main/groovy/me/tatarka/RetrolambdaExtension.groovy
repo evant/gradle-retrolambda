@@ -32,6 +32,7 @@ public class RetrolambdaExtension {
     int bytecodeVersion = 50
     List<String> excludes = []
     List<String> includes = []
+    List<String> jvmArgs = []
     boolean isOnJava8 = System.properties.'java.version'.startsWith('1.8')
 
     private String jdk = null
@@ -49,6 +50,10 @@ public class RetrolambdaExtension {
 
     public void include(Object... e) {
         includes.addAll(e.collect { i -> i.toString() })
+    }
+
+    public void jvmArgs(String... args) {
+        jvmArgs.addAll(args)
     }
 
     public void setBytecodeVersion(int v) {
