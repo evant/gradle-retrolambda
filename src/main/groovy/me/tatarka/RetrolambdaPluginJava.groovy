@@ -39,6 +39,8 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                     def oldOutputDir = set.output.classesDir
                     def newOutputDir = project.file("$project.buildDir/retrolambda/$set.name")
 
+                    newOutputDir.mkdirs()
+
                     def compileJavaTask = project.tasks.getByName(set.compileJavaTaskName)
                     compileJavaTask.destinationDir = newOutputDir
 
