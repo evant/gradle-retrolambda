@@ -1,4 +1,15 @@
+#### 2.2.1
+
+- Ensure output directory is created even if the source set is missing files for the java plugin.
+Otherwise, compiling the source set would error out.
+
+#### 2.2.0
+
+- Added way to add custom jvm arguments when running retrolambda.
+- Disable `extractAnnotations` tasks since they are incompatible with java 8 sources.
+
 #### 2.1.0
+
 - Also check system property 'java.home' for the current java location. IDEs set this but not
 JAVA_HOME, so checking here first is more robust. (aphexcx)
 

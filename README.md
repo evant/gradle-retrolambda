@@ -139,6 +139,11 @@ android.jar with them.
 Updates
 -------
 
+#### 2.2.1
+
+- Ensure output directory is created even if the source set is missing files for the java plugin.
+Otherwise, compiling the source set would error out.
+
 #### 2.2.0
 
 - Added way to add custom jvm arguments when running retrolambda.
