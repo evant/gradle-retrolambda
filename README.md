@@ -139,7 +139,7 @@ Updates
 #### 2.2.2
 
 - Support a `java.home` path that does not end in `/jre`, by using it as it is.
-This is an issue on OSX which may have a different directory structure.
+This is an issue on OSX which may have a different directory structure. (loune)
 
 #### 2.2.1
 
