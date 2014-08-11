@@ -1,3 +1,8 @@
+ #### 2.2.2
+
+- Support a `java.home` path that does not end in `/jre`, by using it as it is.
+This is an issue on OSX which may have a different directory structure.
+
 #### 2.2.1
 
 - Ensure output directory is created even if the source set is missing files for the java plugin.

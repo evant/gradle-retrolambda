@@ -138,7 +138,12 @@ public class RetrolambdaExtension {
     private String findCurrentJdk() {
         String javaHomeProp = System.properties.'java.home'
         if (javaHomeProp) {
-            return javaHomeProp.substring(0, javaHomeProp.lastIndexOf("${File.separator}jre"))
+            int jreIndex = javaHomeProp.lastIndexOf("${File.separator}jre")
+            if (jreIndex != -1) {
+                return javaHomeProp.substring(0, jreIndex)
+            } else {
+                return javaHomeProp
+            }
         } else {
             return System.getenv("JAVA_HOME")
         }
