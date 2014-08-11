@@ -11,7 +11,7 @@ version = '2.1-SNAPSHOT'
 
 dependencies {
     compile gradleApi()
-    compile localGroovy()
+    compile 'org.codehaus.groovy:groovy-all:2.3.3'
     compile 'com.android.tools.build:gradle:0.8+'
 }
 
