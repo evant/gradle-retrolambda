@@ -141,8 +141,7 @@ public class RetrolambdaExtension {
             int jreIndex = javaHomeProp.lastIndexOf("${File.separator}jre")
             if (jreIndex != -1) {
                 return javaHomeProp.substring(0, jreIndex)
-            }
-            else {
+            } else {
                 return javaHomeProp
             }
         } else {
