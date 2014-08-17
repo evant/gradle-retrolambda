@@ -139,6 +139,11 @@ android.jar with them.
 Updates
 -------
 
+#### 2.2.3
+
+- Change dependency back to `localGroovy()`, `org.codehaus.groovy:groovy-all:2.3.3` was causing 
+issues.
+
 #### 2.2.2
 
 - Support a `java.home` path that does not end in `/jre`, by using it as it is.
