@@ -22,7 +22,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:2.2.2'
+         classpath 'me.tatarka:gradle-retrolambda:2.2.3'
       }
    }
 
@@ -136,6 +136,11 @@ android.jar with them.
 Updates
 -------
 
+#### 2.2.3
+
+- Change dependency back to `localGroovy()`, `org.codehaus.groovy:groovy-all:2.3.3` was causing 
+issues.
+
 #### 2.2.2
 
 - Support a `java.home` path that does not end in `/jre`, by using it as it is.
@@ -157,6 +162,7 @@ Otherwise, compiling the source set would error out.
 JAVA_HOME, so checking here first is more robust. (aphexcx)
 
 #### 2.0.0
+
 - Hooks into gradle's incremental compilcation support. This should mean faster build times and less
   inconsistencies when changing the build script without running `clean`. To fully take advantage of
   this you need to use retrolambda `1.4.0+` which is now the default.
