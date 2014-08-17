@@ -7,11 +7,11 @@ repositories {
 }
 
 group = 'me.tatarka'
-version = '2.1-SNAPSHOT'
+version = '2.2-SNAPSHOT'
 
 dependencies {
     compile gradleApi()
-    compile 'org.codehaus.groovy:groovy-all:2.3.3'
+    compile localGroovy()
     compile 'com.android.tools.build:gradle:0.8+'
 }
 
