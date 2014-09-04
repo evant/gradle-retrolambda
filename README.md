@@ -128,6 +128,14 @@ details. You can either disable the lint task (`./gradlew
 assembleRelease -x lintVitalRelease`) or use an older version of
 `gradle-retrolambda`, e.g., `1.3.3`.
 
+### Causes Proguard to fail
+
+Version 2.x of `gradle-retrolambda` is not yet compatible with
+Proguard.  See [Issue
+41](https://github.com/evant/gradle-retrolambda/issues/41) for
+details. You can either disable Proguard or use an older version of
+`gradle-retrolambda`, e.g., `1.3.3`.
+
 What Black Magic did you use to get this to work on Android?
 ------------------------------------------------------------
 
