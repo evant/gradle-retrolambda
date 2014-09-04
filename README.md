@@ -120,6 +120,14 @@ retrolambda {
 }
 ```
 
+### Causes errors in the lint stage of the assembleRelease task
+Version 2.x of `gradle-retrolambda` breaks the lint stage of the
+`assembleRelease` task. See [Issue
+28](https://github.com/evant/gradle-retrolambda/issues/28) for
+details. You can either disable the lint task (`./gradlew
+assembleRelease -x lintVitalRelease`) or use an older version of
+`gradle-retrolambda`, e.g., `1.3.3`.
+
 What Black Magic did you use to get this to work on Android?
 ------------------------------------------------------------
 
