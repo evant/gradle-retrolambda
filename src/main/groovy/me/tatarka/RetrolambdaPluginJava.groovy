@@ -32,6 +32,10 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.afterEvaluate {
+            if (!project.retrolambda.incremental) {
+                project.logger.warn("setting retrolambda.incremental to false has no effect when using the java plugin")
+            }
+            
             project.sourceSets.all { SourceSet set ->
                 if (project.retrolambda.isIncluded(set.name)) {
                     def name = set.name.capitalize()
