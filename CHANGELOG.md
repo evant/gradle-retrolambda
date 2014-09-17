@@ -1,3 +1,8 @@
+#### 2.3.0
+
+- Add ability to set `retrolambda.incremental false` to disable incremental compilation, since it is
+incompatible with android lint/proguard.
+
 #### 2.2.3
 
 - Change dependency back to `localGroovy()`, `org.codehaus.groovy:groovy-all:2.3.3` was causing 
