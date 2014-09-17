@@ -20,6 +20,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.tasks.bundling.Jar
+import proguard.gradle.ProGuardTask
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
 /**
@@ -90,29 +91,36 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         project.logger.warn("$extractTaskName is incomaptible with java 8 sources and has been disabled.")
                     }
 
-                    if (!isLibrary || var instanceof TestVariant) {
-                        var.dex.dependsOn(retrolambdaTask)
+                    if (project.retrolambda.incremental) {
+                        if (!isLibrary || var instanceof TestVariant) {
+                            var.dex.dependsOn(retrolambdaTask)
 
-                        // Dex gets it's input directory from javaCompile. Since we changed it, we
-                        // need to change dex to point back to the original output directory.
-                        def inputFiles = var.dex.inputFiles
-                        inputFiles.remove(newDestDir)
-                        inputFiles.add(oldDestDir)
-                        var.dex.inputFiles = inputFiles
-                    } else {
-                        // The Jar task for libraries isn't so easy because you can't change already
-                        // set sources. So we create a new Jar task with all the same arguments to
-                        // replace it.
-                        def packageJarTask = project.tasks.findByName("package${name}Jar")
-                        def newPackageJarTask = project.task(packageJarTask.name, type: Jar, dependsOn: [retrolambdaTask], overwrite: true) {
-                            from(oldDestDir)
-                            packageJarTask.excludes.each { exclude(it) }
-                            destinationDir = packageJarTask.destinationDir
-                            archiveName = packageJarTask.archiveName
+                            // Dex gets it's input directory from javaCompile. Since we changed it, we
+                            // need to change dex to point back to the original output directory.
+                            def inputFiles = var.dex.inputFiles
+                            inputFiles.remove(newDestDir)
+                            inputFiles.add(oldDestDir)
+                            var.dex.inputFiles = inputFiles
+                        } else {
+                            // The Jar task for libraries isn't so easy because you can't change already
+                            // set sources. So we create a new Jar task with all the same arguments to
+                            // replace it.
+                            def packageJarTask = project.tasks.findByName("package${name}Jar")
+                            def newPackageJarTask = project.task(packageJarTask.name, type: Jar, dependsOn: [retrolambdaTask], overwrite: true) {
+                                from(oldDestDir)
+                                packageJarTask.excludes.each { exclude(it) }
+                                destinationDir = packageJarTask.destinationDir
+                                archiveName = packageJarTask.archiveName
+                            }
+
+                            packageJarTask.deleteAllActions()
+                            packageJarTask.dependsOn(newPackageJarTask)
                         }
-
-                        packageJarTask.deleteAllActions()
-                        packageJarTask.dependsOn(newPackageJarTask)
+                    } else {
+                        // Set the output dir back so subsequent tasks use it
+                        var.javaCompile.doLast {
+                            var.javaCompile.destinationDir = oldDestDir
+                        }
                     }
 
                     if (!project.retrolambda.onJava8) {

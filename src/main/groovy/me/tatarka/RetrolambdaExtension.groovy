@@ -33,6 +33,7 @@ public class RetrolambdaExtension {
     List<String> excludes = []
     List<String> includes = []
     List<String> jvmArgs = []
+    boolean incremental = true
     boolean isOnJava8 = System.properties.'java.version'.startsWith('1.8')
 
     private String jdk = null
@@ -54,6 +55,10 @@ public class RetrolambdaExtension {
 
     public void jvmArgs(String... args) {
         jvmArgs.addAll(args)
+    }
+    
+    public void incremental(boolean value) {
+        incremental = value;
     }
 
     public void setBytecodeVersion(int v) {
