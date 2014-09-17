@@ -19,10 +19,13 @@ Usage
    buildscript {
       repositories {
          mavenCentral()
+         maven {
+             url "https://oss.sonatype.org/content/repositories/snapshots"
+         }
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:2.2.3'
+         classpath 'me.tatarka:gradle-retrolambda:2.3.0'
       }
    }
 
@@ -55,24 +58,28 @@ retrolambda {
   oldJdk System.getenv("JAVA6_HOME")
   javaVersion JavaVersion.VERSION_1_6
   jvmArgs '-arg1', '-arg2'
+  incremental true
 }
 ```
 
 - `jdk` Set the path to the java 8 jdk. The default is found using the
-  environment variable `JAVA8_HOME`. If you a running gradle with java 6 or 7,
-  you must have either `JAVA8_HOME` or this property set.
+    environment variable `JAVA8_HOME`. If you a running gradle with java 6 or 7,
+    you must have either `JAVA8_HOME` or this property set.
 - `oldJdk` Sets the path to the java 6 or 7 jdk. The default is found using the
-  environment variable `JAVA6_HOME`/`JAVA7_HOME`. If you are running gradle with
-  java 8 and wish to run unit tests, you must have either
-  `JAVA6_HOME`/`JAVA7_HOME` or this property set. This is so the tests can be
-  run with the correct java version.
+    environment variable `JAVA6_HOME`/`JAVA7_HOME`. If you are running gradle
+    with java 8 and wish to run unit tests, you must have either
+    `JAVA6_HOME`/`JAVA7_HOME` or this property set. This is so the tests can be
+    run with the correct java version.
 - `javaVersion` Set the java version to compile to. The default is 6. Only 6 or
-  7 are accepted.
+    7 are accepted.
 - `include 'Debug', 'Release'` Sets which sets/variants to run through
-  retrolambda. The default is all of them.
+    retrolambda. The default is all of them.
 - `exclude 'Test'` Sets which sets/variants to not run through retrolambda. Only
-  one of either `include` or `exclude` should be defined.
+    one of either `include` or `exclude` should be defined.
 - `jvmArgs` Add additional jvm args when running retrolambda.
+- `incremental` Enable/disable incremental compilation. It is incompatible with
+    android lint and proguard. This parameter has no effect when using it with
+    the java plugin. The default is `true`.
 
 ### Using a Different Version of the retrolambda.jar
 
@@ -95,8 +102,8 @@ Luckily Android Studio already has built-in lambda support! Enable it for your
 android project by going to `File -> Project Structure -> Project` and selecting
 `8.0 - Lambdas, type annotations etc.` under `Project language level`.
 
-You should also add these lines to you `build.gradle` so it doesn't try to change
-the language level on you when you refresh.
+You should also add these lines to you `build.gradle` so it doesn't try to
+change the language level on you when you refresh.
 
 ```groovy
 android {
@@ -110,9 +117,11 @@ android {
 Known Issues
 ---------------
 ### Using Google Play Services causes retrolambda to fail
-Version `5.0.77` contains bytecode that is incompatible with retrolambda. To work around this issue,
-you can either use an earlier version like `4.4.52` or add `-noverify` to the jvm args. See 
-[orfjackal/retrolambda#25](https://github.com/orfjackal/retrolambda/issues/25) for more information.
+Version `5.0.77` contains bytecode that is incompatible with retrolambda. To
+work around this issue, you can either use an earlier version like `4.4.52` or
+add `-noverify` to the jvm args. See
+[orfjackal/retrolambda#25](https://github.com/orfjackal/retrolambda/issues/25)
+for more information.
 
 ```groovy
 retrolambda {
@@ -121,20 +130,17 @@ retrolambda {
 ```
 
 ### Causes errors in the lint stage of the assembleRelease task
-Version 2.x of `gradle-retrolambda` breaks the lint stage of the
-`assembleRelease` task. See [Issue
-28](https://github.com/evant/gradle-retrolambda/issues/28) for
-details. You can either disable the lint task (`./gradlew
-assembleRelease -x lintVitalRelease`) or use an older version of
-`gradle-retrolambda`, e.g., `1.3.3`.
+Incremental compilation breaks the lint stage of the `assembleRelease` task. See
+[Issue 28](https://github.com/evant/gradle-retrolambda/issues/28) for details.
+You can either disable the lint task 
+(`./gradlew assembleRelease -x lintVitalRelease`) or disable incremental 
+compilation (`retrolambda.incremental false`).
 
 ### Causes Proguard to fail
-
-Version 2.x of `gradle-retrolambda` is not yet compatible with
-Proguard.  See [Issue
-41](https://github.com/evant/gradle-retrolambda/issues/41) for
-details. You can either disable Proguard or use an older version of
-`gradle-retrolambda`, e.g., `1.3.3`.
+Incremental compilation breaks is not compatible with Proguard.  See 
+[Issue 41](https://github.com/evant/gradle-retrolambda/issues/41) for details.
+You can either disable Proguard or disable incremental compilation
+(`retrolambda.incremental false`).
 
 What Black Magic did you use to get this to work on Android?
 ------------------------------------------------------------
@@ -151,6 +157,11 @@ android.jar with them.
 
 Updates
 -------
+
+#### 2.3.0
+
+- Add ability to set `retrolambda.incremental false` to disable incremental compilation, since it is
+incompatible with android lint/proguard.
 
 #### 2.2.3
 
