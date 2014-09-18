@@ -1,3 +1,7 @@
+#### 2.3.1
+
+- Fixed `retrolambda.incremental false` causing the retrolambda task not to run.
+
 #### 2.3.0
 
 - Add ability to set `retrolambda.incremental false` to disable incremental compilation, since it is
