@@ -137,7 +137,7 @@ You can either disable the lint task
 compilation (`retrolambda.incremental false`).
 
 ### Causes Proguard to fail
-Incremental compilation breaks is not compatible with Proguard.  See 
+Incremental compilation is not compatible with Proguard. See 
 [Issue 41](https://github.com/evant/gradle-retrolambda/issues/41) for details.
 You can either disable Proguard or disable incremental compilation
 (`retrolambda.incremental false`).
