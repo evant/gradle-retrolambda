@@ -91,21 +91,24 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         project.logger.warn("$extractTaskName is incomaptible with java 8 sources and has been disabled.")
                     }
 
-                    if (project.retrolambda.incremental) {
-                        if (!isLibrary || var instanceof TestVariant) {
-                            var.dex.dependsOn(retrolambdaTask)
+                    if (!isLibrary || var instanceof TestVariant) {
+                        var.dex.dependsOn(retrolambdaTask)
 
+                        if (project.retrolambda.incremental) {
                             // Dex gets it's input directory from javaCompile. Since we changed it, we
                             // need to change dex to point back to the original output directory.
                             def inputFiles = var.dex.inputFiles
                             inputFiles.remove(newDestDir)
                             inputFiles.add(oldDestDir)
                             var.dex.inputFiles = inputFiles
-                        } else {
-                            // The Jar task for libraries isn't so easy because you can't change already
-                            // set sources. So we create a new Jar task with all the same arguments to
-                            // replace it.
-                            def packageJarTask = project.tasks.findByName("package${name}Jar")
+                        }
+                    } else {
+                        // The Jar task for libraries isn't so easy because you can't change already
+                        // set sources. So we create a new Jar task with all the same arguments to
+                        // replace it.
+                        def packageJarTask = project.tasks.findByName("package${name}Jar")
+
+                        if (project.retrolambda.incremental) {
                             def newPackageJarTask = project.task(packageJarTask.name, type: Jar, dependsOn: [retrolambdaTask], overwrite: true) {
                                 from(oldDestDir)
                                 packageJarTask.excludes.each { exclude(it) }
@@ -115,8 +118,12 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
 
                             packageJarTask.deleteAllActions()
                             packageJarTask.dependsOn(newPackageJarTask)
+                        } else {
+                            packageJarTask.dependsOn(retrolambdaTask)
                         }
-                    } else {
+                    }
+
+                    if (!project.retrolambda.incremental) {
                         // Set the output dir back so subsequent tasks use it
                         var.javaCompile.doLast {
                             var.javaCompile.destinationDir = oldDestDir
