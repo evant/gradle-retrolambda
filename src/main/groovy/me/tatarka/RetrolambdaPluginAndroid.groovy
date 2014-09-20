@@ -151,6 +151,10 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                 inputs.dir rt
                 outputs.dir jarPath
                 outputs.dir classesPath
+                
+                if (!project.file(androidJar).exists()) {
+                    throw new ProjectConfigurationException("Retrolambd: $androidJar does not exsit, make sure ANDROID_HOME or sdk.dir is correctly set to the android sdk directory.", null)
+                }
 
                 doLast {
                     project.copy {
