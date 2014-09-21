@@ -63,6 +63,10 @@ public class RetrolambdaPlugin implements Plugin<Project> {
         }
 
         project.afterEvaluate {
+            if (!project.retrolambda.incremental) {
+                project.logger.warn("setting retrolambda.incremental to false has no effect")
+            }
+
             def config = project.configurations.retrolambdaConfig
 
             if (config.dependencies.isEmpty()) {
