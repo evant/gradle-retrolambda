@@ -1,3 +1,13 @@
+### 2.4.0
+
+- Better incremental compile method that doesn't break lint and proguard (and
+probably other tasks). Because of this, `retrolambda.incremental` is deprecated
+and does nothing.
+- Better handling of manually setting the retrolamba version with
+`retrolambConfig`.
+- Don't use the retrolambda javaagent if using version `1.6.0+`.
+- Set the default retrolambda version to `1.6.0`.
+
 #### 2.3.1
 
 - Fixed `retrolambda.incremental false` causing the retrolambda task not to run.

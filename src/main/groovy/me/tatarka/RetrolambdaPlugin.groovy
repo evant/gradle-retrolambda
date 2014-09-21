@@ -30,7 +30,7 @@ import org.gradle.api.plugins.JavaPlugin
  * To change this template use File | Settings | File Templates.
  */
 public class RetrolambdaPlugin implements Plugin<Project> {
-    private static def retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:1.4.0"
+    private static def retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:1.6.0"
 
     @Override
     void apply(Project project) {
@@ -38,10 +38,6 @@ public class RetrolambdaPlugin implements Plugin<Project> {
 
         project.configurations {
             retrolambdaConfig
-        }
-
-        project.dependencies {
-            retrolambdaConfig retrolambdaCompile
         }
 
         project.task('compileRetrolambda', dependsOn: project.tasks.matching {task ->
@@ -64,6 +60,20 @@ public class RetrolambdaPlugin implements Plugin<Project> {
 
         project.plugins.withType(ApplicationPlugin) {
             project.tasks.findByName('run').dependsOn('compileRetrolambda')
+        }
+
+        project.afterEvaluate {
+            if (!project.retrolambda.incremental) {
+                project.logger.warn("setting retrolambda.incremental to false has no effect")
+            }
+
+            def config = project.configurations.retrolambdaConfig
+
+            if (config.dependencies.isEmpty()) {
+                project.dependencies {
+                    retrolambdaConfig retrolambdaCompile
+                }
+            }
         }
     }
 

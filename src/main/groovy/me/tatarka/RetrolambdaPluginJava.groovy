@@ -19,6 +19,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.compile.JavaCompile
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
 /**
@@ -32,18 +33,12 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.afterEvaluate {
-            if (!project.retrolambda.incremental) {
-                project.logger.warn("setting retrolambda.incremental to false has no effect when using the java plugin")
-            }
-            
             project.sourceSets.all { SourceSet set ->
                 if (project.retrolambda.isIncluded(set.name)) {
                     def name = set.name.capitalize()
                     def taskName = "compileRetrolambda$name"
                     def oldOutputDir = set.output.classesDir
                     def newOutputDir = project.file("$project.buildDir/retrolambda/$set.name")
-
-                    newOutputDir.mkdirs()
 
                     def compileJavaTask = project.tasks.getByName(set.compileJavaTaskName)
                     compileJavaTask.destinationDir = newOutputDir
@@ -54,6 +49,7 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                         classpath = set.compileClasspath + project.files(newOutputDir)
                         javaVersion = project.retrolambda.javaVersion
                         jvmArgs = project.retrolambda.jvmArgs
+                        enabled = !set.allJava.isEmpty()
                     }
 
                     project.tasks.findByName(set.classesTaskName).dependsOn(retrolambdaTask)
