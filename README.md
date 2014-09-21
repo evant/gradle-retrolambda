@@ -94,12 +94,7 @@ dependencies {
 
 Android Studio Setup
 --------------------
-Luckily Android Studio already has built-in lambda support! Enable it for your
-android project by going to `File -> Project Structure -> Project` and selecting
-`8.0 - Lambdas, type annotations etc.` under `Project language level`.
-
-You should also add these lines to you `build.gradle` so it doesn't try to
-change the language level on you when you refresh.
+Add these lines to you `build.gradle` to inform the IDE of the language level.
 
 ```groovy
 android {
