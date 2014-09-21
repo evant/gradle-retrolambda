@@ -25,7 +25,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:2.3-SNAPSHOT'
+         classpath 'me.tatarka:gradle-retrolambda:2.4-SNAPSHOT'
       }
    }
 
@@ -58,7 +58,6 @@ retrolambda {
   oldJdk System.getenv("JAVA6_HOME")
   javaVersion JavaVersion.VERSION_1_6
   jvmArgs '-arg1', '-arg2'
-  incremental true
 }
 ```
 
@@ -77,14 +76,11 @@ retrolambda {
 - `exclude 'Test'` Sets which sets/variants to not run through retrolambda. Only
     one of either `include` or `exclude` should be defined.
 - `jvmArgs` Add additional jvm args when running retrolambda.
-- `incremental` Enable/disable incremental compilation. It is incompatible with
-    android lint and proguard. This parameter has no effect when using it with
-    the java plugin. The default is `true`.
 
 ### Using a Different Version of the retrolambda.jar
 
 The default version of retrolambda used is
-`'net.orfjackal.retrolambda:retrolambda:1.4.0'`. If you want to use a different
+`'net.orfjackal.retrolambda:retrolambda:1.6.0'`. If you want to use a different
 one, you can configure it in your dependencies.
 
 ```groovy
@@ -129,18 +125,12 @@ retrolambda {
 }
 ```
 
-### Causes errors in the lint stage of the assembleRelease task
-Incremental compilation breaks the lint stage of the `assembleRelease` task. See
-[Issue 28](https://github.com/evant/gradle-retrolambda/issues/28) for details.
-You can either disable the lint task 
-(`./gradlew assembleRelease -x lintVitalRelease`) or disable incremental 
-compilation (`retrolambda.incremental false`).
-
-### Causes Proguard to fail
-Incremental compilation breaks is not compatible with Proguard.  See 
-[Issue 41](https://github.com/evant/gradle-retrolambda/issues/41) for details.
-You can either disable Proguard or disable incremental compilation
-(`retrolambda.incremental false`).
+### Compiling for android-L doesn't work when using Android Studio's sdk manager. 
+For some reason only known to the gods, when using Android Studio's sdk manager,
+there is no `android-L` directory sdk directory. Instead, it happily builds
+using the `android-20` directory instead. To work around this, you can symlink
+the `android-L` directory to point to `android-20`. See
+[#36](https://github.com/evant/gradle-retrolambda/issues/36).
 
 What Black Magic did you use to get this to work on Android?
 ------------------------------------------------------------
@@ -157,6 +147,16 @@ android.jar with them.
 
 Updates
 -------
+
+### 2.4.0
+
+- Better incremental compile method that doesn't break lint and proguard (and
+probably other tasks). Because of this, `retrolambda.incremental` is deprecated
+and does nothing.
+- Better handling of manually setting the retrolamba version with
+`retrolambConfig`.
+- Don't use the retrolambda javaagent if using version `1.6.0+`.
+- Set the default retrolambda version to `1.6.0`.
 
 #### 2.3.1
 
@@ -186,16 +186,5 @@ Otherwise, compiling the source set would error out.
 
 - Added way to add custom jvm arguments when running retrolambda.
 - Disable `extractAnnotations` tasks since they are incompatible with java 8 sources.
-
-#### 2.1.0
-
-- Also check system property 'java.home' for the current java location. IDEs set this but not
-JAVA_HOME, so checking here first is more robust. (aphexcx)
-
-#### 2.0.0
-
-- Hooks into gradle's incremental compilcation support. This should mean faster build times and less
-  inconsistencies when changing the build script without running `clean`. To fully take advantage of
-  this you need to use retrolambda `1.4.0+` which is now the default.
 
 Older updates have moved to the [CHANGELOG](https://github.com/evant/gradle-retrolambda/blob/master/CHANGELOG.md).
