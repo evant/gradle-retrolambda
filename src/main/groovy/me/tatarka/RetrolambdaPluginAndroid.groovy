@@ -85,10 +85,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         newJavaCompile.dependsOn(dependency)
                     }
 
-                    var.javaCompile.dependsOn(newJavaCompile)
-                    var.javaCompile.deleteAllActions()
-
-                    def retrolambdaTask = project.task("compileRetrolambda${name}", dependsOn: [var.javaCompile],  type: RetrolambdaTask) {
+                    def retrolambdaTask = project.task("compileRetrolambda${name}", dependsOn: [newJavaCompile],  type: RetrolambdaTask) {
                         inputDir = newDestDir
                         outputDir = oldDestDir
                         classpath = classpathFiles
@@ -96,17 +93,14 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         jvmArgs = project.retrolambda.jvmArgs
                     }
 
+                    var.javaCompile.dependsOn(retrolambdaTask)
+                    var.javaCompile.deleteAllActions()
+
                     def extractTaskName = "extract${var.name.capitalize()}Annotations"
                     def extractTask = project.tasks.findByName(extractTaskName)
                     if (extractTask != null) {
                         extractTask.deleteAllActions()
                         project.logger.warn("$extractTaskName is incomaptible with java 8 sources and has been disabled.")
-                    }
-
-                    if (!isLibrary || var instanceof TestVariant) {
-                        var.dex.dependsOn(retrolambdaTask)
-                    } else {
-                        project.tasks.findByName("package${name}Jar").dependsOn(retrolambdaTask)
                     }
 
                     if (!project.retrolambda.onJava8) {
