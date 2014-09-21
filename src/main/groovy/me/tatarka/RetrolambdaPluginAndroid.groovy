@@ -68,7 +68,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     def classpathFiles =
                             var.javaCompile.classpath +
                                     project.files("$buildPath/$var.name") +
-                                    project .files(androidJar)
+                                    project.files(androidJar)
 
                     var.javaCompile.destinationDir = newDestDir
                     var.javaCompile.sourceCompatibility = "1.8"

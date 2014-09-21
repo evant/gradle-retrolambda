@@ -25,6 +25,7 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.incremental.IncrementalTaskInputs
+import org.gradle.util.VersionNumber
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
@@ -77,8 +78,11 @@ class RetrolambdaTask extends DefaultTask {
                         "-Dretrolambda.outputDir=$outputDir",
                         "-Dretrolambda.classpath=${this.classpath.asPath}",
                         "-Dretrolambda.bytecodeVersion=$bytecodeVersion",
-                        "-javaagent:$classpath.asPath"
                 ]
+
+                if (requiresJavaAgent()) {
+                    jvmArgs += "-javaagent:$classpath.asPath"
+                }
 
                 if (inputs.incremental) {
                     jvmArgs += "-Dretrolambda.includedFiles=${changes*.file.join(File.pathSeparator)}"
@@ -96,6 +100,16 @@ class RetrolambdaTask extends DefaultTask {
             project.logger.debug("Deleted " + outFile)
             deleteRelated(outFile)
         }
+    }
+
+    def requiresJavaAgent() {
+        def retrolambdaConfig = project.configurations.retrolambdaConfig
+        def retrolambdaDep = retrolambdaConfig.dependencies.iterator().next()
+        if (!retrolambdaDep.version) {
+            // Don't know version, assume we need the javaagent.
+            return true
+        }
+        VersionNumber.parse(retrolambdaDep.version).minor < 6
     }
 
     def File toOutput(File file) {
