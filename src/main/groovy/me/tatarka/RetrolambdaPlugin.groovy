@@ -21,6 +21,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ApplicationPlugin
+import org.gradle.api.plugins.GroovyPlugin
 import org.gradle.api.plugins.JavaPlugin
 /**
  * Created with IntelliJ IDEA.
@@ -48,6 +49,10 @@ public class RetrolambdaPlugin implements Plugin<Project> {
 
         project.plugins.withType(JavaPlugin) {
             project.apply plugin: RetrolambdaPluginJava
+        }
+
+        project.plugins.withType(GroovyPlugin) {
+            project.apply plugin: RetrolambdaPluginGroovy
         }
 
         project.plugins.withType(AppPlugin) {
