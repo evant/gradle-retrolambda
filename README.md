@@ -31,7 +31,7 @@ Usage
       mavenCentral()
    }
 
-   apply plugin: 'android' //or apply plugin: 'java'
+   apply plugin: 'com.android.application' //or apply plugin: 'java'
    apply plugin: 'retrolambda'
    ```
 3. There is no step three!
