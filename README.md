@@ -91,7 +91,7 @@ dependencies {
 
 Android Studio Setup
 --------------------
-Add these lines to you `build.gradle` to inform the IDE of the language level.
+Add these lines to your `build.gradle` to inform the IDE of the language level.
 
 ```groovy
 android {
