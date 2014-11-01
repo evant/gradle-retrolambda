@@ -102,6 +102,13 @@ android {
 }
 ```
 
+Proguard
+----------
+This plugin is fully compatible with progurad (since `v1.4.0`). In your progurad file, add
+```
+-dontwarn java.lang.invoke.*
+```
+
 Known Issues
 ---------------
 ### Using Google Play Services causes retrolambda to fail
@@ -123,6 +130,11 @@ there is no `android-L` directory sdk directory. Instead, it happily builds
 using the `android-20` directory instead. To work around this, you can symlink
 the `android-L` directory to point to `android-20`. See
 [#36](https://github.com/evant/gradle-retrolambda/issues/36).
+
+### Build fails with using `android-apt`
+This is because `android-apt` modifies the `javaCompile` task and this plugin 
+replaces it. Since `v1.4.1` this is fixed, you just need to ensure you apply
+this plugin _before_ `android-apt`.
 
 What Black Magic did you use to get this to work on Android?
 ------------------------------------------------------------
