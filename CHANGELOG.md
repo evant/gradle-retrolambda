@@ -1,3 +1,7 @@
+### 2.4.1
+- Fixed compatibly with android-apt.
+- Fixed typo in one of the thrown exceptions. (tomxor)
+
 ### 2.4.0
 
 - Better incremental compile method that doesn't break lint and proguard (and
