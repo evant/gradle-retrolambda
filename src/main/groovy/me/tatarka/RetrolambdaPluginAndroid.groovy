@@ -15,16 +15,14 @@
  */
 
 package me.tatarka
-import com.android.build.gradle.api.TestVariant
+
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
-import org.gradle.api.tasks.JavaExec
-import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
-import proguard.gradle.ProGuardTask
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
+
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -72,7 +70,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                                     project.files("$buildPath/$var.name") +
                                     project.files(androidJar)
 
-                    def newJavaCompile = project.task("_$var.javaCompile.name", dependsOn: ["patchAndroidJar"], type: JavaCompile) {
+                    def newJavaCompile = project.task("_$var.javaCompile.name", dependsOn: "patchAndroidJar", type: JavaCompile) {
                         conventionMapping.source = { var.javaCompile.source }
                         conventionMapping.classpath = { var.javaCompile.classpath }
                         destinationDir = newDestDir
@@ -80,15 +78,11 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         targetCompatibility = "1.8"
                     }
 
-                    var.javaCompile.dependsOn.each { dependency ->
-                        newJavaCompile.dependsOn(dependency)
-                    }
-
-                    var.javaCompile.doLast {
+                    newJavaCompile.doFirst {
                         newJavaCompile.options.compilerArgs = var.javaCompile.options.compilerArgs + ["-bootclasspath", "$jarPath/android.jar"]
                     }
 
-                    def retrolambdaTask = project.task("compileRetrolambda${name}", dependsOn: [newJavaCompile],  type: RetrolambdaTask) {
+                    def retrolambdaTask = project.task("compileRetrolambda${name}", dependsOn: [newJavaCompile], type: RetrolambdaTask) {
                         inputDir = newDestDir
                         outputDir = oldDestDir
                         classpath = classpathFiles
@@ -96,7 +90,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         jvmArgs = project.retrolambda.jvmArgs
                     }
 
-                    var.javaCompile.dependsOn(retrolambdaTask)
+                    var.javaCompile.finalizedBy(retrolambdaTask)
                     var.javaCompile.deleteAllActions()
 
                     def extractTaskName = "extract${var.name.capitalize()}Annotations"
