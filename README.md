@@ -19,13 +19,10 @@ Usage
    buildscript {
       repositories {
          mavenCentral()
-         maven {
-             url "https://oss.sonatype.org/content/repositories/snapshots"
-         }
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:2.4-SNAPSHOT'
+         classpath 'me.tatarka:gradle-retrolambda:2.4.0'
       }
    }
 
