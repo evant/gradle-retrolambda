@@ -1,6 +1,8 @@
 Gradle Retrolambda Plugin
 ========================
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/me.tatarka/gradle-retrolambda/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/me.tatarka/gradle-retrolambda)
+
 This plugin will automatically build your java or *android* project with
 retrolambda, giving you lambda goodness on java 6 or 7. It relies on the
 wonderful [retrolambda](https://github.com/orfjackal/retrolambda) by Esko
