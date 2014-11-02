@@ -104,7 +104,7 @@ android {
 
 Proguard
 ----------
-This plugin is fully compatible with progurad (since `v1.4.0`). In your progurad file, add
+This plugin is fully compatible with progurad (since `v2.4.0`). In your progurad file, add
 ```
 -dontwarn java.lang.invoke.*
 ```
@@ -133,7 +133,7 @@ the `android-L` directory to point to `android-20`. See
 
 ### Build fails with using `android-apt`
 This is because `android-apt` modifies the `javaCompile` task and this plugin 
-replaces it. Since `v1.4.1` this is fixed, you just need to ensure you apply
+replaces it. Since `v2.4.1` this is fixed, you just need to ensure you apply
 this plugin _before_ `android-apt`.
 
 What Black Magic did you use to get this to work on Android?
