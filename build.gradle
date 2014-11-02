@@ -1,3 +1,15 @@
+import org.ajoberstar.grgit.*
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    
+    dependencies {
+        classpath 'org.ajoberstar:gradle-git:0.11.2' 
+    }
+}
+
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'signing'
@@ -16,72 +28,109 @@ dependencies {
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-  classifier = 'javadoc'
-  from 'build/docs/javadoc'
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
 }
 
 task sourcesJar(type: Jar) {
-  from sourceSets.main.allSource
-  classifier = 'sources'
+    from sourceSets.main.allSource
+    classifier = 'sources'
 }
 
 artifacts {
-  archives jar
-  archives javadocJar
-  archives sourcesJar
+    archives jar
+    archives javadocJar
+    archives sourcesJar
 }
 
 if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.password')) {
-signing {
-  sign configurations.archives
-}
-
-uploadArchives {
-  repositories {
-    mavenDeployer {
-      beforeDeployment { deployment -> signing.signPom(deployment) }
-
-      def repoUrl
-      if (project.version.endsWith("SNAPSHOT")) {
-        repoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
-      } else {
-        repoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-      }
-
-      repository(url: repoUrl) {
-        authentication(
-            userName: project.getProperty('sonatype.username'),
-            password: project.getProperty('sonatype.password'))
-      }
-
-      pom.project {
-        name 'gradle-retrolambda'
-        packaging 'jar'
-        description 'A gradle plugin for getting java lambda support in java 6, 7 and android'
-        url 'https://github.com/evant/gradle-retrolambda'
-
-        scm {
-          url 'git@github.com:evant/gradle-retrolambda.git'
-          connection 'scm:git:git@github.com:evant/gradle-retrolambda.git'
-          developerConnection 'scm:git:git@github.com:evant/gradle-retrolambda.git'
-        }
-
-        licenses {
-          license {
-            name 'The Apache Software License, Version 2.0'
-              url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-              distribution 'repo'
-          }
-        }
-
-        developers {
-          developer {
-            id 'evant'
-            name 'Evan Tatarka'
-          }
-        }
-      }
+    signing {
+        sign configurations.archives
     }
-  }
-}
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { deployment -> signing.signPom(deployment) }
+
+                def repoUrl
+                if (project.version.endsWith("SNAPSHOT")) {
+                    repoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+                } else {
+                    repoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                }
+
+                repository(url: repoUrl) {
+                    authentication(
+                            userName: project.getProperty('sonatype.username'),
+                            password: project.getProperty('sonatype.password'))
+                }
+
+                pom.project {
+                    name 'gradle-retrolambda'
+                    packaging 'jar'
+                    description 'A gradle plugin for getting java lambda support in java 6, 7 and android'
+                    url 'https://github.com/evant/gradle-retrolambda'
+
+                    scm {
+                        url 'git@github.com:evant/gradle-retrolambda.git'
+                        connection 'scm:git:git@github.com:evant/gradle-retrolambda.git'
+                        developerConnection 'scm:git:git@github.com:evant/gradle-retrolambda.git'
+                    }
+
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            distribution 'repo'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'evant'
+                            name 'Evan Tatarka'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    def grgit = Grgit.open(project.projectDir)
+
+    task checkRelease << {
+        if (version.endsWith('SNAPSHOT')) {
+            throw new ProjectConfigurationException("Version: $version must not end in SNAPSHOT", null)
+        }
+        
+        def readmeVersion = file('README.md').readLines().find { it.contains('me.tatarka:gradle-retrolambda:') }?.trim()
+        
+        if (readmeVersion == null) {
+            throw new ProjectConfigurationException("Missing README version string", null)
+        }
+
+        if (!readmeVersion.contains(":$version")) {
+            throw new ProjectConfigurationException("README version string: $readmeVersion must match release version: $version", null)
+        }
+        
+        def changelogVersion = file('CHANGELOG.md').readLines().find { it.contains("### $version") }
+        if (changelogVersion == null) {
+            throw new ProjectConfigurationException("CHANGELOG does not contain changes for release version: $version", null)
+        }
+
+        def branchName = grgit.branch.current.name
+        if (branchName != 'master') {
+            throw new ProjectConfigurationException("Branch: $branchName must be master", null)
+        }
+    }
+
+    task tagRelease(dependsOn: [checkRelease]) << {
+        grgit.tag.add {
+            name = "v$version"
+            message = "Release of $version"
+        }
+    }
+    
+    uploadArchives.dependsOn(tagRelease)
 }
