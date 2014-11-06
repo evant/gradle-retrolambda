@@ -2,17 +2,16 @@ import org.ajoberstar.grgit.*
 
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     
     dependencies {
-        classpath 'org.ajoberstar:gradle-git:0.11.2' 
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.6'
     }
 }
 
 apply plugin: 'groovy'
-apply plugin: 'maven'
-apply plugin: 'signing'
+apply from : 'gradle/publishing.gradle'
 
 repositories {
     mavenCentral()
@@ -32,70 +31,18 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from 'build/docs/javadoc'
 }
 
-task sourcesJar(type: Jar) {
+task sourceJar(type: Jar) {
     from sourceSets.main.allSource
-    classifier = 'sources'
+    classifier = 'source'
 }
 
 artifacts {
     archives jar
     archives javadocJar
-    archives sourcesJar
+    archives sourceJar
 }
 
-if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.password')) {
-    signing {
-        sign configurations.archives
-    }
 
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { deployment -> signing.signPom(deployment) }
-
-                def repoUrl
-                if (project.version.endsWith("SNAPSHOT")) {
-                    repoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
-                } else {
-                    repoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                }
-
-                repository(url: repoUrl) {
-                    authentication(
-                            userName: project.getProperty('sonatype.username'),
-                            password: project.getProperty('sonatype.password'))
-                }
-
-                pom.project {
-                    name 'gradle-retrolambda'
-                    packaging 'jar'
-                    description 'A gradle plugin for getting java lambda support in java 6, 7 and android'
-                    url 'https://github.com/evant/gradle-retrolambda'
-
-                    scm {
-                        url 'git@github.com:evant/gradle-retrolambda.git'
-                        connection 'scm:git:git@github.com:evant/gradle-retrolambda.git'
-                        developerConnection 'scm:git:git@github.com:evant/gradle-retrolambda.git'
-                    }
-
-                    licenses {
-                        license {
-                            name 'The Apache Software License, Version 2.0'
-                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                            distribution 'repo'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'evant'
-                            name 'Evan Tatarka'
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     def grgit = Grgit.open(project.projectDir)
 
@@ -132,5 +79,5 @@ if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.pa
         }
     }
     
-    uploadArchives.dependsOn(tagRelease)
-}
+    bintrayUpload.dependsOn(tagRelease)
+
