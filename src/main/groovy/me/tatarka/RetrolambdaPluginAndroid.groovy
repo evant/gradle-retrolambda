@@ -19,16 +19,13 @@ package me.tatarka
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
-import org.gradle.api.tasks.compile.JavaCompile
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
 
 /**
- * Created with IntelliJ IDEA.
  * User: evan
  * Date: 8/4/13
  * Time: 1:36 PM
- * To change this template use File | Settings | File Templates.
  */
 public class RetrolambdaPluginAndroid implements Plugin<Project> {
     @Override
@@ -70,19 +67,13 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                                     project.files("$buildPath/$var.name") +
                                     project.files(androidJar)
 
-                    def newJavaCompile = project.task("_$var.javaCompile.name", dependsOn: "patchAndroidJar", type: JavaCompile) {
-                        conventionMapping.source = { var.javaCompile.source }
-                        conventionMapping.classpath = { var.javaCompile.classpath }
-                        destinationDir = newDestDir
-                        sourceCompatibility = "1.8"
-                        targetCompatibility = "1.8"
-                    }
+                    // modifications to existing javaCompile task
+                    var.javaCompile.destinationDir        = newDestDir
+                    var.javaCompile.sourceCompatibility   = "1.8"
+                    var.javaCompile.targetCompatibility   = "1.8"
+                    var.javaCompile.options.compilerArgs  += ["-bootclasspath", "$jarPath/android.jar"]
 
-                    newJavaCompile.doFirst {
-                        newJavaCompile.options.compilerArgs = var.javaCompile.options.compilerArgs + ["-bootclasspath", "$jarPath/android.jar"]
-                    }
-
-                    def retrolambdaTask = project.task("compileRetrolambda${name}", dependsOn: [newJavaCompile], type: RetrolambdaTask) {
+                    def retrolambdaTask = project.task("compileRetrolambda${name}", type: RetrolambdaTask) {
                         inputDir = newDestDir
                         outputDir = oldDestDir
                         classpath = classpathFiles
@@ -90,8 +81,14 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         jvmArgs = project.retrolambda.jvmArgs
                     }
 
+                    // patch the android jar file before we compile against it
+                    var.javaCompile.dependsOn "patchAndroidJar"
+
+                    // after we compile, do the retrolambda to convert to an android compatible bytecode
                     var.javaCompile.finalizedBy(retrolambdaTask)
-                    var.javaCompile.deleteAllActions()
+
+                    // reset back to the original dest dir when we're all done.
+                    var.javaCompile.doLast() { it.destinationDir = oldDestDir }
 
                     def extractTaskName = "extract${var.name.capitalize()}Annotations"
                     def extractTask = project.tasks.findByName(extractTaskName)
@@ -102,7 +99,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
 
                     if (!project.retrolambda.onJava8) {
                         // Set JDK 8 for compiler task
-                        newJavaCompile.doFirst {
+                        var.javaCompile.doFirst {
                             it.options.fork = true
                             def javac = "${project.retrolambda.tryGetJdk()}/bin/javac"
                             if (!checkIfExecutableExists(javac)) throw new ProjectConfigurationException("Cannot find executable: $javac", null)
