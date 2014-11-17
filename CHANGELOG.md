@@ -1,5 +1,5 @@
 ### 2.4.1
-- Fixed compatibly with android-apt.
+- Fixed compatibility with android-apt.
 - Fixed typo in one of the thrown exceptions. (tomxor)
 - Support groovy testing (ex. spock). (harningt)
 
