@@ -24,7 +24,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:2.4.1'
+         classpath 'me.tatarka:gradle-retrolambda:2.5.0'
       }
    }
 
@@ -33,8 +33,8 @@ Usage
       mavenCentral()
    }
 
-   apply plugin: 'android' //or apply plugin: 'java'
-   apply plugin: 'retrolambda'
+   apply plugin: 'com.android.application' //or apply plugin: 'java'
+   apply plugin: 'me.tatarka.retrolambda'
    ```
 3. There is no step three!
 
