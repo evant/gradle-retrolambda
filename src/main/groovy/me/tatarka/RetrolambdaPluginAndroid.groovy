@@ -91,7 +91,22 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     }
 
                     var.javaCompile.finalizedBy(retrolambdaTask)
-                    var.javaCompile.deleteAllActions()
+                    
+                    // Hack to only delete the compile action and not any doFirst() or doLast()
+                    // I hope gradle doesn't change the class name!
+                    def taskActions = var.javaCompile.taskActions
+                    def taskRemoved = false
+                    for (int i = taskActions.size() - 1; i >= 0; i--) {
+                        if (taskActions[i].class.name == "org.gradle.api.internal.project.taskfactory.AnnotationProcessingTaskFactory\$IncrementalTaskAction") {
+                            taskActions.remove(i)
+                            taskRemoved = true 
+                            break
+                        }
+                    }
+                    
+                    if (!taskRemoved) {
+                        throw new ProjectConfigurationException("Unable to delete old javaCompile action, maybe the class name has changed? Please submit a bug report with what version of gradle you are using.", null)
+                    }
 
                     def extractTaskName = "extract${var.name.capitalize()}Annotations"
                     def extractTask = project.tasks.findByName(extractTaskName)
