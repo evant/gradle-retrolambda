@@ -1,3 +1,9 @@
+### 2.5.0
+- A more robust fix for android-apt compatibility. Important: If you were experiencing issues with
+android-apt previously and updated to this version, you must run `gradle build --rerun-tasks` once.
+- Deprecate plugin name 'retrolambda' for 'me.tatarka.retrolambda' in preparation to publishing on
+the gradle plugin portal.
+
 ### 2.4.1
 - Fixed compatibility with android-apt.
 - Fixed typo in one of the thrown exceptions. (tomxor)
