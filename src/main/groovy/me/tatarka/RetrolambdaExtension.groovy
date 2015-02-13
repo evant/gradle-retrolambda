@@ -113,8 +113,8 @@ public class RetrolambdaExtension {
 
     public boolean isIncluded(String name) {
         if (includes.isEmpty() && excludes.isEmpty()) return true
-        if (excludes.isEmpty() && excludes.contains(name)) return false;
-        if (includes.isEmpty() && !includes.contains(name)) return false;
+        if (excludes.isEmpty() && !includes.contains(name)) return false;
+        if (includes.isEmpty() && excludes.contains(name)) return false;
         return true
     }
 
