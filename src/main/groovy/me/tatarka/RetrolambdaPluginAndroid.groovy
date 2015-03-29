@@ -96,16 +96,43 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     // I hope gradle doesn't change the class name!
                     def taskActions = var.javaCompile.taskActions
                     def taskRemoved = false
+                    def afterActions = []
                     for (int i = taskActions.size() - 1; i >= 0; i--) {
                         if (taskActions[i].class.name == "org.gradle.api.internal.project.taskfactory.AnnotationProcessingTaskFactory\$IncrementalTaskAction") {
                             taskActions.remove(i)
-                            taskRemoved = true 
-                            break
+                            taskRemoved = true
+                        } else if (taskRemoved) {
+                            afterActions.add(taskActions[i])
+                            taskActions.remove(i)
                         }
                     }
                     
                     if (!taskRemoved) {
                         throw new ProjectConfigurationException("Unable to delete old javaCompile action, maybe the class name has changed? Please submit a bug report with what version of gradle you are using.", null)
+                    }
+                    
+                    // Move any after to the retrolambda task to that they run after retrolambda
+                    afterActions.each {
+                        retrolambdaTask.doLast(it)
+                    }
+                    
+                    // Ensure retrolamba runs before compiling tests
+                    def compileTestTaskName = "compile${var.name.capitalize()}UnitTestJava"
+                    def compileTestTask = project.tasks.findByName(compileTestTaskName)
+                    if (compileTestTask != null) {
+                        compileTestTask.mustRunAfter(retrolambdaTask)
+                        // We need to add the rt to the classpath to support lambdas in the tests themselves 
+                        compileTestTask.classpath += project.files("$project.retrolambda.jdk/jre/lib/rt.jar")
+                        
+                        if (!project.retrolambda.onJava8) {
+                            // Set JDK 8 for the compiler task
+                            compileTestTask.doFirst {
+                                it.options.fork = true
+                                def javac = "${project.retrolambda.tryGetJdk()}/bin/javac"
+                                if (!checkIfExecutableExists(javac)) throw new ProjectConfigurationException("Cannot find executable: $javac", null)
+                                it.options.forkOptions.executable = javac
+                            }
+                        }
                     }
 
                     def extractTaskName = "extract${var.name.capitalize()}Annotations"

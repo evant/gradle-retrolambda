@@ -9,10 +9,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import me.tatarka.retrolambda.sample.app.Function;
 import me.tatarka.retrolambda.sample.app.MainActivity;
-import me.tatarka.sample.app.R;
+import me.tatarka.retrolambda.sample.app.R;
 
 import static org.assertj.android.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by evan on 3/29/15.
@@ -38,5 +40,11 @@ public class MainActivityInstrumentationTest extends ActivityInstrumentationTest
     public void testHelloRetrolambdaLib() {
         TextView textLib = (TextView) getActivity().findViewById(R.id.text_lib);
         assertThat(textLib).hasText("Hello, retrolambda (from lib)!");
+    }
+    
+    @Test
+    public void testLambdaInTest() {
+        Function lambda = () -> "test";
+        assertThat(lambda.run()).isEqualTo("test");
     }
 }

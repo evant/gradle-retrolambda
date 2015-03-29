@@ -21,6 +21,8 @@ repositories {
 group = 'me.tatarka'
 version = '2.6.0-SNAPSHOT'
 
+sourceCompatibility = '1.6'
+
 dependencies {
     compile gradleApi()
     compile localGroovy()
