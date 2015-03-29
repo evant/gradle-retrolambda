@@ -48,7 +48,7 @@ class RetrolambdaTask extends DefaultTask {
 
     @Input
     List<String> jvmArgs = []
-
+    
     @TaskAction
     def execute(IncrementalTaskInputs inputs) {
         def changes = []
@@ -84,8 +84,12 @@ class RetrolambdaTask extends DefaultTask {
                     jvmArgs += "-javaagent:$classpath.asPath"
                 }
 
-                if (inputs.incremental) {
+                if (inputs.incremental && project.retrolambda.incremental) {
                     jvmArgs += "-Dretrolambda.includedFiles=${changes*.file.join(File.pathSeparator)}"
+                }
+                
+                if (project.retrolambda.defaultMethods) {
+                    jvmArgs += "-Dretrolambda.defaultMethods=true"
                 }
 
                 this.jvmArgs.each { arg -> jvmArgs += arg }
