@@ -1,7 +1,9 @@
-package me.tatarka.sample;
+package me.tatarka.retrolambda.sample.test;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import me.tatarka.retrolambda.sample.Main;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

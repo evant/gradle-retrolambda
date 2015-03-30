@@ -67,7 +67,7 @@ public class RetrolambdaExtension {
     }
     
     public boolean getIncremental() {
-        return incremental || defaultMethods
+        return incremental && !defaultMethods
     }
 
     public void setBytecodeVersion(int v) {

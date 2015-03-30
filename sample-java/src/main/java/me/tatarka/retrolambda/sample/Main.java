@@ -1,4 +1,4 @@
-package me.tatarka.sample;
+package me.tatarka.retrolambda.sample;
 
 /**
  * Created by evan on 3/29/15.
