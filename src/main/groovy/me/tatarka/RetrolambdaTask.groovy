@@ -55,9 +55,9 @@ class RetrolambdaTask extends DefaultTask {
         
         def changes = []
         inputs.outOfDate { changes += it }
-
+        
         // Ensure output is cleared if build is not incremental.
-        if (inputs.incremental && !retrolambda.incremental) {
+        if (inputs.incremental && !changes.isEmpty() && !retrolambda.incremental) {
             outputDir.eachFile { it.delete() }
         } else {
             changes.each { change ->
