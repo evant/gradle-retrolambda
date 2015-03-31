@@ -2,7 +2,7 @@
 A whole bunch of changes!
 - Changed the default retrolambda to 2.0.0
 - Added support for default methods, add `defaultMethods true` to the retrolambda block. Note: due
-  to a current limitation in retrolamba, this will require all of your source code to be fed through
+  to a current limitation in retrolamba, this will require all of your class files to be fed through
   retrolambda on each build. This may adversely affect build times.
 - `incremental false` is no longer deprecated but has different semantics. Instead of being a hack
   around gradle-retrolambda breaking other plugins, it now only forces all of your class files to be 
