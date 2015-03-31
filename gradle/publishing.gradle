@@ -1,0 +1,95 @@
+import java.text.SimpleDateFormat
+
+Date buildTimeAndDate = new Date()
+ext {
+    buildDate = new SimpleDateFormat('yyyy-MM-dd').format(buildTimeAndDate)
+    buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
+}
+
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+jar {
+    manifest {
+        attributes(
+            'Built-By': System.properties['user.name'],
+            'Created-By': System.properties['java.version'] + ' (' + System.properties['java.vendor'] + ' ' + System.properties["java.vm.version"] + ')',
+            'Build-Date': project.buildDate,
+            'Build-Time': project.buildTime,
+            'Specification-Title': project.name,
+            'Specification-Version': project.version,
+            'Specification-Vendor': project.project_vendor,
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version,
+            'Implementation-Vendor': project.project_vendor
+        )
+    }
+}
+
+def pomConfig = {
+    name 'gradle-retrolambda'
+    packaging 'jar'
+    description 'A gradle plugin for getting java lambda support in java 6, 7 and android'
+    url 'https://github.com/evant/gradle-retrolambda'
+
+    scm {
+        url 'git@github.com:evant/gradle-retrolambda.git'
+        connection 'scm:git:git@github.com:evant/gradle-retrolambda.git'
+        developerConnection 'scm:git:git@github.com:evant/gradle-retrolambda.git'
+    }
+
+    licenses {
+        license {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+        }
+    }
+
+    developers {
+        developer {
+            id 'evant'
+            name 'Evan Tatarka'
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenCustom(MavenPublication) {
+            from components.java
+            artifact sourceJar
+
+            pom.withXml {
+                asNode().children().last() + pomConfig
+            }
+        }
+    }
+}
+
+if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = 'invalid'
+if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = 'invalid'
+
+bintray {
+    user = project.bintrayUsername
+    key = project.bintrayApiKey
+    publications = ['mavenCustom']
+    pkg {
+        repo = project.project_bintray_repo
+        userOrg = project.project_bintray_org
+        name = project.name
+        desc = project.project_description
+        licenses = ['Apache-2.0']
+        labels = ['gradle', 'plugin']
+        websiteUrl = project.project_url
+        issueTrackerUrl = project.project_issues_url
+        vcsUrl = project.project_scm
+        publicDownloadNumbers = true
+        version {
+            vcsTag = project.version
+            attributes = [
+                'gradle-plugin': 'me.tatarka.retrolambda:me.tatarka:gradle-retrolambda'
+            ]
+        }
+    }
+}
