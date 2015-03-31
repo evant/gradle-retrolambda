@@ -19,7 +19,7 @@ repositories {
 }
 
 group = 'me.tatarka'
-version = '3.0.0-SNAPSHOT'
+version = '3.0.0'
 
 sourceCompatibility = '1.6'
 
