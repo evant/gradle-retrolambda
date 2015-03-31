@@ -24,7 +24,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:2.5.0'
+         classpath 'me.tatarka:gradle-retrolambda:3.0.0'
       }
    }
 
@@ -57,6 +57,8 @@ retrolambda {
   oldJdk System.getenv("JAVA6_HOME")
   javaVersion JavaVersion.VERSION_1_6
   jvmArgs '-arg1', '-arg2'
+  defaultMethods false
+  incremental true
 }
 ```
 
@@ -75,11 +77,15 @@ retrolambda {
 - `exclude 'Test'` Sets which sets/variants to not run through retrolambda. Only
     one of either `include` or `exclude` should be defined.
 - `jvmArgs` Add additional jvm args when running retrolambda.
+- `defaultMethods` Turn on default and static methods in interfaces support. Note: due to a 
+   limitation in retrolamba, this will set `incremental` to false. The default is false.
+- `incremental` Setting this to false forces all of your class files to be run through retrolambda
+   instead of only the ones that have changed. The default is true.
 
 ### Using a Different Version of the retrolambda.jar
 
 The default version of retrolambda used is
-`'net.orfjackal.retrolambda:retrolambda:1.6.0'`. If you want to use a different
+`'net.orfjackal.retrolambda:retrolambda:2.0.0'`. If you want to use a different
 one, you can configure it in your dependencies.
 
 ```groovy
@@ -114,11 +120,11 @@ This plugin is fully compatible with progurad (since `v2.4.0`). In your progurad
 Known Issues
 ---------------
 ### Using Google Play Services causes retrolambda to fail
-Version `5.0.77` contains bytecode that is incompatible with retrolambda. To
-work around this issue, you can either use an earlier version like `4.4.52` or
-add `-noverify` to the jvm args. See
-[orfjackal/retrolambda#25](https://github.com/orfjackal/retrolambda/issues/25)
-for more information.
+Version `5.0.77` contains bytecode that is incompatible with retrolambda. This should be fixed in
+newer versions of play services, if you can update, that should be the preferred solution. To work 
+around this issue, you can either use an earlier version like `4.4.52` or add `-noverify` to the jvm 
+args. See [orfjackal/retrolambda#25](https://github.com/orfjackal/retrolambda/issues/25) for more 
+information.
 
 ```groovy
 retrolambda {
@@ -138,20 +144,6 @@ This is because `android-apt` modifies the `javaCompile` task and this plugin
 replaces it. Since `v2.4.1` this is fixed, you just need to ensure you apply
 this plugin _before_ `android-apt`.
 
-What Black Magic did you use to get this to work on Android?
-------------------------------------------------------------
-
-There were two hurdles to overcome when compiling for android. The gradle
-android plugin forces a compile targeting java 6 and uses a custom
-bootclasspath that doesn't include necessary java8 files. To overcome this, the
-plugin:
-
-1. Overrides `-source` and `-target` with 8.
-2. Extracts the necessary files out of the java runtime (rt.jar), and patches
-android.jar with them.
-3. Sets `-bootclasspath` to point to the patched android.jar
-
 Updates
 -------
-
 All updates have moved to the [CHANGELOG](https://github.com/evant/gradle-retrolambda/blob/master/CHANGELOG.md).

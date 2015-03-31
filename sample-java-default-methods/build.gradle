@@ -1,0 +1,36 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "me.tatarka:gradle-retrolambda:${rootProject.version}"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'me.tatarka.retrolambda'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core:2.0.0'
+}
+
+mainClassName = "me.tatarka.retrolambda.sample.Main"
+
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}
+
+retrolambda {
+    javaVersion JavaVersion.VERSION_1_7
+    defaultMethods true
+}

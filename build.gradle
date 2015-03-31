@@ -19,12 +19,16 @@ repositories {
 }
 
 group = 'me.tatarka'
-version = '2.5.0'
+version = '3.0.0-SNAPSHOT'
+
+sourceCompatibility = '1.6'
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
     compile 'com.android.tools.build:gradle:1.0.0'
+    
+    testCompile 'org.assertj:assertj-core:2.0.0'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {

@@ -48,21 +48,29 @@ class RetrolambdaTask extends DefaultTask {
 
     @Input
     List<String> jvmArgs = []
-
+    
     @TaskAction
     def execute(IncrementalTaskInputs inputs) {
+        RetrolambdaExtension retrolambda = project.retrolambda
+        
         def changes = []
         inputs.outOfDate { changes += it }
-
-        changes.each { change ->
-            if (change.modified) deleteRelated(toOutput(change.file))
+        
+        // Ensure output is cleared if build is not incremental.
+        if (inputs.incremental && !changes.isEmpty() && !retrolambda.incremental) {
+            outputDir.eachFile { it.delete() }
+        } else {
+            changes.each { change ->
+                if (change.modified) deleteRelated(toOutput(change.file))
+            }
         }
 
         if (!inputs.incremental || !changes.isEmpty()) {
             project.javaexec {
+                
                 // Ensure retrolambda runs on java8
                 if (!project.retrolambda.onJava8) {
-                    def java = "${project.retrolambda.tryGetJdk()}/bin/java"
+                    def java = "${retrolambda.tryGetJdk()}/bin/java"
                     if (!checkIfExecutableExists(java)) {
                         throw new ProjectConfigurationException("Cannot find executable: $java", null)
                     }
@@ -84,8 +92,12 @@ class RetrolambdaTask extends DefaultTask {
                     jvmArgs += "-javaagent:$classpath.asPath"
                 }
 
-                if (inputs.incremental) {
+                if (inputs.incremental && retrolambda.incremental) {
                     jvmArgs += "-Dretrolambda.includedFiles=${changes*.file.join(File.pathSeparator)}"
+                }
+                
+                if (retrolambda.defaultMethods) {
+                    jvmArgs += "-Dretrolambda.defaultMethods=true"
                 }
 
                 this.jvmArgs.each { arg -> jvmArgs += arg }

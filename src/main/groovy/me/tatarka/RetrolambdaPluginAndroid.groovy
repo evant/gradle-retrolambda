@@ -49,10 +49,9 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                 throw new ProjectConfigurationException("Cannot find android sdk. Make sure sdk.dir is defined in local.properties or the environment variable ANDROID_HOME is set.", null)
             }
 
-            def androidJar = "$sdkDir/platforms/$project.android.compileSdkVersion/android.jar"
-
             def buildPath = "$project.buildDir/retrolambda"
             def jarPath = "$buildPath/$project.android.compileSdkVersion"
+            def rt = "$project.retrolambda.jdk/jre/lib/rt.jar"
 
             def isLibrary = project.plugins.hasPlugin('android-library')
 
@@ -66,20 +65,14 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     def oldDestDir = var.javaCompile.destinationDir
                     def newDestDir = project.file("$buildPath/$var.name")
                     def classpathFiles =
-                            var.javaCompile.classpath +
-                                    project.files("$buildPath/$var.name") +
-                                    project.files(androidJar)
+                            var.javaCompile.classpath + project.files("$buildPath/$var.name")
 
-                    def newJavaCompile = project.task("_$var.javaCompile.name", dependsOn: "patchAndroidJar", type: JavaCompile) {
+                    def newJavaCompile = project.task("_$var.javaCompile.name", type: JavaCompile) {
                         conventionMapping.source = { var.javaCompile.source }
                         conventionMapping.classpath = { var.javaCompile.classpath }
                         destinationDir = newDestDir
                         sourceCompatibility = "1.8"
                         targetCompatibility = "1.8"
-                    }
-
-                    newJavaCompile.doFirst {
-                        newJavaCompile.options.compilerArgs = var.javaCompile.options.compilerArgs + ["-bootclasspath", "$jarPath/android.jar"]
                     }
 
                     def retrolambdaTask = project.task("compileRetrolambda${name}", dependsOn: [newJavaCompile], type: RetrolambdaTask) {
@@ -90,22 +83,66 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         jvmArgs = project.retrolambda.jvmArgs
                     }
 
+                    newJavaCompile.doFirst {
+                        newJavaCompile.classpath += project.files(rt)
+                        newJavaCompile.options.compilerArgs = var.javaCompile.options.compilerArgs
+                        newJavaCompile.options.bootClasspath = var.javaCompile.options.bootClasspath
+                    }
+
+                    retrolambdaTask.doFirst {
+                        retrolambdaTask.classpath += project.files(var.javaCompile.options.bootClasspath)
+                    }
+
                     var.javaCompile.finalizedBy(retrolambdaTask)
                     
                     // Hack to only delete the compile action and not any doFirst() or doLast()
                     // I hope gradle doesn't change the class name!
                     def taskActions = var.javaCompile.taskActions
                     def taskRemoved = false
+                    def beforeActions = []
+                    def afterActions = []
                     for (int i = taskActions.size() - 1; i >= 0; i--) {
                         if (taskActions[i].class.name == "org.gradle.api.internal.project.taskfactory.AnnotationProcessingTaskFactory\$IncrementalTaskAction") {
                             taskActions.remove(i)
-                            taskRemoved = true 
-                            break
+                            taskRemoved = true
+                        } else if (taskRemoved) {
+                            beforeActions.add(taskActions[i])
+                            taskActions.remove(i)
+                        } else {
+                            afterActions.add(taskActions[i])
+                            taskActions.remove(i)
                         }
                     }
                     
                     if (!taskRemoved) {
                         throw new ProjectConfigurationException("Unable to delete old javaCompile action, maybe the class name has changed? Please submit a bug report with what version of gradle you are using.", null)
+                    }
+                    
+                    // Move any after to the retrolambda task to that they run after retrolambda
+                    beforeActions.each {
+                        newJavaCompile.doFirst(it)
+                    }
+                    afterActions.each {
+                        retrolambdaTask.doLast(it)
+                    }
+
+                    // Ensure retrolamba runs before compiling tests
+                    def compileTestTaskName = "compile${var.name.capitalize()}UnitTestJava"
+                    def compileTestTask = project.tasks.findByName(compileTestTaskName)
+                    if (compileTestTask != null) {
+                        compileTestTask.mustRunAfter(retrolambdaTask)
+                        // We need to add the rt to the classpath to support lambdas in the tests themselves 
+                        compileTestTask.classpath += project.files(rt)
+                        
+                        if (!project.retrolambda.onJava8) {
+                            // Set JDK 8 for the compiler task
+                            compileTestTask.doFirst {
+                                it.options.fork = true
+                                def javac = "${project.retrolambda.tryGetJdk()}/bin/javac"
+                                if (!checkIfExecutableExists(javac)) throw new ProjectConfigurationException("Cannot find executable: $javac", null)
+                                it.options.forkOptions.executable = javac
+                            }
+                        }
                     }
 
                     def extractTaskName = "extract${var.name.capitalize()}Annotations"
@@ -123,48 +160,6 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                             if (!checkIfExecutableExists(javac)) throw new ProjectConfigurationException("Cannot find executable: $javac", null)
                             it.options.forkOptions.executable = javac
                         }
-                    }
-                }
-            }
-
-            project.task("patchAndroidJar") {
-                def rt = "$project.retrolambda.jdk/jre/lib/rt.jar"
-                def classesPath = "$buildPath/classes"
-                def jdkPathError = " does not exist, make sure that the environment variable JAVA_HOME or JAVA8_HOME, or the gradle property retrolambda.jdk points to a valid version of java8."
-
-                inputs.dir androidJar
-                inputs.dir rt
-                outputs.dir jarPath
-                outputs.dir classesPath
-
-                if (!project.file(androidJar).exists()) {
-                    throw new ProjectConfigurationException("Retrolambda: $androidJar does not exist, make sure ANDROID_HOME or sdk.dir is correctly set to the android sdk directory.", null)
-                }
-
-                doLast {
-                    project.copy {
-                        from project.file(androidJar)
-                        into project.file(jarPath)
-                    }
-
-                    if (!project.file(rt).exists()) {
-                        throw new ProjectConfigurationException("Retrolambda: " + rt + jdkPathError, null)
-                    }
-
-                    project.copy {
-                        from(project.zipTree(project.file(rt))) {
-                            include("java/lang/invoke/**/*.class")
-                        }
-
-                        into project.file(classesPath)
-                    }
-
-                    if (!project.file(classesPath).isDirectory()) {
-                        throw new ProjectConfigurationException("Retrolambda: " + "$buildPath/classes" + jdkPathError, null)
-                    }
-
-                    project.ant.jar(update: true, destFile: "$jarPath/android.jar") {
-                        fileset(dir: "$buildPath/classes")
                     }
                 }
             }
