@@ -16,6 +16,7 @@ A whole bunch of changes!
   the intention, but was broken in the last build.
 - More minor changes to how the java compile task is replaced, this should ensure better 
   compatibility with other plugins.
+- Removed 'retrolambda', now you can only apply the plugin with 'me.tatarka.retrolambda'.
 
 #### 2.5.0
 - A more robust fix for android-apt compatibility. Important: If you were experiencing issues with
