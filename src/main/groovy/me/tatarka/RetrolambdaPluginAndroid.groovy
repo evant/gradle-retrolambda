@@ -90,7 +90,12 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     }
 
                     retrolambdaTask.doFirst {
-                        retrolambdaTask.classpath += project.files(var.javaCompile.options.bootClasspath)
+                        if (var.javaCompile.options.bootClasspath) {
+                            retrolambdaTask.classpath += project.files(var.javaCompile.options.bootClasspath)
+                        } else {
+                            // If this is null it means the javaCompile task didn't need to run, don't bother running retrolambda either.
+                            retrolambdaTask.enabled = false
+                        }
                     }
 
                     var.javaCompile.finalizedBy(retrolambdaTask)
