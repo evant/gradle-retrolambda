@@ -155,7 +155,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     def extractTask = project.tasks.findByName(extractTaskName)
                     if (extractTask != null) {
                         extractTask.deleteAllActions()
-                        project.logger.warn("$extractTaskName is incomaptible with java 8 sources and has been disabled.")
+                        project.logger.warn("$extractTaskName is incompatible with java 8 sources and has been disabled.")
                     }
 
                     if (!project.retrolambda.onJava8) {
