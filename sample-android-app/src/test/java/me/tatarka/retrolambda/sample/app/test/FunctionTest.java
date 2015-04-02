@@ -6,6 +6,7 @@ import org.junit.runners.JUnit4;
 
 import me.tatarka.retrolambda.sample.app.Function;
 import me.tatarka.retrolambda.sample.app.MainActivity;
+import me.tatarka.retrolambda.sample.app.MyModule;
 import me.tatarka.retrolambda.sample.lib.Lib;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,14 +16,16 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(JUnit4.class)
 public class FunctionTest {
+    MyModule module = new MyModule();
+    
     @Test
     public void testGetHello() {
-        assertThat(MainActivity.getHello().run()).isEqualTo("Hello, retrolambda!");
+        assertThat(module.provideHello().run()).isEqualTo("Hello, retrolambda!");
     }
 
     @Test
     public void testGetHelloLib() {
-        assertThat(Lib.getHello().run()).isEqualTo("Hello, retrolambda (from lib)!");
+        assertThat(module.provideLibHello().run()).isEqualTo("Hello, retrolambda (from lib)!");
     }
     
     @Test

@@ -3,13 +3,18 @@ import org.ajoberstar.grgit.*
 buildscript {
     repositories {
         mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     
     dependencies {
-        classpath 'org.ajoberstar:gradle-git:0.11.2' 
+        classpath 'org.ajoberstar:gradle-git:0.11.2'
+        classpath "com.gradle.publish:plugin-publish-plugin:0.9.0"
     }
 }
 
+apply plugin: "com.gradle.plugin-publish"
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'signing'
@@ -19,7 +24,7 @@ repositories {
 }
 
 group = 'me.tatarka'
-version = '3.0.0'
+version = '3.0.1-SNAPSHOT'
 
 sourceCompatibility = '1.6'
 
@@ -47,11 +52,25 @@ artifacts {
     archives sourcesJar
 }
 
-if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.password')) {
-    signing {
-        sign configurations.archives
-    }
+pluginBundle {
+    website = 'https://github.com/evant/gradle-retrolambda'
+    vcsUrl = 'https://github.com/evant/gradle-retrolambda.git'
+    description = 'https://github.com/evant/gradle-retrolambda.git'
+    tags = ['java', 'android', 'lambda']
 
+    plugins {
+        retrolambdaPlugin {
+            id = 'me.tatarka.retrolambda'
+            displayName = 'gradle-retrolambda'
+        }
+    }
+}
+
+signing {
+    sign configurations.archives
+}
+
+if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.password')) {
     uploadArchives {
         repositories {
             mavenDeployer {
