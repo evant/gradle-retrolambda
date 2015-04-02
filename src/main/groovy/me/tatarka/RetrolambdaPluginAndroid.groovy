@@ -19,6 +19,7 @@ package me.tatarka
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.compile.JavaCompile
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
@@ -94,7 +95,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                             retrolambdaTask.classpath += project.files(var.javaCompile.options.bootClasspath)
                         } else {
                             // If this is null it means the javaCompile task didn't need to run, don't bother running retrolambda either.
-                            retrolambdaTask.enabled = false
+                            throw new StopExecutionException()
                         }
                     }
 
