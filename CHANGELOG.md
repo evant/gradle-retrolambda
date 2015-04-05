@@ -1,6 +1,7 @@
 ### 3.0.1
 - Fixed occasional "Build exception: cannot call Task.setEnabled(boolean)" error.
 - Fixed minor warning typo.
+- Uploaded to the gradle plugin portal.
 
 ### 3.0.0
 A whole bunch of changes!
