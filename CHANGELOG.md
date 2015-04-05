@@ -1,3 +1,7 @@
+### 3.0.1
+- Fixed occasional "Build exception: cannot call Task.setEnabled(boolean)" error.
+- Fixed minor warning typo.
+
 ### 3.0.0
 A whole bunch of changes!
 - Changed the default retrolambda to 2.0.0

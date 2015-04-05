@@ -24,7 +24,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:3.0.0'
+         classpath 'me.tatarka:gradle-retrolambda:3.0.1'
       }
    }
 
@@ -91,7 +91,7 @@ one, you can configure it in your dependencies.
 ```groovy
 dependencies {
   // Latest one on maven central
-  retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:1.+'
+  retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:+'
   // Or a local version
   // retrolambdaConfig files('libs/retrolambda.jar')
 }
