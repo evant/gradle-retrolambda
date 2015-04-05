@@ -36,6 +36,13 @@ Usage
    apply plugin: 'com.android.application' //or apply plugin: 'java'
    apply plugin: 'me.tatarka.retrolambda'
    ```
+   alternativly, you can use the new plugin syntax for gradle `2.1+`
+   ```groovy'
+   plugins {
+      id "me.tatarka.retrolambda" version "3.0.1"
+   }
+   ```
+   
 3. There is no step three!
 
 The plugin will compile the source code with java8 and then replace the class
