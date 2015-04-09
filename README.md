@@ -119,7 +119,7 @@ android {
 
 Proguard
 ----------
-This plugin is fully compatible with progurad (since `v2.4.0`). In your progurad file, add
+This plugin is fully compatible with proguard (since `v2.4.0`). In your proguard file, add
 ```
 -dontwarn java.lang.invoke.*
 ```
