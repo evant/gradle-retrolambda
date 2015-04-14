@@ -42,7 +42,7 @@ Usage
       id "me.tatarka.retrolambda" version "3.0.1"
    }
    ```
-   
+
 3. There is no step three!
 
 The plugin will compile the source code with java8 and then replace the class
@@ -84,7 +84,7 @@ retrolambda {
 - `exclude 'Test'` Sets which sets/variants to not run through retrolambda. Only
     one of either `include` or `exclude` should be defined.
 - `jvmArgs` Add additional jvm args when running retrolambda.
-- `defaultMethods` Turn on default and static methods in interfaces support. Note: due to a 
+- `defaultMethods` Turn on default and static methods in interfaces support. Note: due to a
    limitation in retrolamba, this will set `incremental` to false. The default is false.
 - `incremental` Setting this to false forces all of your class files to be run through retrolambda
    instead of only the ones that have changed. The default is true.
@@ -128,9 +128,9 @@ Known Issues
 ---------------
 ### Using Google Play Services causes retrolambda to fail
 Version `5.0.77` contains bytecode that is incompatible with retrolambda. This should be fixed in
-newer versions of play services, if you can update, that should be the preferred solution. To work 
-around this issue, you can either use an earlier version like `4.4.52` or add `-noverify` to the jvm 
-args. See [orfjackal/retrolambda#25](https://github.com/orfjackal/retrolambda/issues/25) for more 
+newer versions of play services, if you can update, that should be the preferred solution. To work
+around this issue, you can either use an earlier version like `4.4.52` or add `-noverify` to the jvm
+args. See [orfjackal/retrolambda#25](https://github.com/orfjackal/retrolambda/issues/25) for more
 information.
 
 ```groovy
@@ -139,7 +139,7 @@ retrolambda {
 }
 ```
 
-### Compiling for android-L doesn't work when using Android Studio's sdk manager. 
+### Compiling for android-L doesn't work when using Android Studio's sdk manager.
 For some reason only known to the gods, when using Android Studio's sdk manager,
 there is no `android-L` directory sdk directory. Instead, it happily builds
 using the `android-20` directory instead. To work around this, you can symlink
@@ -147,9 +147,8 @@ the `android-L` directory to point to `android-20`. See
 [#36](https://github.com/evant/gradle-retrolambda/issues/36).
 
 ### Build fails with using `android-apt`
-This is because `android-apt` modifies the `javaCompile` task and this plugin 
-replaces it. Since `v2.4.1` this is fixed, you just need to ensure you apply
-this plugin _before_ `android-apt`.
+This is because `android-apt` modifies the `javaCompile` task and this plugin
+replaces it. Since `v2.4.1` this is fixed, you just need to ensure you apply this plugin _last_.
 
 Updates
 -------

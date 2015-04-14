@@ -3,24 +3,25 @@
 - Fixed minor warning typo.
 - Uploaded to the gradle plugin portal.
 
-### 3.0.0
+#### 3.0.0
 A whole bunch of changes!
 - Changed the default retrolambda to 2.0.0
 - Added support for default methods, add `defaultMethods true` to the retrolambda block. Note: due
   to a current limitation in retrolamba, this will require all of your class files to be fed through
   retrolambda on each build. This may adversely affect build times.
 - `incremental false` is no longer deprecated but has different semantics. Instead of being a hack
-  around gradle-retrolambda breaking other plugins, it now only forces all of your class files to be 
+  around gradle-retrolambda breaking other plugins, it now only forces all of your class files to be
   run through retrolambda instead of only the changed ones.
 - Added support for android unit tests, including lambdas in the tests themselves.
 - No longer patch the android jar, modify the classpath instead. This should resolve issues with
   using gradle-retrolambda with more obscure android sdks, like google glass. This should also speed
   up a clean build since it doesn't have to do any zipping shenanigans.
-- Ensure the gradle plugin is compiled with java 6 compatibility. This should allow you to run 
+- Ensure the gradle plugin is compiled with java 6 compatibility. This should allow you to run
   gradle with an older version of java if you don't want java 8 set as the default. This was always
   the intention, but was broken in the last build.
-- More minor changes to how the java compile task is replaced, this should ensure better 
-  compatibility with other plugins.
+- More minor changes to how the java compile task is replaced, this should ensure better
+  compatibility with other plugins. Note: these changes make the plugin application order more
+  important. *Make sure you you apply this plugin last.*
 - Removed 'retrolambda', now you can only apply the plugin with 'me.tatarka.retrolambda'.
 
 #### 2.5.0
@@ -55,7 +56,7 @@ the gradle plugin portal.
 
 #### 2.2.3
 
-- Change dependency back to `localGroovy()`, `org.codehaus.groovy:groovy-all:2.3.3` was causing 
+- Change dependency back to `localGroovy()`, `org.codehaus.groovy:groovy-all:2.3.3` was causing
   issues.
 
 #### 2.2.2
