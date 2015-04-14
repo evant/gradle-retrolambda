@@ -14,24 +14,24 @@ import me.tatarka.retrolambda.sample.lib.Lib;
 public class MainActivity extends Activity {
     @Inject
     Function hello;
-    
+
     @Inject
     me.tatarka.retrolambda.sample.lib.Function libHello;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Dagger_MyComponent.builder()
+        DaggerMyComponent.builder()
                 .myModule(new MyModule())
                 .build()
                 .inject(this);
-        
+
         setContentView(R.layout.activity_main);
-        
+
         TextView text = (TextView) findViewById(R.id.text);
         text.setText(hello.run());
-        
+
         TextView textLib = (TextView) findViewById(R.id.text_lib);
         textLib.setText(libHello.run());
     }

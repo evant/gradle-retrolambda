@@ -17,18 +17,15 @@ apply plugin: 'me.tatarka.retrolambda'
 
 repositories {
     mavenCentral()
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
 }
 
 dependencies {
     compile project(':sample-android-lib')
 
-    compile 'com.google.dagger:dagger:2.0-SNAPSHOT'
-    apt "com.google.dagger:dagger-compiler:2.0-SNAPSHOT"
+    compile 'com.google.dagger:dagger:2.0'
+    apt "com.google.dagger:dagger-compiler:2.0"
     provided 'javax.annotation:jsr250-api:1.0'
-    
+
     androidTestCompile 'com.android.support.test:testing-support-lib:0.1'
     androidTestCompile 'org.assertj:assertj-core:1.6.1'
     androidTestCompile 'com.squareup.assertj:assertj-android:1.0.0'
