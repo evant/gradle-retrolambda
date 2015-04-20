@@ -92,7 +92,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
 
                     retrolambdaTask.doFirst {
                         if (var.javaCompile.options.bootClasspath) {
-                            retrolambdaTask.classpath += project.files(var.javaCompile.options.bootClasspath)
+                            retrolambdaTask.classpath += project.files(var.javaCompile.options.bootClasspath.tokenize(File.pathSeparator))
                         } else {
                             // If this is null it means the javaCompile task didn't need to run, don't bother running retrolambda either.
                             throw new StopExecutionException()
@@ -100,7 +100,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                     }
 
                     var.javaCompile.finalizedBy(retrolambdaTask)
-                    
+
                     // Hack to only delete the compile action and not any doFirst() or doLast()
                     // I hope gradle doesn't change the class name!
                     def taskActions = var.javaCompile.taskActions
@@ -119,11 +119,11 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                             taskActions.remove(i)
                         }
                     }
-                    
+
                     if (!taskRemoved) {
                         throw new ProjectConfigurationException("Unable to delete old javaCompile action, maybe the class name has changed? Please submit a bug report with what version of gradle you are using.", null)
                     }
-                    
+
                     // Move any after to the retrolambda task to that they run after retrolambda
                     beforeActions.each {
                         newJavaCompile.doFirst(it)
@@ -139,7 +139,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         compileTestTask.mustRunAfter(retrolambdaTask)
                         // We need to add the rt to the classpath to support lambdas in the tests themselves 
                         compileTestTask.classpath += project.files(rt)
-                        
+
                         if (!project.retrolambda.onJava8) {
                             // Set JDK 8 for the compiler task
                             compileTestTask.doFirst {
