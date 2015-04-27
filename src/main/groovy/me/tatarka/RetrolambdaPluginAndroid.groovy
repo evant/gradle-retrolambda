@@ -74,6 +74,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
                         destinationDir = newDestDir
                         sourceCompatibility = "1.8"
                         targetCompatibility = "1.8"
+                        options.encoding = var.javaCompile.options.encoding
                     }
 
                     def retrolambdaTask = project.task("compileRetrolambda${name}", dependsOn: [newJavaCompile], type: RetrolambdaTask) {
