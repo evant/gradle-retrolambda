@@ -123,11 +123,6 @@ if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.pa
     def grgit = Grgit.open(project.projectDir)
 
     task checkRelease << {
-        if (version.endsWith('SNAPSHOT')) {
-            logger.warn("relaxing release checks for SNAPSHOT")
-            return
-        }
-        
         def readmeVersion = file('README.md').readLines().find { it.contains('me.tatarka:gradle-retrolambda:') }?.trim()
         
         if (readmeVersion == null) {
@@ -156,5 +151,7 @@ if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.pa
         }
     }
     
-    uploadArchives.dependsOn(tagRelease)
+    if (!version.endsWith('SNAPSHOT')) {
+        uploadArchives.dependsOn(tagRelease)
+    }
 }
