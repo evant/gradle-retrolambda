@@ -6,8 +6,6 @@ import android.widget.TextView;
 
 import javax.inject.Inject;
 
-import me.tatarka.retrolambda.sample.lib.Lib;
-
 /**
  * Created by evan on 3/29/15.
  */
