@@ -45,23 +45,19 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
         if (isLibrary) {
             def android = project.extensions.getByType(LibraryExtension)
             android.libraryVariants.all { BaseVariant variant ->
-                println "variant $variant.name"
                 configureCompileJavaTask(project, variant.name, variant.javaCompile)
             }
             android.testVariants.all { TestVariant variant ->
-                println "variant $variant.name"
                 configureCompileJavaTask(project, variant.name, variant.javaCompile)
             }
         } else {
             def android = project.extensions.getByType(AppExtension)
             android.applicationVariants.all { BaseVariant variant ->
-                println "variant $variant.name"
                 configureCompileJavaTask(project, variant.name, variant.javaCompile)
                 
                 
             }
             android.testVariants.all { TestVariant variant ->
-                println "variant $variant.name"
                 configureCompileJavaTask(project, variant.name, variant.javaCompile)
             }
         }
