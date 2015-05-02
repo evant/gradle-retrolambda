@@ -15,15 +15,21 @@
  */
 
 package me.tatarka
-
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.LibraryPlugin
+import com.android.build.gradle.api.BaseVariant
+import com.android.build.gradle.api.TestVariant
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.Task
 import org.gradle.api.tasks.StopExecutionException
+import org.gradle.api.tasks.TaskState
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.testing.Test
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
-
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -34,141 +40,129 @@ import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
 public class RetrolambdaPluginAndroid implements Plugin<Project> {
     @Override
     void apply(Project project) {
-        project.afterEvaluate {
-            def sdkDir
+        def isLibrary = project.plugins.hasPlugin(LibraryPlugin)
 
-            Properties properties = new Properties()
-            File localProps = project.rootProject.file('local.properties')
-            if (localProps.exists()) {
-                properties.load(localProps.newDataInputStream())
-                sdkDir = properties.getProperty('sdk.dir')
+        if (isLibrary) {
+            def android = project.extensions.getByType(LibraryExtension)
+            android.libraryVariants.all { BaseVariant variant ->
+                configureCompileJavaTask(project, variant.name, variant.javaCompile)
+            }
+            android.testVariants.all { TestVariant variant ->
+                configureCompileJavaTask(project, variant.name, variant.javaCompile)
+            }
+        } else {
+            def android = project.extensions.getByType(AppExtension)
+            android.applicationVariants.all { BaseVariant variant ->
+                configureCompileJavaTask(project, variant.name, variant.javaCompile)
+                
+                
+            }
+            android.testVariants.all { TestVariant variant ->
+                configureCompileJavaTask(project, variant.name, variant.javaCompile)
+            }
+        }
+    }
+
+    private static configureCompileJavaTask(Project project, String variant, JavaCompile javaCompileTask) {
+        def oldDestDir = javaCompileTask.destinationDir
+        def newDestDir = project.file("$project.buildDir/retrolambda/$variant")
+        def classpathFiles = javaCompileTask.classpath + project.files("$project.buildDir/retrolambda/$variant")
+
+        RetrolambdaTask retrolambdaTask = project.task(
+                "compileRetrolambda${variant.capitalize()}",
+                dependsOn: [javaCompileTask],
+                type: RetrolambdaTask
+        ) as RetrolambdaTask
+
+        retrolambdaTask.inputDir = newDestDir
+        retrolambdaTask.outputDir = oldDestDir
+        retrolambdaTask.classpath = classpathFiles
+
+        retrolambdaTask.doFirst {
+            // bootClasspath isn't set until the last possible moment because it's expensive to look
+            // up the android sdk path.
+            def bootClasspath = javaCompileTask.options.bootClasspath
+            if (bootClasspath) {
+                retrolambdaTask.classpath += project.files(bootClasspath.tokenize(File.pathSeparator))
             } else {
-                sdkDir = System.getenv('ANDROID_HOME')
+                // If this is null it means the javaCompile task didn't need to run, don't bother running retrolambda either.
+                throw new StopExecutionException()
             }
+        }
 
-            if (!sdkDir) {
-                throw new ProjectConfigurationException("Cannot find android sdk. Make sure sdk.dir is defined in local.properties or the environment variable ANDROID_HOME is set.", null)
+        project.gradle.taskGraph.afterTask { Task task, TaskState state ->
+            if (task == retrolambdaTask) {
+                // We need to set this back to subsequent android tasks work correctly.
+                javaCompileTask.destinationDir = oldDestDir
             }
+        }
 
-            def buildPath = "$project.buildDir/retrolambda"
-            def jarPath = "$buildPath/$project.android.compileSdkVersion"
-            def rt = "$project.retrolambda.jdk/jre/lib/rt.jar"
+        javaCompileTask.destinationDir = newDestDir
+        javaCompileTask.sourceCompatibility = "1.8"
+        javaCompileTask.targetCompatibility = "1.8"
+        javaCompileTask.finalizedBy(retrolambdaTask)
 
-            def isLibrary = project.plugins.hasPlugin('android-library')
+        javaCompileTask.doFirst {
+            def retrolambda = project.extensions.getByType(RetrolambdaExtension)
+            def rt = "$retrolambda.jdk/jre/lib/rt.jar"
 
-            def variants = (isLibrary ?
-                    project.android.libraryVariants :
-                    project.android.applicationVariants) + project.android.testVariants
+            javaCompileTask.classpath += project.files(rt)
 
-            variants.each { var ->
-                if (project.retrolambda.isIncluded(var.name)) {
-                    def name = var.name.capitalize()
-                    def oldDestDir = var.javaCompile.destinationDir
-                    def newDestDir = project.file("$buildPath/$var.name")
-                    def classpathFiles =
-                            var.javaCompile.classpath + project.files("$buildPath/$var.name")
+            retrolambdaTask.javaVersion = retrolambda.javaVersion
+            retrolambdaTask.jvmArgs = retrolambda.jvmArgs
 
-                    def newJavaCompile = project.task("_$var.javaCompile.name", type: JavaCompile) {
-                        conventionMapping.source = { var.javaCompile.source }
-                        conventionMapping.classpath = { var.javaCompile.classpath }
-                        destinationDir = newDestDir
-                        sourceCompatibility = "1.8"
-                        targetCompatibility = "1.8"
-                    }
+            ensureCompileOnJava8(retrolambda, javaCompileTask)
+        }
 
-                    def retrolambdaTask = project.task("compileRetrolambda${name}", dependsOn: [newJavaCompile], type: RetrolambdaTask) {
-                        inputDir = newDestDir
-                        outputDir = oldDestDir
-                        classpath = classpathFiles
-                        javaVersion = project.retrolambda.javaVersion
-                        jvmArgs = project.retrolambda.jvmArgs
-                    }
+        def extractAnnotations = project.tasks.findByName("extract${variant.capitalize()}Annotations")
+        if (extractAnnotations) {
+            extractAnnotations.deleteAllActions()
+            project.logger.warn("$extractAnnotations.name is incompatible with java 8 sources and has been disabled.")
+        }
 
-                    newJavaCompile.doFirst {
-                        newJavaCompile.classpath += project.files(rt)
-                        newJavaCompile.options.compilerArgs = var.javaCompile.options.compilerArgs
-                        newJavaCompile.options.bootClasspath = var.javaCompile.options.bootClasspath
-                    }
+        JavaCompile compileUnitTest = (JavaCompile) project.tasks.findByName("compile${variant.capitalize()}UnitTestJava")
+        if (compileUnitTest) {
+            configureUnitTestTask(project, variant, compileUnitTest)
+        }
+    }
 
-                    retrolambdaTask.doFirst {
-                        if (var.javaCompile.options.bootClasspath) {
-                            retrolambdaTask.classpath += project.files(var.javaCompile.options.bootClasspath)
-                        } else {
-                            // If this is null it means the javaCompile task didn't need to run, don't bother running retrolambda either.
-                            throw new StopExecutionException()
-                        }
-                    }
+    private static configureUnitTestTask(Project project, String variant, JavaCompile javaCompileTask) {
+        javaCompileTask.mustRunAfter("compileRetrolambda${variant.capitalize()}")
 
-                    var.javaCompile.finalizedBy(retrolambdaTask)
-                    
-                    // Hack to only delete the compile action and not any doFirst() or doLast()
-                    // I hope gradle doesn't change the class name!
-                    def taskActions = var.javaCompile.taskActions
-                    def taskRemoved = false
-                    def beforeActions = []
-                    def afterActions = []
-                    for (int i = taskActions.size() - 1; i >= 0; i--) {
-                        if (taskActions[i].class.name == "org.gradle.api.internal.project.taskfactory.AnnotationProcessingTaskFactory\$IncrementalTaskAction") {
-                            taskActions.remove(i)
-                            taskRemoved = true
-                        } else if (taskRemoved) {
-                            beforeActions.add(taskActions[i])
-                            taskActions.remove(i)
-                        } else {
-                            afterActions.add(taskActions[i])
-                            taskActions.remove(i)
-                        }
-                    }
-                    
-                    if (!taskRemoved) {
-                        throw new ProjectConfigurationException("Unable to delete old javaCompile action, maybe the class name has changed? Please submit a bug report with what version of gradle you are using.", null)
-                    }
-                    
-                    // Move any after to the retrolambda task to that they run after retrolambda
-                    beforeActions.each {
-                        newJavaCompile.doFirst(it)
-                    }
-                    afterActions.each {
-                        retrolambdaTask.doLast(it)
-                    }
+        javaCompileTask.doFirst {
+            def retrolambda = project.extensions.getByType(RetrolambdaExtension)
+            def rt = "$retrolambda.jdk/jre/lib/rt.jar"
 
-                    // Ensure retrolamba runs before compiling tests
-                    def compileTestTaskName = "compile${var.name.capitalize()}UnitTestJava"
-                    def compileTestTask = project.tasks.findByName(compileTestTaskName)
-                    if (compileTestTask != null) {
-                        compileTestTask.mustRunAfter(retrolambdaTask)
-                        // We need to add the rt to the classpath to support lambdas in the tests themselves 
-                        compileTestTask.classpath += project.files(rt)
-                        
-                        if (!project.retrolambda.onJava8) {
-                            // Set JDK 8 for the compiler task
-                            compileTestTask.doFirst {
-                                it.options.fork = true
-                                def javac = "${project.retrolambda.tryGetJdk()}/bin/javac"
-                                if (!checkIfExecutableExists(javac)) throw new ProjectConfigurationException("Cannot find executable: $javac", null)
-                                it.options.forkOptions.executable = javac
-                            }
-                        }
-                    }
+            // We need to add the rt to the classpath to support lambdas in the tests themselves
+            javaCompileTask.classpath += project.files(rt)
 
-                    def extractTaskName = "extract${var.name.capitalize()}Annotations"
-                    def extractTask = project.tasks.findByName(extractTaskName)
-                    if (extractTask != null) {
-                        extractTask.deleteAllActions()
-                        project.logger.warn("$extractTaskName is incompatible with java 8 sources and has been disabled.")
-                    }
+            ensureCompileOnJava8(retrolambda, javaCompileTask)
+        }
 
-                    if (!project.retrolambda.onJava8) {
-                        // Set JDK 8 for compiler task
-                        newJavaCompile.doFirst {
-                            it.options.fork = true
-                            def javac = "${project.retrolambda.tryGetJdk()}/bin/javac"
-                            if (!checkIfExecutableExists(javac)) throw new ProjectConfigurationException("Cannot find executable: $javac", null)
-                            it.options.forkOptions.executable = javac
-                        }
-                    }
-                }
+        Test runTask = (Test) project.tasks.findByName("test${variant.capitalize()}")
+        if (runTask) {
+            runTask.doFirst {
+                def retrolambda = project.extensions.getByType(RetrolambdaExtension)
+                ensureRunOnJava8(retrolambda, runTask)
             }
+        }
+    }
+
+    private static ensureCompileOnJava8(RetrolambdaExtension retrolambda, JavaCompile javaCompile) {
+        if (!retrolambda.onJava8) {
+            // Set JDK 8 for the compiler task
+            def javac = "${retrolambda.tryGetJdk()}/bin/javac"
+            if (!checkIfExecutableExists(javac)) throw new ProjectConfigurationException("Cannot find executable: $javac", null)
+            javaCompile.options.fork = true
+            javaCompile.options.forkOptions.executable = javac
+        }
+    }
+
+    private static ensureRunOnJava8(RetrolambdaExtension retrolambda, Test test) {
+        if (!retrolambda.onJava8) {
+            def java = "${retrolambda.tryGetJdk()}/bin/java"
+            if (!checkIfExecutableExists(java)) throw new ProjectConfigurationException("Cannot find executable: $java", null)
+            test.executable java
         }
     }
 }

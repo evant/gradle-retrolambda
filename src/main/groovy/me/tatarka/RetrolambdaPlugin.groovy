@@ -45,6 +45,7 @@ public class RetrolambdaPlugin implements Plugin<Project> {
             !task.name.equals('compileRetrolambda') && task.name.startsWith('compileRetrolambda')
         })  {
             description = "Converts all java 8 class files to java 6 or 7"
+            group = "build"
         }
 
         project.plugins.withType(JavaPlugin) {

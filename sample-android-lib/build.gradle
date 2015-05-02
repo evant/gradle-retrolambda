@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.0'
+        classpath 'com.android.tools.build:gradle:1.1.1'
         classpath "me.tatarka:gradle-retrolambda:${rootProject.version}"
     }
 }
@@ -19,7 +19,7 @@ apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "22.0.0"
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         minSdkVersion 15
@@ -41,4 +41,6 @@ android {
     }
 }
 
-
+dependencies {
+    compile 'com.android.support:support-annotations:20.0.0'
+}
