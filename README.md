@@ -24,7 +24,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:3.0.1'
+         classpath 'me.tatarka:gradle-retrolambda:3.1.0'
       }
    }
 
@@ -39,7 +39,7 @@ Usage
    alternativly, you can use the new plugin syntax for gradle `2.1+`
    ```groovy
    plugins {
-      id "me.tatarka.retrolambda" version "3.0.1"
+      id "me.tatarka.retrolambda" version "3.1.0"
    }
    ```
 
@@ -92,7 +92,7 @@ retrolambda {
 ### Using a Different Version of the retrolambda.jar
 
 The default version of retrolambda used is
-`'net.orfjackal.retrolambda:retrolambda:2.0.0'`. If you want to use a different
+`'net.orfjackal.retrolambda:retrolambda:2.0.2'`. If you want to use a different
 one, you can configure it in your dependencies.
 
 ```groovy

@@ -1,4 +1,15 @@
-### 3.0.1
+### 3.1.0
+- Major refactoring of android plugin.
+The method for modifying the javaCompile task is now *way* less hackey. In fact,
+it is much closer to the original way that it was done. I had originally
+abandoned this approach because it was breaking increment compilation is some
+weird ways. However, I think I have solved it.
+
+What this means for you: It is now less fickle of plugin application order and
+way less likely to break other plugins.
+- Properly split bootclasspath if it has multiple paths
+
+#### 3.0.1
 - Fixed occasional "Build exception: cannot call Task.setEnabled(boolean)" error.
 - Fixed minor warning typo.
 - Uploaded to the gradle plugin portal.
