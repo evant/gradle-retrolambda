@@ -126,6 +126,9 @@ This plugin is fully compatible with proguard (since `v2.4.0`). In your proguard
 
 Known Issues
 ---------------
+### Lint fails on java files that have lambdas.
+Android's lint doesn't understand java 8 syntax and will fail silently or loudly. There is now an [experimental fork](https://github.com/evant/android-retrolambda-lombok) that fixes the issue.
+
 ### Using Google Play Services causes retrolambda to fail
 Version `5.0.77` contains bytecode that is incompatible with retrolambda. This should be fixed in
 newer versions of play services, if you can update, that should be the preferred solution. To work
