@@ -2,6 +2,7 @@ package me.tatarka.retrolambda.sample.app;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import javax.inject.Inject;
@@ -9,7 +10,7 @@ import javax.inject.Inject;
 /**
  * Created by evan on 3/29/15.
  */
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     @Inject
     ResFunction hello;
 
@@ -32,5 +33,7 @@ public class MainActivity extends Activity {
 
         TextView textLib = (TextView) findViewById(R.id.text_lib);
         textLib.setText(libHello.run());
+        
+        ResFunction lambda = (res) -> "Foo";
     }
 }

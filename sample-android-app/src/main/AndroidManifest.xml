@@ -5,7 +5,8 @@
 
     <application
         android:icon="@mipmap/ic_launcher"
-        android:allowBackup="true">
+        android:allowBackup="true"
+        android:theme="@style/AppTheme">
         <activity android:name="me.tatarka.retrolambda.sample.app.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
