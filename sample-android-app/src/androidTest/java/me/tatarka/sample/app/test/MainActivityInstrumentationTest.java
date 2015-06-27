@@ -9,11 +9,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import me.tatarka.retrolambda.sample.app.Function;
 import me.tatarka.retrolambda.sample.app.MainActivity;
 import me.tatarka.retrolambda.sample.app.R;
+import me.tatarka.retrolambda.sample.app.ResFunction;
 
-import static org.assertj.android.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -24,27 +23,27 @@ public class MainActivityInstrumentationTest extends ActivityInstrumentationTest
     public MainActivityInstrumentationTest() {
         super(MainActivity.class);
     }
-    
+
     @Before
     public void setup() {
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
     }
-    
+
     @Test
     public void testHelloRetrolambda() {
         TextView text = (TextView) getActivity().findViewById(R.id.text);
-        assertThat(text).hasText("Hello, retrolambda!");
+        assertThat(text.getText().toString()).isEqualTo("Hello, Retrolambda!");
     }
-    
+
     @Test
     public void testHelloRetrolambdaLib() {
         TextView textLib = (TextView) getActivity().findViewById(R.id.text_lib);
-        assertThat(textLib).hasText("Hello, retrolambda (from lib)!");
+        assertThat(textLib.getText().toString()).isEqualTo("Hello, retrolambda (from lib)!");
     }
-    
+
     @Test
     public void testLambdaInTest() {
-        Function lambda = () -> "test";
-        assertThat(lambda.run()).isEqualTo("test");
+        ResFunction lambda = (res) -> "test";
+        assertThat(lambda.run(getActivity().getResources())).isEqualTo("test");
     }
 }

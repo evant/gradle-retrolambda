@@ -10,11 +10,11 @@ buildscript {
     
     dependencies {
         classpath 'org.ajoberstar:gradle-git:0.11.2'
-        classpath "com.gradle.publish:plugin-publish-plugin:0.9.0"
+//        classpath "com.gradle.publish:plugin-publish-plugin:0.9.0"
     }
 }
 
-apply plugin: "com.gradle.plugin-publish"
+//apply plugin: "com.gradle.plugin-publish"
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'signing'
@@ -24,16 +24,26 @@ repositories {
 }
 
 group = 'me.tatarka'
-version = '3.1.0'
+version = '3.2.0-SNAPSHOT'
 
 sourceCompatibility = '1.6'
+
+configurations {
+    provided
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.provided
+    }
+}
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'com.android.tools.build:gradle:1.0.0'
+    provided 'com.android.tools.build:gradle:1.0.0'
     
-    testCompile 'org.assertj:assertj-core:2.0.0'
+    testCompile 'org.assertj:assertj-core:2.1.0'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -52,19 +62,19 @@ artifacts {
     archives sourcesJar
 }
 
-pluginBundle {
-    website = 'https://github.com/evant/gradle-retrolambda'
-    vcsUrl = 'https://github.com/evant/gradle-retrolambda.git'
-    description = 'https://github.com/evant/gradle-retrolambda.git'
-    tags = ['java', 'android', 'lambda']
-
-    plugins {
-        retrolambdaPlugin {
-            id = 'me.tatarka.retrolambda'
-            displayName = 'gradle-retrolambda'
-        }
-    }
-}
+//pluginBundle {
+//    website = 'https://github.com/evant/gradle-retrolambda'
+//    vcsUrl = 'https://github.com/evant/gradle-retrolambda.git'
+//    description = 'https://github.com/evant/gradle-retrolambda.git'
+//    tags = ['java', 'android', 'lambda']
+//
+//    plugins {
+//        retrolambdaPlugin {
+//            id = 'me.tatarka.retrolambda'
+//            displayName = 'gradle-retrolambda'
+//        }
+//    }
+//}
 
 signing {
     sign configurations.archives
@@ -154,4 +164,8 @@ if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.pa
     if (!version.endsWith('SNAPSHOT')) {
         uploadArchives.dependsOn(tagRelease)
     }
+}
+
+task printBuildScriptClasspath << {
+    println project.buildscript.configurations.classpath.asPath
 }

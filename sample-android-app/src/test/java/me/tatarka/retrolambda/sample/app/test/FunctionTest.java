@@ -1,15 +1,18 @@
 package me.tatarka.retrolambda.sample.app.test;
 
+import android.content.res.Resources;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import me.tatarka.retrolambda.sample.app.Function;
-import me.tatarka.retrolambda.sample.app.MainActivity;
+import me.tatarka.retrolambda.sample.app.R;
+import me.tatarka.retrolambda.sample.app.ResFunction;
 import me.tatarka.retrolambda.sample.app.MyModule;
-import me.tatarka.retrolambda.sample.lib.Lib;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by evan on 3/29/15.
@@ -20,7 +23,9 @@ public class FunctionTest {
     
     @Test
     public void testGetHello() {
-        assertThat(module.provideHello().run()).isEqualTo("Hello, retrolambda!");
+        Resources res = mock(Resources.class);
+        when(res.getString(R.string.hello)).thenReturn("Hello, retrolambda!");
+        assertThat(module.provideHello().run(res)).isEqualTo("Hello, retrolambda!");
     }
 
     @Test
@@ -30,7 +35,8 @@ public class FunctionTest {
     
     @Test
     public void testLambdaInTest() {
-        Function lambda = () -> "test";
-        assertThat(lambda.run()).isEqualTo("test");
+        ResFunction lambda = (res) -> "test";
+        Resources res = mock(Resources.class);
+        assertThat(lambda.run(res)).isEqualTo("test");
     }
 }
