@@ -24,7 +24,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:3.1.0'
+         classpath 'me.tatarka:gradle-retrolambda:3.2.0'
       }
    }
 
@@ -39,7 +39,7 @@ Usage
    alternativly, you can use the new plugin syntax for gradle `2.1+`
    ```groovy
    plugins {
-      id "me.tatarka.retrolambda" version "3.1.0"
+      id "me.tatarka.retrolambda" version "3.2.0"
    }
    ```
 
@@ -52,10 +52,10 @@ Configuration
 -------------
 
 Configuration is entirely optional, the plugin will by default pick up the
-`JAVA6_HOME`/`JAVA7_HOME`/`JAVA8_HOME` environment variables. It's also smart
+`JAVA5_HOME`/`JAVA6_HOME`/`JAVA7_HOME`/`JAVA8_HOME` environment variables. It's also smart
 enough to figure out what version of java you are running gradle with. For
 example, if you have java8 set as your default, you only need to define
-`JAVA6_HOME`/`JAVA7_HOME`. If you need to though, you can add a block like the
+`JAVA5_HOME`/`JAVA6_HOME`/`JAVA7_HOME`. If you need to though, you can add a block like the
 following to configure the plugin:
 
 ```groovy
@@ -70,14 +70,14 @@ retrolambda {
 ```
 
 - `jdk` Set the path to the java 8 jdk. The default is found using the
-    environment variable `JAVA8_HOME`. If you a running gradle with java 6 or 7,
+    environment variable `JAVA8_HOME`. If you a running gradle with java 5, 6 or 7,
     you must have either `JAVA8_HOME` or this property set.
-- `oldJdk` Sets the path to the java 6 or 7 jdk. The default is found using the
-    environment variable `JAVA6_HOME`/`JAVA7_HOME`. If you are running gradle
+- `oldJdk` Sets the path to the java 5, 6 or 7 jdk. The default is found using the
+    environment variable `JAVA5_HOME`/`JAVA6_HOME`/`JAVA7_HOME`. If you are running gradle
     with java 8 and wish to run unit tests, you must have either
-    `JAVA6_HOME`/`JAVA7_HOME` or this property set. This is so the tests can be
+    `JAVA5_HOME`/`JAVA6_HOME`/`JAVA7_HOME` or this property set. This is so the tests can be
     run with the correct java version.
-- `javaVersion` Set the java version to compile to. The default is 6. Only 6 or
+- `javaVersion` Set the java version to compile to. The default is 6. Only 5, 6 or
     7 are accepted.
 - `include 'Debug', 'Release'` Sets which sets/variants to run through
     retrolambda. The default is all of them.

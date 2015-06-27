@@ -1,4 +1,10 @@
-### 3.1.0
+### 3.2.0
+- Support for targeting java 5 with retrolambda.
+- Don't depend on the android gradle plugin being on the classpath when using in pure java projects.
+- Delay calculating classpath for retrolambda. This fixes missing aar libs added by the android 
+gradle plugin.
+
+#### 3.1.0
 - Major refactoring of android plugin.
 The method for modifying the javaCompile task is now *way* less hackey. In fact,
 it is much closer to the original way that it was done. I had originally
