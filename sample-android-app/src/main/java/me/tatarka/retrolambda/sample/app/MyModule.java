@@ -1,5 +1,6 @@
 package me.tatarka.retrolambda.sample.app;
 
+import android.content.res.Resources;
 import dagger.Module;
 import dagger.Provides;
 import me.tatarka.retrolambda.sample.lib.Lib;
@@ -10,8 +11,15 @@ import me.tatarka.retrolambda.sample.lib.Lib;
 @Module
 public class MyModule {
     @Provides
-    public Function provideHello() {
-        return () -> "Hello, retrolambda!";
+    public ResFunction provideHello() {
+        return this::getHello;
+    }
+
+    private String getHello(Resources resources) {
+        ResFunction f = (res) -> {
+            return res.getString(R.string.hello);
+        };
+        return f.run(resources);
     }
 
     @Provides

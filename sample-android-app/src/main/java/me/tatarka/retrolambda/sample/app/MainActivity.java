@@ -11,7 +11,7 @@ import javax.inject.Inject;
  */
 public class MainActivity extends Activity {
     @Inject
-    Function hello;
+    ResFunction hello;
 
     @Inject
     me.tatarka.retrolambda.sample.lib.Function libHello;
@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         TextView text = (TextView) findViewById(R.id.text);
-        text.setText(hello.run());
+        text.setText(hello.run(getResources()));
 
         TextView textLib = (TextView) findViewById(R.id.text_lib);
         textLib.setText(libHello.run());

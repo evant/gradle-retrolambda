@@ -15,8 +15,6 @@
  */
 
 package me.tatarka
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -56,11 +54,11 @@ public class RetrolambdaPlugin implements Plugin<Project> {
             project.apply plugin: RetrolambdaPluginGroovy
         }
 
-        project.plugins.withType(AppPlugin) {
+        project.plugins.withId('com.android.application') {
             project.apply plugin: RetrolambdaPluginAndroid
         }
 
-        project.plugins.withType(LibraryPlugin) {
+        project.plugins.withId('com.android.library') {
             project.apply plugin: RetrolambdaPluginAndroid
         }
 

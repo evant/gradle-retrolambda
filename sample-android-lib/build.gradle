@@ -1,13 +1,17 @@
 buildscript {
     repositories {
         mavenLocal()
+        jcenter()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.1'
+        classpath 'com.android.tools.build:gradle:1.2.3'
         classpath "me.tatarka:gradle-retrolambda:${rootProject.version}"
+        classpath 'me.tatarka.retrolambda.projectlombok:lombok.ast:0.2.3.a2'
     }
+
+    configurations.classpath.exclude group: 'com.android.tools.external.lombok'
 }
 
 repositories {
@@ -42,5 +46,5 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-annotations:20.0.0'
+    compile 'com.android.support:support-annotations:22.2.0'
 }
