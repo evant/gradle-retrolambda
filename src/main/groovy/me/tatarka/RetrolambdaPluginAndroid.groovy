@@ -15,6 +15,7 @@
  */
 
 package me.tatarka
+
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
@@ -30,6 +31,7 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
+
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -54,8 +56,8 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             def android = project.extensions.getByType(AppExtension)
             android.applicationVariants.all { BaseVariant variant ->
                 configureCompileJavaTask(project, variant.name, variant.javaCompile)
-                
-                
+
+
             }
             android.testVariants.all { TestVariant variant ->
                 configureCompileJavaTask(project, variant.name, variant.javaCompile)
@@ -63,10 +65,10 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
         }
     }
 
-    private static configureCompileJavaTask(Project project, String variant, JavaCompile javaCompileTask) {
+    private
+    static configureCompileJavaTask(Project project, String variant, JavaCompile javaCompileTask) {
         def oldDestDir = javaCompileTask.destinationDir
         def newDestDir = project.file("$project.buildDir/retrolambda/$variant")
-        def classpathFiles = javaCompileTask.classpath + project.files("$project.buildDir/retrolambda/$variant")
 
         RetrolambdaTask retrolambdaTask = project.task(
                 "compileRetrolambda${variant.capitalize()}",
@@ -76,9 +78,12 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
 
         retrolambdaTask.inputDir = newDestDir
         retrolambdaTask.outputDir = oldDestDir
-        retrolambdaTask.classpath = classpathFiles
+        retrolambdaTask.classpath = project.files()
 
         retrolambdaTask.doFirst {
+            def classpathFiles = javaCompileTask.classpath + project.files("$project.buildDir/retrolambda/$variant")
+            retrolambdaTask.classpath += classpathFiles
+
             // bootClasspath isn't set until the last possible moment because it's expensive to look
             // up the android sdk path.
             def bootClasspath = javaCompileTask.options.bootClasspath
@@ -126,7 +131,8 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
         }
     }
 
-    private static configureUnitTestTask(Project project, String variant, JavaCompile javaCompileTask) {
+    private
+    static configureUnitTestTask(Project project, String variant, JavaCompile javaCompileTask) {
         javaCompileTask.mustRunAfter("compileRetrolambda${variant.capitalize()}")
 
         javaCompileTask.doFirst {
