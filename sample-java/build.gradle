@@ -19,7 +19,6 @@ repositories {
 
 dependencies {
     testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:2.1.0'
 }
 
 mainClassName = "me.tatarka.retrolambda.sample.Main"
@@ -31,7 +30,7 @@ jar {
 }
 
 retrolambda {
-    javaVersion JavaVersion.VERSION_1_7
+    javaVersion JavaVersion.VERSION_1_5
 }
 
 task buildscriptDependencies << {

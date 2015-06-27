@@ -82,6 +82,7 @@ public class RetrolambdaExtension {
 
     public JavaVersion getJavaVersion() {
         switch (bytecodeVersion) {
+            case 49: return JavaVersion.VERSION_1_5
             case 50: return JavaVersion.VERSION_1_6
             case 51: return JavaVersion.VERSION_1_7
         }
@@ -97,7 +98,7 @@ public class RetrolambdaExtension {
 
     String tryGetJdk() {
         if (jdk == null) {
-            throw new ProjectConfigurationException("When running gradle with java 6 or 7, you must set the path to jdk8, either with property retrolambda.jdk or environment variable JAVA8_HOME", null)
+            throw new ProjectConfigurationException("When running gradle with java 5, 6 or 7, you must set the path to jdk8, either with property retrolambda.jdk or environment variable JAVA8_HOME", null)
         }
         return jdk
     }
@@ -113,7 +114,7 @@ public class RetrolambdaExtension {
 
     String tryGetOldJdk() {
         if (oldJdk == null) {
-            throw new ProjectConfigurationException("When running gradle with java 8, you must set the path to the old jdk, either with property retrolambda.oldJdk or environment variable JAVA6_HOME/JAVA7_HOME", null)
+            throw new ProjectConfigurationException("When running gradle with java 8, you must set the path to the old jdk, either with property retrolambda.oldJdk or environment variable JAVA5_HOME/JAVA6_HOME/JAVA7_HOME", null)
         }
         return oldJdk
     }
@@ -142,6 +143,7 @@ public class RetrolambdaExtension {
             return findCurrentJdk()
         } else {
             switch (bytecodeVersion) {
+                case 49: return System.getenv("JAVA5_HOME")
                 case 50: return System.getenv("JAVA6_HOME")
                 case 51: return System.getenv("JAVA7_HOME")
             }
