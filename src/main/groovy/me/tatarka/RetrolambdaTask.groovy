@@ -121,7 +121,9 @@ class RetrolambdaTask extends DefaultTask {
             // Don't know version, assume we need the javaagent.
             return true
         }
-        VersionNumber.parse(retrolambdaDep.version).minor < 6
+        def versionNumber = VersionNumber.parse(retrolambdaDep.version)
+        def targetVersionNumber = VersionNumber.parse('1.6.0')
+        versionNumber < targetVersionNumber
     }
 
     def File toOutput(File file) {
