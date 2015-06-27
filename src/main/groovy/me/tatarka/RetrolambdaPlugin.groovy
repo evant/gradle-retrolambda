@@ -88,12 +88,11 @@ public class RetrolambdaPlugin implements Plugin<Project> {
 
     static int javaVersionToBytecode(JavaVersion v) {
         switch (v.majorVersion) {
+            case '5': return 49
             case '6': return 50
-                break
             case '7': return 51
-                break
             default:
-                throw new RuntimeException("Unknown java version: $v, only 6 or 7 are accepted")
+                throw new RuntimeException("Unknown java version: $v, only 5, 6 or 7 are accepted")
         }
     }
 }
