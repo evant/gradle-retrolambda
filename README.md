@@ -36,7 +36,7 @@ Usage
    apply plugin: 'com.android.application' //or apply plugin: 'java'
    apply plugin: 'me.tatarka.retrolambda'
    ```
-   alternativly, you can use the new plugin syntax for gradle `2.1+`
+   alternatively, you can use the new plugin syntax for gradle `2.1+`
    ```groovy
    plugins {
       id "me.tatarka.retrolambda" version "3.2.0"
