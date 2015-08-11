@@ -24,7 +24,7 @@ repositories {
 }
 
 group = 'me.tatarka'
-version = '3.2.0'
+version = '3.2.1'
 
 sourceCompatibility = '1.6'
 
@@ -44,6 +44,8 @@ dependencies {
     provided 'com.android.tools.build:gradle:1.0.0'
     
     testCompile 'org.assertj:assertj-core:2.1.0'
+    testCompile 'com.android.tools.build:gradle:1.0.0'
+    testCompile 'com.neenbedankt.gradle.plugins:android-apt:1.6'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {

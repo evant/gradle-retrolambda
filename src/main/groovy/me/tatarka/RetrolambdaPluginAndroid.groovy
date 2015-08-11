@@ -56,8 +56,6 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             def android = project.extensions.getByType(AppExtension)
             android.applicationVariants.all { BaseVariant variant ->
                 configureCompileJavaTask(project, variant.name, variant.javaCompile)
-
-
             }
             android.testVariants.all { TestVariant variant ->
                 configureCompileJavaTask(project, variant.name, variant.javaCompile)
@@ -125,7 +123,9 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             project.logger.warn("$extractAnnotations.name is incompatible with java 8 sources and has been disabled.")
         }
 
-        JavaCompile compileUnitTest = (JavaCompile) project.tasks.findByName("compile${variant.capitalize()}UnitTestJava")
+        JavaCompile compileUnitTest = (JavaCompile) project.tasks.find { task -> 
+            task.name.startsWith("compile${variant.capitalize()}UnitTestJava") 
+        }
         if (compileUnitTest) {
             configureUnitTestTask(project, variant, compileUnitTest)
         }

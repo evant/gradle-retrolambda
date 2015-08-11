@@ -1,4 +1,8 @@
-### 3.2.0
+### 3.2.1
+- Fixed unit tests on android gradle plugin 1.3.0
+- Bumped default retrolambda version to 2.0.5
+
+#### 3.2.0
 - Support for targeting java 5 with retrolambda.
 - Don't depend on the android gradle plugin being on the classpath when using in pure java projects.
 - Delay calculating classpath for retrolambda. This fixes missing aar libs added by the android 
