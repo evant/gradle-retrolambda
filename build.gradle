@@ -24,7 +24,7 @@ repositories {
 }
 
 group = 'me.tatarka'
-version = '3.2.1-SNAPSHOT'
+version = '3.2.1'
 
 sourceCompatibility = '1.6'
 
