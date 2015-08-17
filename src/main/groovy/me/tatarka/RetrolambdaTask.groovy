@@ -135,7 +135,7 @@ class RetrolambdaTask extends DefaultTask {
         // Delete any generated Lambda classes
         project.logger.debug("Deleting related for " + className + " in " + file.parentFile)
         file.parentFile.eachFile {
-            if (it.path.matches(/.*$className\$\$/ + /Lambda.*\.class$/)) {
+            if (it.name.matches(/$className\$\$/ + /Lambda.*\.class$/)) {
                 project.logger.debug("Deleted " + it)
                 it.delete()
             }
