@@ -1,6 +1,6 @@
 #### 3.2.2
 - Fixed wrongly deleting lambda classes where the related class is a prefix of the one that actually
-changed during incremental compilation.
+changed during incremental compilation. (thanks clemp6r!)
 
 #### 3.2.1
 - Fixed unit tests on android gradle plugin 1.3.0
