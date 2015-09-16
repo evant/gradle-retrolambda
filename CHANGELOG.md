@@ -1,3 +1,13 @@
+#### 3.3.0-beta1
+Experimental support for the new transform api
+
+http://tools.android.com/tech-docs/new-build-system/transform-api
+
+known issues:
+- include/exclude are ignored
+- does not work in library projects (falls back to the old method)
+- prints retrolambda output to stdout instead of log level --info
+
 #### 3.2.2
 - Fixed wrongly deleting lambda classes where the related class is a prefix of the one that actually
 changed during incremental compilation.
