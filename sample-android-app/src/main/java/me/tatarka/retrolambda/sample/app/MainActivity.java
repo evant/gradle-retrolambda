@@ -33,6 +33,6 @@ public class MainActivity extends AppCompatActivity {
         TextView textLib = (TextView) findViewById(R.id.text_lib);
         textLib.setText(libHello.run());
 
-        ResFunction lambda = (res) -> "Foo1";
+//        ResFunction lambda = (res) -> "Foo1";
     }
 }

@@ -61,16 +61,16 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             android.registerTransform(transform)
 
             android.applicationVariants.all { BaseVariant variant ->
-                configureCompileJavaTask(project, variant.name, variant.javaCompile, transform)
+                configureCompileJavaTask(project, variant, variant.javaCompile, transform)
             }
             android.testVariants.all { TestVariant variant ->
-                configureCompileJavaTask(project, variant.name, variant.javaCompile, transform)
+                configureCompileJavaTask(project, variant, variant.javaCompile, transform)
             }
         }
     }
 
     private
-    static configureCompileJavaTask(Project project, String variant, JavaCompile javaCompileTask, RetrolambdaTransform transform) {
+    static configureCompileJavaTask(Project project, BaseVariant variant, JavaCompile javaCompileTask, RetrolambdaTransform transform) {
         javaCompileTask.sourceCompatibility = "1.8"
         javaCompileTask.targetCompatibility = "1.8"
 
@@ -82,19 +82,19 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             ensureCompileOnJava8(retrolambda, javaCompileTask)
         }
 
-        transform.putJavaCompileTask(variant, javaCompileTask)
+        transform.putJavaCompileTask(variant.flavorName, variant.buildType.name, javaCompileTask)
 
-        def extractAnnotations = project.tasks.findByName("extract${variant.capitalize()}Annotations")
+        def extractAnnotations = project.tasks.findByName("extract${variant.name.capitalize()}Annotations")
         if (extractAnnotations) {
             extractAnnotations.deleteAllActions()
             project.logger.warn("$extractAnnotations.name is incompatible with java 8 sources and has been disabled.")
         }
 
         JavaCompile compileUnitTest = (JavaCompile) project.tasks.find { task ->
-            task.name.startsWith("compile${variant.capitalize()}UnitTestJava")
+            task.name.startsWith("compile${variant.name.capitalize()}UnitTestJava")
         }
         if (compileUnitTest) {
-            configureUnitTestTask(project, variant, compileUnitTest)
+            configureUnitTestTask(project, variant.name, compileUnitTest)
         }
     }
 

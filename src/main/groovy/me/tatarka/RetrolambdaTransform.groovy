@@ -1,6 +1,7 @@
 package me.tatarka
 
 import com.android.build.transform.api.*
+import com.android.utils.Pair
 import com.google.common.collect.ImmutableMap
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
@@ -17,7 +18,7 @@ class RetrolambdaTransform implements AsInputTransform {
 
     private final Project project
     private final RetrolambdaExtension retrolambda
-    private final Map<String, JavaCompile> javaCompileTasks = new HashMap<>()
+    private final Map<Pair<String, String>, JavaCompile> javaCompileTasks = new HashMap<>()
 
     public RetrolambdaTransform(Project project, RetrolambdaExtension retrolambda) {
         this.project = project
@@ -29,8 +30,8 @@ class RetrolambdaTransform implements AsInputTransform {
      * possible moment when the java compile task runs. While a Transform currently doesn't have any
      * variant information, we can guess the variant based off the input path.
      */
-    public void putJavaCompileTask(String variantName, JavaCompile javaCompileTask) {
-        javaCompileTasks.put(variantName, javaCompileTask)
+    public void putJavaCompileTask(String flavorName, String buildTypeName, JavaCompile javaCompileTask) {
+        javaCompileTasks.put(Pair.of(flavorName, buildTypeName), javaCompileTask)
     }
 
     @Override
@@ -41,7 +42,6 @@ class RetrolambdaTransform implements AsInputTransform {
             // Instead of looping, it might be better to figure out a way to pass multiple input
             // dirs into retrolambda. Luckily, the common case is only one.
             input.files.each { File inputFile ->
-                def guessedVariantName = inputFile.name
                 FileCollection changed
                 if (isIncremental) {
                     changed = project.files()
@@ -67,7 +67,7 @@ class RetrolambdaTransform implements AsInputTransform {
                     inputDir = inputFile
                     outputDir = output.outFile
                     bytecodeVersion = javaVersionToBytecode(retrolambda.javaVersion)
-                    classpath = getClasspath(guessedVariantName, referencedInputs) + project.files(inputFile)
+                    classpath = getClasspath(inputFile, referencedInputs) + project.files(inputFile)
                     includedFiles = changed
                     defaultMethods = retrolambda.defaultMethods
                     jvmArgs = retrolambda.jvmArgs
@@ -93,8 +93,15 @@ class RetrolambdaTransform implements AsInputTransform {
         }
     }
 
-    private FileCollection getClasspath(String variantName, Collection<TransformInput> referencedInputs) {
-        JavaCompile javaCompileTask = javaCompileTasks.get(variantName)
+    private FileCollection getClasspath(File inputFile, Collection<TransformInput> referencedInputs) {
+        String buildName = inputFile.name
+        String flavorName = inputFile.parentFile.name
+
+        JavaCompile javaCompileTask = javaCompileTasks.get(Pair.of(flavorName, buildName))
+        if (javaCompileTask == null) {
+            // Flavor might not exist
+            javaCompileTask = javaCompileTasks.get(Pair.of("", buildName))
+        }
 
         def classpathFiles = javaCompileTask.classpath
         referencedInputs.each { TransformInput input -> classpathFiles += project.files(input.files) }
