@@ -20,11 +20,12 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 repositories {
+    jcenter()
     mavenCentral()
 }
 
 group = 'me.tatarka'
-version = '3.2.2'
+version = '3.3.0-beta1'
 
 sourceCompatibility = '1.6'
 
@@ -41,11 +42,11 @@ sourceSets {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    provided 'com.android.tools.build:gradle:1.0.0'
+    provided 'com.android.tools.build:gradle:1.4.0-beta2'
     
     testCompile 'org.assertj:assertj-core:2.1.0'
-    testCompile 'com.android.tools.build:gradle:1.0.0'
-    testCompile 'com.neenbedankt.gradle.plugins:android-apt:1.6'
+    testCompile 'com.android.tools.build:gradle:1.4.0-beta2'
+    testCompile 'com.neenbedankt.gradle.plugins:android-apt:1.7'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {

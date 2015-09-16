@@ -43,28 +43,68 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
     @Override
     void apply(Project project) {
         def isLibrary = project.plugins.hasPlugin(LibraryPlugin)
+        def retrolambda = project.extensions.getByType(RetrolambdaExtension)
 
         if (isLibrary) {
             def android = project.extensions.getByType(LibraryExtension)
+
             android.libraryVariants.all { BaseVariant variant ->
-                configureCompileJavaTask(project, variant.name, variant.javaCompile)
+                configureCompileJavaTaskOld(project, variant.name, variant.javaCompile)
             }
             android.testVariants.all { TestVariant variant ->
-                configureCompileJavaTask(project, variant.name, variant.javaCompile)
+                configureCompileJavaTaskOld(project, variant.name, variant.javaCompile)
             }
+
         } else {
+            def transform = new RetrolambdaTransform(project, retrolambda)
             def android = project.extensions.getByType(AppExtension)
+            android.registerTransform(transform)
+
             android.applicationVariants.all { BaseVariant variant ->
-                configureCompileJavaTask(project, variant.name, variant.javaCompile)
+                configureCompileJavaTask(project, variant.name, variant.javaCompile, transform)
             }
             android.testVariants.all { TestVariant variant ->
-                configureCompileJavaTask(project, variant.name, variant.javaCompile)
+                configureCompileJavaTask(project, variant.name, variant.javaCompile, transform)
             }
         }
     }
 
     private
-    static configureCompileJavaTask(Project project, String variant, JavaCompile javaCompileTask) {
+    static configureCompileJavaTask(Project project, String variant, JavaCompile javaCompileTask, RetrolambdaTransform transform) {
+        javaCompileTask.sourceCompatibility = "1.8"
+        javaCompileTask.targetCompatibility = "1.8"
+
+        javaCompileTask.doFirst {
+            def retrolambda = project.extensions.getByType(RetrolambdaExtension)
+            def rt = "$retrolambda.jdk/jre/lib/rt.jar"
+
+            javaCompileTask.classpath += project.files(rt)
+            ensureCompileOnJava8(retrolambda, javaCompileTask)
+        }
+
+        transform.putJavaCompileTask(variant, javaCompileTask)
+
+        def extractAnnotations = project.tasks.findByName("extract${variant.capitalize()}Annotations")
+        if (extractAnnotations) {
+            extractAnnotations.deleteAllActions()
+            project.logger.warn("$extractAnnotations.name is incompatible with java 8 sources and has been disabled.")
+        }
+
+        JavaCompile compileUnitTest = (JavaCompile) project.tasks.find { task ->
+            task.name.startsWith("compile${variant.capitalize()}UnitTestJava")
+        }
+        if (compileUnitTest) {
+            configureUnitTestTask(project, variant, compileUnitTest)
+        }
+    }
+
+    /**
+     * Previous version of configuring the task which modified it's output directory instead of
+     * using a transform. Currently still here since custom transforms don't work in library
+     * projects.
+     */
+    private
+    static configureCompileJavaTaskOld(Project project, String variant, JavaCompile javaCompileTask) {
         def oldDestDir = javaCompileTask.destinationDir
         def newDestDir = project.file("$project.buildDir/retrolambda/$variant")
 
@@ -123,8 +163,8 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             project.logger.warn("$extractAnnotations.name is incompatible with java 8 sources and has been disabled.")
         }
 
-        JavaCompile compileUnitTest = (JavaCompile) project.tasks.find { task -> 
-            task.name.startsWith("compile${variant.capitalize()}UnitTestJava") 
+        JavaCompile compileUnitTest = (JavaCompile) project.tasks.find { task ->
+            task.name.startsWith("compile${variant.capitalize()}UnitTestJava")
         }
         if (compileUnitTest) {
             configureUnitTestTask(project, variant, compileUnitTest)
@@ -133,8 +173,6 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
 
     private
     static configureUnitTestTask(Project project, String variant, JavaCompile javaCompileTask) {
-        javaCompileTask.mustRunAfter("compileRetrolambda${variant.capitalize()}")
-
         javaCompileTask.doFirst {
             def retrolambda = project.extensions.getByType(RetrolambdaExtension)
             def rt = "$retrolambda.jdk/jre/lib/rt.jar"
@@ -145,7 +183,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             ensureCompileOnJava8(retrolambda, javaCompileTask)
         }
 
-        Test runTask = (Test) project.tasks.findByName("test${variant.capitalize()}")
+        Test runTask = (Test) project.tasks.findByName("test${variant.capitalize()}UnitTest")
         if (runTask) {
             runTask.doFirst {
                 def retrolambda = project.extensions.getByType(RetrolambdaExtension)

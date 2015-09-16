@@ -1,39 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <data>
-
-        <variable
-            name="fun"
-            type="me.tatarka.retrolambda.sample.lib.Function" />
-    </data>
-
-    <LinearLayout
+    <TextView
+        android:id="@+id/text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        tools:text="Hello, retrolambda!" />
 
-        <TextView
-            android:id="@+id/text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            tools:text="Hello, retrolambda!" />
-
-        <TextView
-            android:id="@+id/text_lib"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            tools:text="Hello, retrolambda (from lib)!" />
-
-        <TextView
-            android:id="@+id/text_databinding"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:text="@{fun}"
-            tools:text="Hello, retrolambda (from databinding)!" />
-    </LinearLayout>
-</layout>
+    <TextView
+        android:id="@+id/text_lib"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        tools:text="Hello, retrolambda (from lib)!" />
+</LinearLayout>

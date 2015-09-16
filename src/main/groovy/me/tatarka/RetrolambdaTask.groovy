@@ -17,7 +17,6 @@
 package me.tatarka
 import org.gradle.api.DefaultTask
 import org.gradle.api.JavaVersion
-import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.Input
@@ -25,13 +24,10 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.incremental.IncrementalTaskInputs
-import org.gradle.util.VersionNumber
 
-import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
-
 /**
- * Created by evan on 3/4/14.
+ * A task that runs retrolambda
  */
 class RetrolambdaTask extends DefaultTask {
     @InputDirectory
@@ -65,45 +61,22 @@ class RetrolambdaTask extends DefaultTask {
             }
         }
 
+        logging.captureStandardOutput(LogLevel.INFO)
+
         if (!inputs.incremental || !changes.isEmpty()) {
-            project.javaexec {
-                
-                // Ensure retrolambda runs on java8
-                if (!project.retrolambda.onJava8) {
-                    def java = "${retrolambda.tryGetJdk()}/bin/java"
-                    if (!checkIfExecutableExists(java)) {
-                        throw new ProjectConfigurationException("Cannot find executable: $java", null)
-                    }
-                    executable java
-                }
-
-                def bytecodeVersion = javaVersionToBytecode(javaVersion)
-
-                classpath = project.files(project.configurations.retrolambdaConfig)
-                main = 'net.orfjackal.retrolambda.Main'
-                jvmArgs = [
-                        "-Dretrolambda.inputDir=$inputDir",
-                        "-Dretrolambda.outputDir=$outputDir",
-                        "-Dretrolambda.classpath=${this.classpath.asPath}",
-                        "-Dretrolambda.bytecodeVersion=$bytecodeVersion",
-                ]
-
-                if (requiresJavaAgent()) {
-                    jvmArgs += "-javaagent:$classpath.asPath"
-                }
-
+            RetrolambdaExec retrolambdaExec = new RetrolambdaExec(project)
+            retrolambdaExec.with {
+                inputDir = this.inputDir
+                outputDir = this.outputDir
+                bytecodeVersion = javaVersionToBytecode(javaVersion)
+                classpath = this.classpath
                 if (inputs.incremental && retrolambda.incremental) {
-                    jvmArgs += "-Dretrolambda.includedFiles=${changes*.file.join(File.pathSeparator)}"
+                    includedFiles = project.files(changes*.file)
                 }
-                
-                if (retrolambda.defaultMethods) {
-                    jvmArgs += "-Dretrolambda.defaultMethods=true"
-                }
-
-                this.jvmArgs.each { arg -> jvmArgs += arg }
-
-                logging.captureStandardOutput(LogLevel.INFO)
+                defaultMethods = retrolambda.defaultMethods
+                jvmArgs = this.jvmArgs
             }
+            retrolambdaExec.exec()
         }
 
         inputs.removed { change ->
@@ -112,18 +85,6 @@ class RetrolambdaTask extends DefaultTask {
             project.logger.debug("Deleted " + outFile)
             deleteRelated(outFile)
         }
-    }
-
-    def requiresJavaAgent() {
-        def retrolambdaConfig = project.configurations.retrolambdaConfig
-        def retrolambdaDep = retrolambdaConfig.dependencies.iterator().next()
-        if (!retrolambdaDep.version) {
-            // Don't know version, assume we need the javaagent.
-            return true
-        }
-        def versionNumber = VersionNumber.parse(retrolambdaDep.version)
-        def targetVersionNumber = VersionNumber.parse('1.6.0')
-        versionNumber < targetVersionNumber
     }
 
     def File toOutput(File file) {

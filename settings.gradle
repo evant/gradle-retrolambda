@@ -1,4 +1,4 @@
-include ':sample-java',
-        ':sample-java-default-methods',
-        ':sample-android-app',
-        ':sample-android-lib'
+//include ':sample-java',
+//        ':sample-java-default-methods',
+//        ':sample-android-app',
+//        ':sample-android-lib'
