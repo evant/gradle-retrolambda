@@ -176,8 +176,7 @@ class RetrolambdaTransform implements AsInputTransform {
                 .put("jvmArgs", retrolambda.jvmArgs)
                 .put("incremental", retrolambda.incremental)
                 .put("defaultMethods", retrolambda.defaultMethods)
-                .put("jdk", retrolambda.jdk)
-                .put("oldJdk", retrolambda.oldJdk)
+                .put("jdk", retrolambda.tryGetJdk())
                 .build();
     }
 
