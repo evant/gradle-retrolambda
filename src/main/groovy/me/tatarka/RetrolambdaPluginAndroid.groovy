@@ -70,7 +70,6 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
 
         RetrolambdaTask retrolambdaTask = project.task(
                 "compileRetrolambda${variant.capitalize()}",
-                dependsOn: [javaCompileTask],
                 type: RetrolambdaTask
         ) as RetrolambdaTask
 
