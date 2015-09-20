@@ -1,4 +1,6 @@
-include ':sample-java',
+include ':gradle-retrolambda'
+include ':gradle-retrolambda',
+        ':sample-java',
         ':sample-java-default-methods',
         ':sample-android-app',
         ':sample-android-lib'
