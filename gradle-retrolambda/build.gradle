@@ -176,7 +176,11 @@ if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.pa
         }
 
         def branchName = grgit.branch.current.name
-        if (branchName != 'master') {
+        if (branchName == 'beta') {
+            if (!version.contains('beta')) {
+                throw new ProjectConfigurationException("Beta branch must contain 'beta' in the version name", null)
+            }
+        } else if (branchName != 'master') {
             throw new ProjectConfigurationException("Branch: $branchName must be master", null)
         }
     }
