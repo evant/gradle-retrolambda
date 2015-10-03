@@ -2,6 +2,7 @@ package me.tatarka
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.file.FileCollection
+import org.gradle.api.logging.LogLevel
 import org.gradle.util.VersionNumber
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists

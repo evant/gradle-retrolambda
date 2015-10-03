@@ -1,11 +1,13 @@
 package me.tatarka
 
 import com.android.build.transform.api.*
+import com.android.ddmlib.Log
 import com.android.utils.Pair
 import com.google.common.collect.ImmutableMap
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.file.FileCollection
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.compile.JavaCompile
 
 import static com.android.build.transform.api.TransformInput.FileStatus.*
@@ -14,7 +16,7 @@ import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
 /**
  * Transform java 8 class files to java 5, 6, or 7 use retrolambda
  */
-class RetrolambdaTransform implements AsInputTransform {
+class RetrolambdaTransform extends Transform implements AsInputTransform {
 
     private final Project project
     private final RetrolambdaExtension retrolambda
@@ -35,7 +37,8 @@ class RetrolambdaTransform implements AsInputTransform {
     }
 
     @Override
-    void transform(Map<TransformInput, TransformOutput> inputs, Collection<TransformInput> referencedInputs, boolean isIncremental) throws IOException, TransformException, InterruptedException {
+    void transform(Context context, Map<TransformInput, TransformOutput> inputs, Collection<TransformInput> referencedInputs, boolean isIncremental) throws IOException, TransformException, InterruptedException {
+        context.logging.captureStandardOutput(LogLevel.INFO)
         project.logger.debug("running transform: " + name);
 
         inputs.each { TransformInput input, TransformOutput output ->
@@ -145,28 +148,8 @@ class RetrolambdaTransform implements AsInputTransform {
     }
 
     @Override
-    public Transform.Type getTransformType() {
-        return Transform.Type.AS_INPUT
-    }
-
-    @Override
     public ScopedContent.Format getOutputFormat() {
         return ScopedContent.Format.SINGLE_FOLDER
-    }
-
-    @Override
-    public Collection<File> getSecondaryFileInputs() {
-        return Collections.emptyList()
-    }
-
-    @Override
-    public Collection<File> getSecondaryFileOutputs() {
-        return Collections.emptyList()
-    }
-
-    @Override
-    public Collection<File> getSecondaryFolderOutputs() {
-        return Collections.emptyList()
     }
 
     @Override

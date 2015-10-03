@@ -18,7 +18,7 @@ import static me.tatarka.TestHelpers.writeFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(JUnit4.class)
-public class RetrolambdaAndroidAppPluginTest {
+public class RetrolambdaAndroidLibPluginTest {
     @Rule
     public final TemporaryFolder testProjectDir = new TemporaryFolder();
     private File buildFile;
@@ -52,7 +52,7 @@ public class RetrolambdaAndroidAppPluginTest {
                         "    }\n" +
                         "}\n" +
                         "\n" +
-                        "apply plugin: 'com.android.application'\n" +
+                        "apply plugin: 'com.android.library'\n" +
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +

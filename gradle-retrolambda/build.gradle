@@ -22,9 +22,6 @@ apply plugin: 'idea'
 
 sourceCompatibility = '1.6'
 
-group = project.rootProject.group
-version = project.rootProject.version
-
 repositories {
     jcenter()
     mavenCentral()
@@ -43,11 +40,11 @@ sourceSets {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    provided 'com.android.tools.build:gradle:1.4.0-beta2'
+    provided "com.android.tools.build:gradle:$androidPluginVersion"
 
     testCompile gradleTestKit()
     testCompile 'org.assertj:assertj-core:2.1.0'
-    testCompile 'com.android.tools.build:gradle:1.4.0-beta2'
+    testCompile "com.android.tools.build:gradle:$androidPluginVersion"
     testCompile 'com.neenbedankt.gradle.plugins:android-apt:1.7'
 }
 

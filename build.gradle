@@ -1,4 +1,5 @@
-group = 'me.tatarka'
-version = '3.3.0-SNAPSHOT'
-
-
+allprojects {
+    group = 'me.tatarka'
+    version = '3.3.0-beta2'
+    ext.androidPluginVersion = '1.4.0-beta4'
+}

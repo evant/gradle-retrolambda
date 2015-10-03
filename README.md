@@ -8,7 +8,7 @@ retrolambda, giving you lambda goodness on java 6 or 7. It relies on the
 wonderful [retrolambda](https://github.com/orfjackal/retrolambda) by Esko
 Luontola.
 
-Note: The minimum android gradle plugin is `1.0.0`.
+Note: The minimum android gradle plugin is `1.4.0-beta4`.
 
 Usage
 ----
@@ -24,7 +24,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta1'
+         classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta2'
       }
    }
 
@@ -92,7 +92,7 @@ retrolambda {
 ### Using a Different Version of the retrolambda.jar
 
 The default version of retrolambda used is
-`'net.orfjackal.retrolambda:retrolambda:2.0.5'`. If you want to use a different
+`'net.orfjackal.retrolambda:retrolambda:2.0.6'`. If you want to use a different
 one, you can configure it in your dependencies.
 
 ```groovy
