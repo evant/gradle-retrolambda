@@ -18,6 +18,7 @@ package me.tatarka
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.Task
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.compile.JavaCompile
 
@@ -49,7 +50,12 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                         classpath = set.compileClasspath + project.files(newOutputDir)
                         javaVersion = project.retrolambda.javaVersion
                         jvmArgs = project.retrolambda.jvmArgs
-                        enabled = true//!set.allJava.isEmpty()
+                    }
+
+                    project.gradle.taskGraph.beforeTask { Task task ->
+                        if (task == retrolambdaTask) {
+                            retrolambdaTask.setEnabled(!set.allJava.isEmpty())
+                        }
                     }
 
                     project.tasks.findByName(set.classesTaskName).dependsOn(retrolambdaTask)
