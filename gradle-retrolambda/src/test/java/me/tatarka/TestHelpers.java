@@ -28,6 +28,8 @@ public class TestHelpers {
     }
 
     public static void writeFile(File file, String content) throws IOException {
+        //noinspection ResultOfMethodCallIgnored
+        file.getParentFile().mkdirs();
         BufferedWriter writer = new BufferedWriter(new FileWriter(file));
         try {
             writer.write(content);

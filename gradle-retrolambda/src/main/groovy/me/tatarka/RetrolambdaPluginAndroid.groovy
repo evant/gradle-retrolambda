@@ -69,9 +69,6 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
 
     private
     static configureCompileJavaTask(Project project, BaseVariant variant, JavaCompile javaCompileTask, RetrolambdaTransform transform) {
-        javaCompileTask.sourceCompatibility = "1.8"
-        javaCompileTask.targetCompatibility = "1.8"
-
         javaCompileTask.doFirst {
             def retrolambda = project.extensions.getByType(RetrolambdaExtension)
             def rt = "$retrolambda.jdk/jre/lib/rt.jar"
@@ -97,6 +94,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
     }
 
     private static configureUnitTestTask(Project project, String variant, JavaCompile javaCompileTask) {
+
         javaCompileTask.doFirst {
             def retrolambda = project.extensions.getByType(RetrolambdaExtension)
             def rt = "$retrolambda.jdk/jre/lib/rt.jar"
@@ -117,6 +115,9 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
     }
 
     private static ensureCompileOnJava8(RetrolambdaExtension retrolambda, JavaCompile javaCompile) {
+        javaCompile.sourceCompatibility = "1.8"
+        javaCompile.targetCompatibility = "1.8"
+
         if (!retrolambda.onJava8) {
             // Set JDK 8 for the compiler task
             def javac = "${retrolambda.tryGetJdk()}/bin/javac"

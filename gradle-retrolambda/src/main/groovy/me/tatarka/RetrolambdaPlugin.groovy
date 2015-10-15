@@ -74,6 +74,7 @@ public class RetrolambdaPlugin implements Plugin<Project> {
                     retrolambdaConfig retrolambdaCompile
                 }
             }
+
         }
     }
 
