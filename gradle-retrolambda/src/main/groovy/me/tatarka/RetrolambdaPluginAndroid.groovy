@@ -21,9 +21,11 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.TestVariant
+import groovy.transform.CompileStatic
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.Task
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 
@@ -36,6 +38,7 @@ import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
  * Time: 1:36 PM
  * To change this template use File | Settings | File Templates.
  */
+@CompileStatic
 public class RetrolambdaPluginAndroid implements Plugin<Project> {
     @Override
     void apply(Project project) {
@@ -85,7 +88,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             project.logger.warn("$extractAnnotations.name is incompatible with java 8 sources and has been disabled.")
         }
 
-        JavaCompile compileUnitTest = (JavaCompile) project.tasks.find { task ->
+        def compileUnitTest = (JavaCompile) project.tasks.find { Task task ->
             task.name.startsWith("compile${variant.name.capitalize()}UnitTestJava")
         }
         if (compileUnitTest) {
@@ -93,14 +96,14 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
         }
     }
 
-    private static configureUnitTestTask(Project project, String variant, JavaCompile javaCompileTask) {
-
+    private
+    static configureUnitTestTask(Project project, String variant, JavaCompile javaCompileTask) {
         javaCompileTask.doFirst {
             def retrolambda = project.extensions.getByType(RetrolambdaExtension)
             def rt = "$retrolambda.jdk/jre/lib/rt.jar"
 
             // We need to add the rt to the classpath to support lambdas in the tests themselves
-            javaCompileTask.classpath += project.files(rt)
+            javaCompileTask.classpath = javaCompileTask.classpath + project.files(rt)
 
             ensureCompileOnJava8(retrolambda, javaCompileTask)
         }

@@ -57,7 +57,7 @@ public class JavaPluginTest {
 
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
-                .withArguments("assemble")
+                .withArguments("assemble", "--stacktrace")
                 .build();
 
         assertThat(result.getStandardError()).isNullOrEmpty();
@@ -122,7 +122,7 @@ public class JavaPluginTest {
 
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
-                .withArguments("test")
+                .withArguments("test", "--stacktrace")
                 .build();
 
         assertThat(result.getStandardError()).isNullOrEmpty();

@@ -87,7 +87,7 @@ public class AndroidLibPluginTest {
 
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
-                .withArguments("assembleDebug")
+                .withArguments("assembleDebug", "--stacktrace")
                 .build();
 
         assertThat(result.getStandardError()).isNullOrEmpty();
@@ -173,7 +173,7 @@ public class AndroidLibPluginTest {
 
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
-                .withArguments("test")
+                .withArguments("test", "--stacktrace")
                 .build();
 
         assertThat(result.getStandardError()).isNullOrEmpty();
@@ -255,7 +255,7 @@ public class AndroidLibPluginTest {
 
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
-                .withArguments("connectedCheck")
+                .withArguments("connectedCheck", "--stacktrace")
                 .build();
 
         assertThat(result.getStandardError()).isNullOrEmpty();

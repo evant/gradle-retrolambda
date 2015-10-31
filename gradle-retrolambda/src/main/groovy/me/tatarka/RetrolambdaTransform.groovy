@@ -4,6 +4,7 @@ import com.android.build.transform.api.*
 import com.android.ddmlib.Log
 import com.android.utils.Pair
 import com.google.common.collect.ImmutableMap
+import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.file.FileCollection
@@ -16,6 +17,7 @@ import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
 /**
  * Transform java 8 class files to java 5, 6, or 7 use retrolambda
  */
+@CompileStatic
 class RetrolambdaTransform extends Transform implements AsInputTransform {
 
     private final Project project
@@ -58,6 +60,7 @@ class RetrolambdaTransform extends Transform implements AsInputTransform {
                         }
                     }
                 } else {
+                    changed = null
                     input.files.each { File file ->
                         project.logger.debug("input: " + file);
                     }
@@ -65,17 +68,15 @@ class RetrolambdaTransform extends Transform implements AsInputTransform {
 
                 project.logger.debug("output: " + output.outFile);
 
-                RetrolambdaExec retrolambdaExec = new RetrolambdaExec(project)
-                retrolambdaExec.with {
-                    inputDir = inputFile
-                    outputDir = output.outFile
-                    bytecodeVersion = javaVersionToBytecode(retrolambda.javaVersion)
-                    classpath = getClasspath(inputFile, referencedInputs) + project.files(inputFile)
-                    includedFiles = changed
-                    defaultMethods = retrolambda.defaultMethods
-                    jvmArgs = retrolambda.jvmArgs
-                }
-                retrolambdaExec.exec()
+                def exec = new RetrolambdaExec(project)
+                exec.inputDir = inputFile
+                exec.outputDir = output.outFile
+                exec.bytecodeVersion = javaVersionToBytecode(retrolambda.javaVersion)
+                exec.classpath = getClasspath(inputFile, referencedInputs) + project.files(inputFile)
+                exec.includedFiles = changed
+                exec.defaultMethods = retrolambda.defaultMethods
+                exec.jvmArgs = retrolambda.jvmArgs
+                exec.exec()
             }
         }
     }
@@ -97,10 +98,10 @@ class RetrolambdaTransform extends Transform implements AsInputTransform {
     }
 
     private FileCollection getClasspath(File inputFile, Collection<TransformInput> referencedInputs) {
-        String buildName = inputFile.name
-        String flavorName = inputFile.parentFile.name
+        def buildName = inputFile.name
+        def flavorName = inputFile.parentFile.name
 
-        JavaCompile javaCompileTask = javaCompileTasks.get(Pair.of(flavorName, buildName))
+        def javaCompileTask = javaCompileTasks.get(Pair.of(flavorName, buildName))
         if (javaCompileTask == null) {
             // Flavor might not exist
             javaCompileTask = javaCompileTasks.get(Pair.of("", buildName))

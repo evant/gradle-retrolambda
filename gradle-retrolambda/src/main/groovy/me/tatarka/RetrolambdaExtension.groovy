@@ -16,6 +16,7 @@
 
 package me.tatarka
 
+import groovy.transform.CompileStatic
 import org.gradle.api.JavaVersion
 import org.gradle.api.ProjectConfigurationException
 
@@ -28,6 +29,7 @@ import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
  * Time: 1:33 PM
  * To change this template use File | Settings | File Templates.
  */
+@CompileStatic
 public class RetrolambdaExtension {
     int bytecodeVersion = 50
     List<String> excludes = []
@@ -35,7 +37,7 @@ public class RetrolambdaExtension {
     List<String> jvmArgs = []
     boolean incremental = true
     boolean defaultMethods = false
-    boolean isOnJava8 = System.properties.'java.version'.startsWith('1.8')
+    boolean isOnJava8 = (System.properties.'java.version' as String).startsWith('1.8')
 
     private String jdk = null
     private String oldJdk = null
@@ -66,7 +68,7 @@ public class RetrolambdaExtension {
         defaultMethods = value
     }
     
-    public boolean getIncremental() {
+    public boolean isIncremental() {
         return incremental && !defaultMethods
     }
 
@@ -86,6 +88,7 @@ public class RetrolambdaExtension {
             case 50: return JavaVersion.VERSION_1_6
             case 51: return JavaVersion.VERSION_1_7
         }
+        throw new AssertionError()
     }
 
     public void setJdk(String path) {
@@ -151,7 +154,7 @@ public class RetrolambdaExtension {
         }
     }
 
-    private String findCurrentJdk() {
+    private static String findCurrentJdk() {
         String javaHomeProp = System.properties.'java.home'
         if (javaHomeProp) {
             int jreIndex = javaHomeProp.lastIndexOf("${File.separator}jre")

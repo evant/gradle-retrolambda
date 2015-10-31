@@ -15,12 +15,14 @@
  */
 
 package me.tatarka
-import org.gradle.api.JavaVersion
-import org.gradle.api.Plugin
-import org.gradle.api.Project
+
+import groovy.transform.CompileStatic
+import org.gradle.api.*
+import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.GroovyPlugin
 import org.gradle.api.plugins.JavaPlugin
+
 /**
  * Created with IntelliJ IDEA.
  * User: evan
@@ -28,22 +30,25 @@ import org.gradle.api.plugins.JavaPlugin
  * Time: 1:34 PM
  * To change this template use File | Settings | File Templates.
  */
+@CompileStatic
 public class RetrolambdaPlugin implements Plugin<Project> {
-    protected static def retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:2.0.6"
+    protected static String retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:2.0.6"
 
     @Override
     void apply(Project project) {
         project.extensions.create('retrolambda', RetrolambdaExtension)
 
-        project.configurations {
-            retrolambdaConfig
+        def retrolambdaConfig = project.configurations.create("retrolambdaConfig")
+
+        retrolambdaConfig.defaultDependencies { DependencySet dependencies ->
+            dependencies.add(project.dependencies.create(retrolambdaCompile))
         }
 
-        project.task('compileRetrolambda', dependsOn: project.tasks.matching {task ->
+        project.task('compileRetrolambda', dependsOn: project.tasks.matching { Task task ->
             !task.name.equals('compileRetrolambda') && task.name.startsWith('compileRetrolambda')
-        })  {
-            description = "Converts all java 8 class files to java 6 or 7"
-            group = "build"
+        }) { Task task ->
+            task.description = "Converts all java 8 class files to java 6 or 7"
+            task.group = "build"
         }
 
         project.plugins.withType(JavaPlugin) {
@@ -65,17 +70,6 @@ public class RetrolambdaPlugin implements Plugin<Project> {
         project.plugins.withType(ApplicationPlugin) {
             project.tasks.findByName('run').dependsOn('compileRetrolambda')
         }
-
-        project.afterEvaluate {
-            def config = project.configurations.retrolambdaConfig
-
-            if (config.dependencies.isEmpty()) {
-                project.dependencies {
-                    retrolambdaConfig retrolambdaCompile
-                }
-            }
-
-        }
     }
 
     /**
@@ -83,8 +77,8 @@ public class RetrolambdaPlugin implements Plugin<Project> {
      * @param file
      * @return
      */
-    static String checkIfExecutableExists(String file){
-        new File(file).exists()||new File(file+'.exe').exists()
+    static String checkIfExecutableExists(String file) {
+        new File(file).exists() || new File(file + '.exe').exists()
     }
 
     static int javaVersionToBytecode(JavaVersion v) {
