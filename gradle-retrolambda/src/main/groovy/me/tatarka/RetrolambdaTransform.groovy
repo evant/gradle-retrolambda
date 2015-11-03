@@ -1,24 +1,24 @@
 package me.tatarka
 
 import com.android.build.transform.api.*
-import com.android.ddmlib.Log
 import com.android.utils.Pair
 import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.file.FileCollection
+import org.gradle.api.internal.file.collections.FileCollectionAdapter
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.compile.JavaCompile
 
-import static com.android.build.transform.api.TransformInput.FileStatus.*
+import static com.android.build.transform.api.Status.*
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
 
 /**
  * Transform java 8 class files to java 5, 6, or 7 use retrolambda
  */
 @CompileStatic
-class RetrolambdaTransform extends Transform implements AsInputTransform {
+class RetrolambdaTransform extends Transform {
 
     private final Project project
     private final RetrolambdaExtension retrolambda
@@ -39,38 +39,39 @@ class RetrolambdaTransform extends Transform implements AsInputTransform {
     }
 
     @Override
-    void transform(Context context, Map<TransformInput, TransformOutput> inputs, Collection<TransformInput> referencedInputs, boolean isIncremental) throws IOException, TransformException, InterruptedException {
-        context.logging.captureStandardOutput(LogLevel.INFO)
-        project.logger.debug("running transform: " + name);
+    void transform(Context context, Collection<TransformInput> inputs, Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider, boolean isIncremental) throws IOException, TransformException, InterruptedException {
+//        context.logging.captureStandardOutput(LogLevel.INFO)
+        project.logger.quiet("running transform: " + name);
 
-        inputs.each { TransformInput input, TransformOutput output ->
+        inputs.each { TransformInput input ->
+            def outputDir = outputProvider.getContentLocation("retrolambda", outputTypes, scopes, Format.DIRECTORY)
+
             // Instead of looping, it might be better to figure out a way to pass multiple input
             // dirs into retrolambda. Luckily, the common case is only one.
-            input.files.each { File inputFile ->
+            input.directoryInputs.each { DirectoryInput directoryInput ->
+                File inputFile = directoryInput.file
                 FileCollection changed
                 if (isIncremental) {
                     changed = project.files()
-                    input.changedFiles.each { File file, TransformInput.FileStatus status ->
-                        project.logger.debug("input (incremental): " + file);
+                    directoryInput.changedFiles.each { File file, Status status ->
+                        project.logger.quiet("input (incremental): " + file + " status: " + status);
                         if (status == ADDED || status == CHANGED) {
                             changed += project.files(file);
                         }
                         if (status == CHANGED || status == REMOVED) {
-                            deleteRelated(toOutput(inputFile, output.outFile, file))
+                            deleteRelated(toOutput(inputFile, outputDir, file))
                         }
                     }
                 } else {
                     changed = null
-                    input.files.each { File file ->
-                        project.logger.debug("input: " + file);
-                    }
+                    project.logger.quiet("input: " + inputFile);
                 }
 
-                project.logger.debug("output: " + output.outFile);
+                project.logger.quiet("output: " + outputDir);
 
                 def exec = new RetrolambdaExec(project)
                 exec.inputDir = inputFile
-                exec.outputDir = output.outFile
+                exec.outputDir = outputDir
                 exec.bytecodeVersion = javaVersionToBytecode(retrolambda.javaVersion)
                 exec.classpath = getClasspath(inputFile, referencedInputs) + project.files(inputFile)
                 exec.includedFiles = changed
@@ -88,10 +89,10 @@ class RetrolambdaTransform extends Transform implements AsInputTransform {
     private void deleteRelated(File file) {
         def className = file.name.replaceFirst(/\.class$/, '')
         // Delete any generated Lambda classes
-        project.logger.debug("Deleting related for " + className + " in " + file.parentFile)
+        project.logger.quiet("Deleting related for " + className + " in " + file.parentFile)
         file.parentFile.eachFile {
             if (it.name.matches(/$className\$\$/ + /Lambda.*\.class$/)) {
-                project.logger.debug("Deleted " + it)
+                project.logger.quiet("Deleted " + it)
                 it.delete()
             }
         }
@@ -108,7 +109,7 @@ class RetrolambdaTransform extends Transform implements AsInputTransform {
         }
 
         def classpathFiles = javaCompileTask.classpath
-        referencedInputs.each { TransformInput input -> classpathFiles += project.files(input.files) }
+        referencedInputs.each { TransformInput input -> classpathFiles += project.files(input.directoryInputs*.file) }
 
         // bootClasspath isn't set until the last possible moment because it's expensive to look
         // up the android sdk path.
@@ -129,28 +130,18 @@ class RetrolambdaTransform extends Transform implements AsInputTransform {
     }
 
     @Override
-    public Set<ScopedContent.ContentType> getInputTypes() {
-        return Collections.singleton(ScopedContent.ContentType.CLASSES)
+    Set<QualifiedContent.ContentType> getInputTypes() {
+        return Collections.singleton(QualifiedContent.DefaultContentType.CLASSES)
     }
 
     @Override
-    public Set<ScopedContent.ContentType> getOutputTypes() {
-        return Collections.singleton(ScopedContent.ContentType.CLASSES)
+    Set<QualifiedContent.Scope> getScopes() {
+        return Collections.singleton(QualifiedContent.Scope.PROJECT)
     }
 
     @Override
-    public Set<ScopedContent.Scope> getScopes() {
-        return Collections.singleton(ScopedContent.Scope.PROJECT)
-    }
-
-    @Override
-    public Set<ScopedContent.Scope> getReferencedScopes() {
-        return Collections.singleton(ScopedContent.Scope.TESTED_CODE)
-    }
-
-    @Override
-    public ScopedContent.Format getOutputFormat() {
-        return ScopedContent.Format.SINGLE_FOLDER
+    Set<QualifiedContent.Scope> getReferencedScopes() {
+        return Collections.singleton(QualifiedContent.Scope.TESTED_CODE)
     }
 
     @Override

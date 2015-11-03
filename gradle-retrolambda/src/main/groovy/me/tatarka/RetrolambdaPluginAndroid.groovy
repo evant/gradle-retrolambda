@@ -76,7 +76,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             def retrolambda = project.extensions.getByType(RetrolambdaExtension)
             def rt = "$retrolambda.jdk/jre/lib/rt.jar"
 
-            javaCompileTask.classpath += project.files(rt)
+            javaCompileTask.classpath = javaCompileTask.classpath + project.files(rt)
             ensureCompileOnJava8(retrolambda, javaCompileTask)
         }
 

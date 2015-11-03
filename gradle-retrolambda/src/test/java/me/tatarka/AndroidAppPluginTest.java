@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(JUnit4.class)
 public class AndroidAppPluginTest {
+    static final String androidVersion = "1.5.0-beta1";
+    
     @Rule
     public final TemporaryFolder testProjectDir = new TemporaryFolder();
     private File rootDir;
@@ -41,7 +43,7 @@ public class AndroidAppPluginTest {
                         "    \n" +
                         "    dependencies {\n" +
                         "        classpath files($pluginClasspath)\n" +
-                        "        classpath 'com.android.tools.build:gradle:1.4.0-beta6'\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
                         "    }\n" +
                         "}\n" +
                         "\n" +
@@ -90,8 +92,93 @@ public class AndroidAppPluginTest {
 
         assertThat(result.getStandardError()).isNullOrEmpty();
 
-        File mainClassFile = new File(rootDir, "build/intermediates/transforms/CLASSES/PROJECT/retrolambda/debug/test/MainActivity.class");
-        File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/CLASSES/PROJECT/retrolambda/debug/test/MainActivity$$Lambda$1.class");
+        File mainClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity.class");
+        File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity$$Lambda$1.class");
+
+        assertThat(mainClassFile).exists();
+        assertThat(lambdaClassFile).exists();
+    }
+
+    @Test
+    public void assembleDebugIncremental() throws Exception {
+        writeBuildFile(buildFile,
+                //language="Groovy"
+                "buildscript {\n" +
+                        "    repositories {\n" +
+                        "        jcenter()\n" +
+                        "    }\n" +
+                        "    \n" +
+                        "    dependencies {\n" +
+                        "        classpath files($pluginClasspath)\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
+                        "    }\n" +
+                        "}\n" +
+                        "\n" +
+                        "apply plugin: 'com.android.application'\n" +
+                        "apply plugin: 'me.tatarka.retrolambda'\n" +
+                        "\n" +
+                        "repositories {\n" +
+                        "    mavenCentral()\n" +
+                        "}\n" +
+                        "\n" +
+                        "android {\n" +
+                        "    compileSdkVersion 23\n" +
+                        "    buildToolsVersion '23.0.1'\n" +
+                        "    \n" +
+                        "    defaultConfig {\n" +
+                        "        minSdkVersion 15\n" +
+                        "        targetSdkVersion 23\n" +
+                        "    }\n" +
+                        "}");
+
+        File manifestFile = new File(rootDir, "src/main/AndroidManifest.xml");
+
+        writeFile(manifestFile,
+                //language="XML"
+                "<manifest package=\"test\">\n" +
+                        "    <application/>\n" +
+                        "</manifest>");
+
+        File javaFile = new File(rootDir, "src/main/java/MainActivity.java");
+
+        writeFile(javaFile, "package test;" +
+                "import android.app.Activity;" +
+                "import android.os.Bundle;" +
+                "import android.util.Log;" +
+                "public class MainActivity extends Activity {\n" +
+                "    public void onCreate(Bundle savedInstanceState) {\n" +
+                "        Runnable lambda = () -> Log.d(\"MainActivity\", \"Hello, Lambda!\");\n" +
+                "        lambda.run();\n" +
+                "    }\n" +
+                "}");
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("assembleDebug", "--stacktrace")
+                .build();
+
+        assertThat(result.getStandardError()).isNullOrEmpty();
+
+        writeFile(javaFile, "package test;" +
+                "import android.app.Activity;" +
+                "import android.os.Bundle;" +
+                "import android.util.Log;" +
+                "public class MainActivity extends Activity {\n" +
+                "    public void onCreate(Bundle savedInstanceState) {\n" +
+                "        Runnable lambda = () -> Log.d(\"MainActivity\", \"Hello, Lambda2!\");\n" +
+                "        lambda.run();\n" +
+                "    }\n" +
+                "}");
+
+        result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("assembleDebug", "--stacktrace")
+                .build();
+
+        assertThat(result.getStandardError()).isNullOrEmpty();
+
+        File mainClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity.class");
+        File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity$$Lambda$1.class");
 
         assertThat(mainClassFile).exists();
         assertThat(lambdaClassFile).exists();
@@ -108,7 +195,7 @@ public class AndroidAppPluginTest {
                         "    \n" +
                         "    dependencies {\n" +
                         "        classpath files($pluginClasspath)\n" +
-                        "        classpath 'com.android.tools.build:gradle:1.4.0-beta6'\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
                         "    }\n" +
                         "}\n" +
                         "\n" +

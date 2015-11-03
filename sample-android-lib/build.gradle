@@ -6,7 +6,6 @@ buildscript {
 
     dependencies {
         classpath "com.android.tools.build:gradle:$androidPluginVersion"
-        classpath 'com.android.databinding:dataBinder:1.0-rc1'
         classpath "me.tatarka:gradle-retrolambda:$version"
         classpath 'me.tatarka.retrolambda.projectlombok:lombok.ast:0.2.3.a2'
     }
@@ -42,6 +41,10 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    dataBinding {
+        enabled = true
     }
 }
 

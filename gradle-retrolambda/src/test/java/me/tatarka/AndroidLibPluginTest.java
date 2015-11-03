@@ -21,6 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(JUnit4.class)
 public class AndroidLibPluginTest {
+    static final String androidVersion = "1.5.0-beta1";
+    
     @Rule
     public final TemporaryFolder testProjectDir = new TemporaryFolder();
     private File rootDir;
@@ -43,7 +45,7 @@ public class AndroidLibPluginTest {
                         "    \n" +
                         "    dependencies {\n" +
                         "        classpath files($pluginClasspath)\n" +
-                        "        classpath 'com.android.tools.build:gradle:1.4.0-beta6'\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
                         "    }\n" +
                         "}\n" +
                         "\n" +
@@ -92,8 +94,8 @@ public class AndroidLibPluginTest {
 
         assertThat(result.getStandardError()).isNullOrEmpty();
 
-        File mainClassFile = new File(rootDir, "build/intermediates/transforms/CLASSES/PROJECT/retrolambda/debug/test/MainActivity.class");
-        File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/CLASSES/PROJECT/retrolambda/debug/test/MainActivity$$Lambda$1.class");
+        File mainClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity.class");
+        File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity$$Lambda$1.class");
 
         assertThat(mainClassFile).exists();
         assertThat(lambdaClassFile).exists();
@@ -110,7 +112,7 @@ public class AndroidLibPluginTest {
                         "    \n" +
                         "    dependencies {\n" +
                         "        classpath files($pluginClasspath)\n" +
-                        "        classpath 'com.android.tools.build:gradle:1.4.0-beta6'\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
                         "    }\n" +
                         "}\n" +
                         "\n" +
@@ -190,7 +192,7 @@ public class AndroidLibPluginTest {
                         "    \n" +
                         "    dependencies {\n" +
                         "        classpath files($pluginClasspath)\n" +
-                        "        classpath 'com.android.tools.build:gradle:1.4.0-beta6'\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
                         "    }\n" +
                         "}\n" +
                         "\n" +

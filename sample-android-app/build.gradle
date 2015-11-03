@@ -6,7 +6,7 @@ buildscript {
 
     dependencies {
         classpath "com.android.tools.build:gradle:$androidPluginVersion"
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.7'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath "me.tatarka:gradle-retrolambda:$version"
         classpath 'me.tatarka.retrolambda.projectlombok:lombok.ast:0.2.3.a2'
     }
@@ -29,9 +29,9 @@ dependencies {
     apt "com.google.dagger:dagger-compiler:2.0"
     provided 'javax.annotation:jsr250-api:1.0'
 
-    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:appcompat-v7:23.1.0'
 
-    androidTestCompile 'com.android.support:support-annotations:23.0.1'
+    androidTestCompile 'com.android.support:support-annotations:23.1.0'
     androidTestCompile 'com.android.support.test:runner:0.3'
     androidTestCompile 'org.assertj:assertj-core:2.1.0'
 

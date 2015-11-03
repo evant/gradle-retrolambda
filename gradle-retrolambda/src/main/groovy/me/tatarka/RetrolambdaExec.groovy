@@ -58,6 +58,7 @@ class RetrolambdaExec {
 
             if (includedFiles != null) {
                 exec.jvmArgs "-Dretrolambda.includedFiles=${includedFiles.join(File.pathSeparator)})"
+                project.logger.quiet("-Dretrolambda.includedFiles=${includedFiles.join(File.pathSeparator)})")
             }
 
             if (defaultMethods) {
