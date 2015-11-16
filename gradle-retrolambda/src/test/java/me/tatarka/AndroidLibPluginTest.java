@@ -21,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(JUnit4.class)
 public class AndroidLibPluginTest {
-    static final String androidVersion = "1.5.0-beta1";
-    
+    static final String androidVersion = "1.5.0";
+
     @Rule
     public final TemporaryFolder testProjectDir = new TemporaryFolder();
     private File rootDir;

@@ -1,6 +1,6 @@
 package me.tatarka
 
-import com.android.build.transform.api.*
+import com.android.build.api.transform.*
 import com.android.utils.Pair
 import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileStatic
@@ -11,7 +11,7 @@ import org.gradle.api.internal.file.collections.FileCollectionAdapter
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.compile.JavaCompile
 
-import static com.android.build.transform.api.Status.*
+import static com.android.build.api.transform.Status.*
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
 
 /**
