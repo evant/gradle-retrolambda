@@ -1,5 +1,4 @@
 package me.tatarka
-
 import com.android.build.api.transform.*
 import com.android.utils.Pair
 import com.google.common.collect.ImmutableMap
@@ -7,13 +6,10 @@ import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.file.FileCollection
-import org.gradle.api.internal.file.collections.FileCollectionAdapter
-import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.compile.JavaCompile
 
 import static com.android.build.api.transform.Status.*
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
-
 /**
  * Transform java 8 class files to java 5, 6, or 7 use retrolambda
  */
