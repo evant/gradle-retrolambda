@@ -1,3 +1,4 @@
+rootProject.name = 'gradle-retrolambda'
 include ':sample-java',
         ':sample-java-default-methods',
         ':sample-android-app',
