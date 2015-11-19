@@ -6,6 +6,7 @@ import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.file.FileCollection
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.compile.JavaCompile
 
 import static com.android.build.api.transform.Status.*
@@ -36,8 +37,7 @@ class RetrolambdaTransform extends Transform {
 
     @Override
     void transform(Context context, Collection<TransformInput> inputs, Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider, boolean isIncremental) throws IOException, TransformException, InterruptedException {
-//        context.logging.captureStandardOutput(LogLevel.INFO)
-        project.logger.quiet("running transform: " + name);
+        context.logging.captureStandardOutput(LogLevel.INFO)
 
         inputs.each { TransformInput input ->
             def outputDir = outputProvider.getContentLocation("retrolambda", outputTypes, scopes, Format.DIRECTORY)
@@ -50,7 +50,6 @@ class RetrolambdaTransform extends Transform {
                 if (isIncremental) {
                     changed = project.files()
                     directoryInput.changedFiles.each { File file, Status status ->
-                        project.logger.quiet("input (incremental): " + file + " status: " + status);
                         if (status == ADDED || status == CHANGED) {
                             changed += project.files(file);
                         }
@@ -60,10 +59,7 @@ class RetrolambdaTransform extends Transform {
                     }
                 } else {
                     changed = null
-                    project.logger.quiet("input: " + inputFile);
                 }
-
-                project.logger.quiet("output: " + outputDir);
 
                 def exec = new RetrolambdaExec(project)
                 exec.inputDir = inputFile
@@ -85,10 +81,8 @@ class RetrolambdaTransform extends Transform {
     private void deleteRelated(File file) {
         def className = file.name.replaceFirst(/\.class$/, '')
         // Delete any generated Lambda classes
-        project.logger.quiet("Deleting related for " + className + " in " + file.parentFile)
         file.parentFile.eachFile {
             if (it.name.matches(/$className\$\$/ + /Lambda.*\.class$/)) {
-                project.logger.quiet("Deleted " + it)
                 it.delete()
             }
         }

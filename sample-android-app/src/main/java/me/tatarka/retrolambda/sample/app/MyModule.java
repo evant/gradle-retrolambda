@@ -17,8 +17,7 @@ public class MyModule {
 
     private String getHello(Resources resources) {
         ResFunction f = (res) -> {
-//            return res.getString(R.string.hello);
-            return "test";
+            return res.getString(R.string.hello);
         };
         return f.run(resources);
     }

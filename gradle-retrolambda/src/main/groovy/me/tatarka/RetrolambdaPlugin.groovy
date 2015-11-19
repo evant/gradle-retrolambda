@@ -36,7 +36,7 @@ public class RetrolambdaPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        project.extensions.create('retrolambda', RetrolambdaExtension)
+        project.extensions.create('retrolambda', RetrolambdaExtension, project)
 
         def retrolambdaConfig = project.configurations.create("retrolambdaConfig")
 
