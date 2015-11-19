@@ -30,7 +30,7 @@ jar {
 }
 
 retrolambda {
-    javaVersion JavaVersion.VERSION_1_5
+    javaVersion JavaVersion.VERSION_1_6
 }
 
 task buildscriptDependencies << {
