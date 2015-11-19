@@ -1,3 +1,6 @@
+#### 3.3.0-beta3
+- Supports transform api in android plugin '1.5.0'
+
 #### 3.3.0-beta2
 Experimental support for the new transform api
 - Requires android plugin `1.4.0-beta4`
