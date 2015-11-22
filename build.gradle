@@ -1,5 +1,5 @@
 allprojects {
     group = 'me.tatarka'
-    version = '3.3.0-beta3'
+    version = '3.3.0-SNAPSHOT'
     ext.androidPluginVersion = '1.5.0'
 }

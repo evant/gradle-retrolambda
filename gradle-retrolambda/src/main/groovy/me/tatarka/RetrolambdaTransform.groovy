@@ -89,8 +89,18 @@ class RetrolambdaTransform extends Transform {
     }
 
     private FileCollection getClasspath(File inputFile, Collection<TransformInput> referencedInputs) {
-        def buildName = inputFile.name
-        def flavorName = inputFile.parentFile.name
+        String buildName = inputFile.name
+        String flavorName = inputFile.parentFile.name
+
+        // If either one starts with a number or is 'folders', it's probably the result of a transform, keep moving
+        // up the dir structure until we find the right folders.
+        // Yes I know this is bad, but hopefully per-variant transforms will land soon.
+        File current = inputFile
+        while (Character.isDigit(buildName.charAt(0)) || Character.isDigit(flavorName.charAt(0)) || buildName.equals("folders") || flavorName.equals("folders")) {
+            current = current.parentFile
+            buildName = current.name
+            flavorName = current.parentFile.name
+        }
 
         def javaCompileTask = javaCompileTasks.get(Pair.of(flavorName, buildName))
         if (javaCompileTask == null) {
