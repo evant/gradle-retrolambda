@@ -93,7 +93,15 @@ class RetrolambdaTask extends DefaultTask {
                 }
 
                 if (inputs.incremental && retrolambda.incremental) {
-                    jvmArgs += "-Dretrolambda.includedFiles=${changes*.file.join(File.pathSeparator)}"
+                    def includedFiles = changes*.file.join("\n");
+                    def includedFile = File.createTempFile("inc-", ".list");
+
+                    includedFile.withWriter('UTF-8') { writer ->
+                        writer.write(includedFiles)
+                    }
+                    jvmArgs += "-Dretrolambda.includedFilesFile=${includedFile.getAbsolutePath()}"
+
+                    includedFile.deleteOnExit();
                 }
                 
                 if (retrolambda.defaultMethods) {
