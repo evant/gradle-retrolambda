@@ -25,6 +25,7 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.incremental.IncrementalTaskInputs
+import org.gradle.api.tasks.incremental.InputFileDetails
 import org.gradle.util.VersionNumber
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
@@ -34,6 +35,9 @@ import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
  * Created by evan on 3/4/14.
  */
 class RetrolambdaTask extends DefaultTask {
+
+    private static final int COMMANDLINE_LENGTH_LIMIT = 1536;
+
     @InputDirectory
     File inputDir
 
@@ -84,18 +88,28 @@ class RetrolambdaTask extends DefaultTask {
                 jvmArgs = [
                         "-Dretrolambda.inputDir=$inputDir",
                         "-Dretrolambda.outputDir=$outputDir",
-                        "-Dretrolambda.classpath=${this.classpath.asPath}",
                         "-Dretrolambda.bytecodeVersion=$bytecodeVersion",
                 ]
 
-                if (requiresJavaAgent()) {
+                def requiresJavaAgent = !requireVersion('1.6.0')
+                if (requiresJavaAgent) {
                     jvmArgs += "-javaagent:$classpath.asPath"
                 }
 
                 if (inputs.incremental && retrolambda.incremental) {
-                    jvmArgs += "-Dretrolambda.includedFiles=${changes*.file.join(File.pathSeparator)}"
+
+                    def classPathLength = classpath.asPath.length()
+                    def changedFileLength = changes*.file.sum { f -> f.lenght() }
+                    def charLength = changedFileLength + classPathLength
+                    def supportIncludeFiles = requireVersion '2.1.0'
+
+                    if (supportIncludeFiles && charLength > COMMANDLINE_LENGTH_LIMIT) {
+                        fileModeInclude(jvmArgs, changes, classpath)
+                    } else {
+                        parameterModeInclude(jvmArgs, changes, classpath)
+                    }
                 }
-                
+
                 if (retrolambda.defaultMethods) {
                     jvmArgs += "-Dretrolambda.defaultMethods=true"
                 }
@@ -114,16 +128,16 @@ class RetrolambdaTask extends DefaultTask {
         }
     }
 
-    def requiresJavaAgent() {
+    def requireVersion(String version, boolean fallback = false) {
         def retrolambdaConfig = project.configurations.retrolambdaConfig
         def retrolambdaDep = retrolambdaConfig.dependencies.iterator().next()
         if (!retrolambdaDep.version) {
-            // Don't know version, assume we need the javaagent.
-            return true
+            // Don't know version, assume fallback.
+            return fallback
         }
         def versionNumber = VersionNumber.parse(retrolambdaDep.version)
-        def targetVersionNumber = VersionNumber.parse('1.6.0')
-        versionNumber < targetVersionNumber
+        def targetVersionNumber = VersionNumber.parse(version)
+        versionNumber >= targetVersionNumber
     }
 
     def File toOutput(File file) {
@@ -140,5 +154,27 @@ class RetrolambdaTask extends DefaultTask {
                 it.delete()
             }
         }
+    }
+
+    def static parameterModeInclude(List<String> jvmargs, List<InputFileDetails> changes, FileCollection classpath) {
+        jvmargs.add "-Dretrolambda.includedFiles=${changes*.file.join File.pathSeparator}"
+        jvmargs.add "-Dretrolambda.classpath=${classpath.asPath}"
+    }
+
+    def static fileModeInclude(List<String> jvmargs, List<InputFileDetails> changes, FileCollection classpath) {
+        def includedFile = File.createTempFile "inc-", ".list";
+        includedFile.withWriter('UTF-8') { writer ->
+            writer.write changes*.file.join("\n")
+        }
+        includedFile.deleteOnExit();
+        jvmargs.add "-Dretrolambda.includedFilesFile=${includedFile.getAbsolutePath()}"
+
+        def classpathFile = File.createTempFile "inc-", ".path";
+        classpathFile.withWriter('UTF-8') { writer ->
+            writer.write classpath.join("\n")
+        }
+        classpathFile.deleteOnExit();
+        jvmargs.add "-Dretrolambda.classpathFile=${classpathFile.getAbsolutePath()}"
+
     }
 }
