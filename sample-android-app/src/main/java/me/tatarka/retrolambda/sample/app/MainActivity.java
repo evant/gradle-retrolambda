@@ -3,6 +3,7 @@ package me.tatarka.retrolambda.sample.app;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import javax.inject.Inject;
 
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
         TextView textLib = (TextView) findViewById(R.id.text_lib);
         textLib.setText(libHello.run());
 
-        ResFunction lambda = (res) -> "Foo1";
+        ResFunction lambda = (res) -> "Foo2";
+
+        Toast.makeText(this, lambda.run(null), Toast.LENGTH_SHORT).show();
     }
 }
