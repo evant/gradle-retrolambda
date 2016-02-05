@@ -36,7 +36,7 @@ import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
  */
 class RetrolambdaTask extends DefaultTask {
 
-    private static final int COMMANDLINE_LENGTH_LIMIT = 1536;
+    private static final int COMMANDLINE_LENGTH_LIMIT = 3496;
 
     @InputDirectory
     File inputDir
@@ -84,6 +84,7 @@ class RetrolambdaTask extends DefaultTask {
                 def bytecodeVersion = javaVersionToBytecode(javaVersion)
 
                 classpath = project.files(project.configurations.retrolambdaConfig)
+                def path = this.classpath.asPath
                 main = 'net.orfjackal.retrolambda.Main'
                 jvmArgs = [
                         "-Dretrolambda.inputDir=$inputDir",
@@ -93,20 +94,36 @@ class RetrolambdaTask extends DefaultTask {
 
                 def requiresJavaAgent = !requireVersion('1.6.0')
                 if (requiresJavaAgent) {
-                    jvmArgs += "-javaagent:$classpath.asPath"
+                    jvmArgs += "-javaagent:$path"
+                }
+
+                def supportIncludeFiles = requireVersion('2.1.0')
+
+                if (supportIncludeFiles && classpathLengthGreaterThanLimit(path)) {
+                    def classpathFile = File.createTempFile("inc-", ".path")
+                    classpathFile.withWriter('UTF-8') { writer ->
+                        for (String item : this.classpath) {
+                            writer.write(item + "\n")
+                        }
+                    }
+                    classpathFile.deleteOnExit();
+                    jvmArgs += "-Dretrolambda.classpathFile=${classpathFile.absolutePath}"
+                } else {
+                    jvmArgs += "-Dretrolambda.classpath=${path}"
                 }
 
                 if (inputs.incremental && retrolambda.incremental) {
-
-                    def classPathLength = classpath.asPath.length()
-                    def changedFileLength = changes*.file.sum { f -> f.lenght() }
-                    def charLength = changedFileLength + classPathLength
-                    def supportIncludeFiles = requireVersion '2.1.0'
-
-                    if (supportIncludeFiles && charLength > COMMANDLINE_LENGTH_LIMIT) {
-                        fileModeInclude(jvmArgs, changes, classpath)
+                    if (supportIncludeFiles && changeFileLengthGreaterThanLimit(changes)) {
+                        def includedFile = File.createTempFile("inc-", ".list")
+                        includedFile.withWriter('UTF-8') { writer ->
+                            for (InputFileDetails change : changes) {
+                                writer.write(change.file.toString() + "\n")
+                            }
+                        }
+                        includedFile.deleteOnExit();
+                        jvmArgs += "-Dretrolambda.includedFilesFile=${includedFile.absolutePath}"
                     } else {
-                        parameterModeInclude(jvmArgs, changes, classpath)
+                        jvmArgs += "-Dretrolambda.includedFiles=${changes*.file.join(File.pathSeparator)}"
                     }
                 }
 
@@ -156,25 +173,18 @@ class RetrolambdaTask extends DefaultTask {
         }
     }
 
-    def static parameterModeInclude(List<String> jvmargs, List<InputFileDetails> changes, FileCollection classpath) {
-        jvmargs.add "-Dretrolambda.includedFiles=${changes*.file.join File.pathSeparator}"
-        jvmargs.add "-Dretrolambda.classpath=${classpath.asPath}"
+    def static boolean classpathLengthGreaterThanLimit(String path) {
+        return path.length() > COMMANDLINE_LENGTH_LIMIT
     }
 
-    def static fileModeInclude(List<String> jvmargs, List<InputFileDetails> changes, FileCollection classpath) {
-        def includedFile = File.createTempFile "inc-", ".list";
-        includedFile.withWriter('UTF-8') { writer ->
-            writer.write changes*.file.join("\n")
+    def static boolean changeFileLengthGreaterThanLimit(List<InputFileDetails> changes) {
+        int total = 0;
+        for (InputFileDetails change : changes) {
+            total += change.file.toString().length();
+            if (total > COMMANDLINE_LENGTH_LIMIT) {
+                return true
+            }
         }
-        includedFile.deleteOnExit();
-        jvmargs.add "-Dretrolambda.includedFilesFile=${includedFile.getAbsolutePath()}"
-
-        def classpathFile = File.createTempFile "inc-", ".path";
-        classpathFile.withWriter('UTF-8') { writer ->
-            writer.write classpath.join("\n")
-        }
-        classpathFile.deleteOnExit();
-        jvmargs.add "-Dretrolambda.classpathFile=${classpathFile.getAbsolutePath()}"
-
+        return false
     }
 }

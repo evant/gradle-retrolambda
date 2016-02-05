@@ -29,7 +29,7 @@ import org.gradle.api.plugins.JavaPlugin
  * To change this template use File | Settings | File Templates.
  */
 public class RetrolambdaPlugin implements Plugin<Project> {
-    protected static def retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:2.0.6"
+    protected static def retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:2.1.0"
 
     @Override
     void apply(Project project) {

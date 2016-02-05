@@ -5,8 +5,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.3.0'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.6'
+        classpath 'com.android.tools.build:gradle:1.3.1'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'com.android.databinding:dataBinder:1.0-rc1'
         classpath "me.tatarka:gradle-retrolambda:${rootProject.version}"
         classpath 'me.tatarka.retrolambda.projectlombok:lombok.ast:0.2.3.a2'
