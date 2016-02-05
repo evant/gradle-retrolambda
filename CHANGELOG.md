@@ -1,5 +1,10 @@
+#### 3.3.0-beta4
+- Merged in all changes up to `3.2.5`
+- Supports running with other transforms (this is a bit hackey, hopefully we'll get per-variant
+transforms and it can be implemented far more cleanly).
+
 #### 3.3.0-beta3
-- Supports transform api in android plugin '1.5.0'
+- Supports transform api in android plugin `1.5.0`
 
 #### 3.3.0-beta2
 Experimental support for the new transform api

@@ -14,6 +14,7 @@ import org.junit.runners.JUnit4;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 
 import static me.tatarka.TestHelpers.writeBuildFile;
 import static me.tatarka.TestHelpers.writeFile;
@@ -87,12 +88,14 @@ public class AndroidLibPluginTest {
                 "    }\n" +
                 "}");
 
+        StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("assembleDebug", "--stacktrace")
+                .forwardStdError(errorOutput)
                 .build();
 
-        assertThat(result.getStandardError()).isNullOrEmpty();
+        assertThat(errorOutput.toString()).isNullOrEmpty();
 
         File mainClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity.class");
         File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity$$Lambda$1.class");
@@ -173,12 +176,14 @@ public class AndroidLibPluginTest {
                 "    }\n" +
                 "}");
 
+        StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("test", "--stacktrace")
+                .forwardStdError(errorOutput)
                 .build();
 
-        assertThat(result.getStandardError()).isNullOrEmpty();
+        assertThat(errorOutput.toString()).isNullOrEmpty();
     }
 
     @Test
@@ -255,11 +260,13 @@ public class AndroidLibPluginTest {
                 "    }\n" +
                 "}");
 
+        StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("connectedCheck", "--stacktrace")
+                .forwardStdError(errorOutput)
                 .build();
 
-        assertThat(result.getStandardError()).isNullOrEmpty();
+        assertThat(errorOutput.toString()).isNullOrEmpty();
     }
 }

@@ -12,6 +12,7 @@ import org.junit.runners.JUnit4;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 
 import static me.tatarka.TestHelpers.writeBuildFile;
 import static me.tatarka.TestHelpers.writeFile;
@@ -55,12 +56,14 @@ public class JavaPluginTest {
                 "    }\n" +
                 "}");
 
+        StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("assemble", "--stacktrace")
+                .forwardStdError(errorOutput)
                 .build();
 
-        assertThat(result.getStandardError()).isNullOrEmpty();
+        assertThat(errorOutput.toString()).isNullOrEmpty();
 
         File mainClassFile = new File(rootDir, "build/classes/main/Main.class");
         File lambdaClassFile = new File(rootDir, "build/classes/main/Main$$Lambda$1.class");
@@ -120,12 +123,14 @@ public class JavaPluginTest {
                 "    }\n" +
                 "}");
 
+        StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("test", "--stacktrace")
+                .forwardStdError(errorOutput)
                 .build();
 
-        assertThat(result.getStandardError()).isNullOrEmpty();
+        assertThat(errorOutput.toString()).isNullOrEmpty();
     }
 
     @Test
@@ -161,12 +166,14 @@ public class JavaPluginTest {
                 "    }\n" +
                 "}");
 
+        StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("run")
+                .forwardStdError(errorOutput)
                 .build();
 
-        assertThat(result.getStandardError()).isNullOrEmpty();
-        assertThat(result.getStandardOutput()).contains("Hello, Lambda Run!");
+        assertThat(errorOutput.toString()).isNullOrEmpty();
+        assertThat(result.getOutput()).contains("Hello, Lambda Run!");
     }
 }
