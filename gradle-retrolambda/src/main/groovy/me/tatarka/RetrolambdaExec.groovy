@@ -59,12 +59,12 @@ class RetrolambdaExec {
             ]
 
             VersionNumber retrolambdaVersion = retrolambdaVersion(retrolambdaConfig)
-            boolean requiresJavaAgent = requireVersion(retrolambdaVersion, '1.6.0', /*above=*/false)
+            boolean requiresJavaAgent = !requireVersion(retrolambdaVersion, '1.6.0')
             if (requiresJavaAgent) {
                 exec.jvmArgs "-javaagent:$exec.classpath.asPath"
             }
 
-            boolean supportIncludeFiles = requireVersion(retrolambdaVersion, '2.1.0', /*above=*/true)
+            boolean supportIncludeFiles = requireVersion(retrolambdaVersion, '2.1.0')
             if (supportIncludeFiles && classpathLengthGreaterThanLimit(path)) {
                 File classpathFile = File.createTempFile("inc-", ".path")
                 classpathFile.withWriter('UTF-8') { writer ->
@@ -132,12 +132,12 @@ class RetrolambdaExec {
 
     }
 
-    private static boolean requireVersion(VersionNumber retrolambdaVersion, String version, boolean above = true) {
+    private static boolean requireVersion(VersionNumber retrolambdaVersion, String version, boolean fallback = false) {
         if (retrolambdaVersion == null) {
-            // Don't know version
-            return !above
+            // Don't know version, assume fallback
+            return fallback
         }
         def targetVersionNumber = VersionNumber.parse(version)
-        return above ? retrolambdaVersion >= targetVersionNumber : retrolambdaVersion <= targetVersionNumber
+        return retrolambdaVersion >= targetVersionNumber
     }
 }
