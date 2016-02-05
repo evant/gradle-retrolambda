@@ -36,6 +36,8 @@ Usage
    apply plugin: 'com.android.application' //or apply plugin: 'java'
    apply plugin: 'me.tatarka.retrolambda'
    ```
+   **Note**: If you are using the `2.0.0-alpha/beta` android gradle plugins, you should use `3.3.0-beta4` since it better supports instant run.
+   
    alternatively, you can use the new plugin syntax for gradle `2.1+`
    ```groovy
    plugins {
