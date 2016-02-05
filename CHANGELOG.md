@@ -23,6 +23,12 @@ known issues:
 - Does not work in library projects (falls back to the old method).
 - Prints retrolambda output to stdout instead of log level --info.
 
+#### 3.2.5
+- Bumped default retrolambda version to `2.1.0`
+- If the commandline parameters are over a certain limit, they will be written to files. This should
+prevent failures on projects with large classpaths or when a huge number of incremental changes
+happen.
+
 #### 3.2.4
 - Bumped default retrolambda version to `2.0.6`.
 
