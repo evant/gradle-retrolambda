@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.file.FileCollection
 import org.gradle.process.JavaExecSpec
 import org.gradle.util.VersionNumber
@@ -15,6 +16,9 @@ import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
  */
 @CompileStatic
 class RetrolambdaExec {
+
+    private static final int COMMANDLINE_LENGTH_LIMIT = 3496;
+
     FileCollection classpath
     File inputDir;
     File outputDir;
@@ -43,42 +47,97 @@ class RetrolambdaExec {
                 exec.executable java
             }
 
+            String path = classpath.asPath
+
             exec.classpath = project.files(retrolambdaConfig)
             exec.main = 'net.orfjackal.retrolambda.Main'
             exec.jvmArgs = [
                     "-Dretrolambda.inputDir=$inputDir",
                     "-Dretrolambda.outputDir=$outputDir",
-                    "-Dretrolambda.classpath=${classpath.asPath}",
+                    "-Dretrolambda.classpath=${path}",
                     "-Dretrolambda.bytecodeVersion=$bytecodeVersion",
             ]
 
-            if (requiresJavaAgent(retrolambdaConfig)) {
-                exec.jvmArgs "-javaagent:$classpath.asPath"
+            VersionNumber retrolambdaVersion = retrolambdaVersion(retrolambdaConfig)
+            boolean requiresJavaAgent = requireVersion(retrolambdaVersion, '1.6.0', /*above=*/false)
+            if (requiresJavaAgent) {
+                exec.jvmArgs "-javaagent:$exec.classpath.asPath"
+            }
+
+            boolean supportIncludeFiles = requireVersion(retrolambdaVersion, '2.1.0', /*above=*/true)
+            if (supportIncludeFiles && classpathLengthGreaterThanLimit(path)) {
+                File classpathFile = File.createTempFile("inc-", ".path")
+                classpathFile.withWriter('UTF-8') { writer ->
+                    for (String item : this.classpath) {
+                        writer.write(item + "\n")
+                    }
+                }
+                classpathFile.deleteOnExit();
+                exec.jvmArgs "-Dretrolambda.classpathFile=${classpathFile.absolutePath}"
+            } else {
+                exec.jvmArgs "-Dretrolambda.classpath=${path}"
             }
 
             if (includedFiles != null) {
-                def includedArg = "-Dretrolambda.includedFiles=${includedFiles.join(File.pathSeparator)}"
-                exec.jvmArgs includedArg
-                project.logger.quiet(includedArg)
+                if (supportIncludeFiles && changeFileLengthGreaterThanLimit(includedFiles)) {
+                    def includedFile = File.createTempFile("inc-", ".list")
+                    includedFile.withWriter('UTF-8') { writer ->
+                        for (File file : includedFiles) {
+                            writer.write(file.toString() + "\n")
+                        }
+                    }
+                    includedFile.deleteOnExit();
+                    exec.jvmArgs "-Dretrolambda.includedFilesFile=${includedFile.absolutePath}"
+                } else {
+                    def includedArg = "-Dretrolambda.includedFiles=${includedFiles.join(File.pathSeparator)}"
+                    exec.jvmArgs includedArg
+                    project.logger.quiet(includedArg)
+                }
+
             }
 
             if (defaultMethods) {
                 exec.jvmArgs "-Dretrolambda.defaultMethods=true"
             }
 
-            jvmArgs.each { arg -> exec.jvmArgs arg }
+            for (String arg : jvmArgs) {
+                exec.jvmArgs arg
+            }
         }
     }
 
-    private static boolean requiresJavaAgent(Configuration retrolambdaConfig) {
-        retrolambdaConfig.resolve()
-        def retrolambdaDep = retrolambdaConfig.dependencies.iterator().next()
-        if (!retrolambdaDep.version) {
-            // Don't know version, assume we need the javaagent.
-            return true
+    private static boolean classpathLengthGreaterThanLimit(String path) {
+        return path.length() > COMMANDLINE_LENGTH_LIMIT
+    }
+
+    private static boolean changeFileLengthGreaterThanLimit(FileCollection includedFiles) {
+        int total = 0;
+        for (File file : includedFiles) {
+            total += file.toString().length();
+            if (total > COMMANDLINE_LENGTH_LIMIT) {
+                return true
+            }
         }
-        def versionNumber = VersionNumber.parse(retrolambdaDep.version)
-        def targetVersionNumber = VersionNumber.parse('1.6.0')
-        versionNumber < targetVersionNumber
+        return false
+    }
+
+    private static VersionNumber retrolambdaVersion(Configuration retrolambdaConfig) {
+        retrolambdaConfig.resolve()
+        Dependency retrolambdaDep = retrolambdaConfig.dependencies.iterator().next()
+        if (!retrolambdaDep.version) {
+            // Don't know version
+            return null
+        }
+        return VersionNumber.parse(retrolambdaDep.version)
+
+    }
+
+    private static boolean requireVersion(VersionNumber retrolambdaVersion, String version, boolean above = true) {
+        if (retrolambdaVersion == null) {
+            // Don't know version
+            return !above
+        }
+        def targetVersionNumber = VersionNumber.parse(version)
+        return above ? retrolambdaVersion >= targetVersionNumber : retrolambdaVersion <= targetVersionNumber
     }
 }

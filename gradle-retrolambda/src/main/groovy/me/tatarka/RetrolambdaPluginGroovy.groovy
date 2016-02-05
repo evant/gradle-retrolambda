@@ -19,6 +19,7 @@ package me.tatarka
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.Task
 import org.gradle.api.tasks.SourceSet
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
@@ -51,7 +52,13 @@ public class RetrolambdaPluginGroovy implements Plugin<Project> {
                         classpath = set.compileClasspath + project.files(newOutputDir)
                         javaVersion = project.retrolambda.javaVersion
                         jvmArgs = project.retrolambda.jvmArgs
-                        enabled = !set.allJava.isEmpty()
+                    }
+                    
+                    // enable retrolambdaTask dynamically, based on up-to-date source set before running 
+                    project.gradle.taskGraph.beforeTask { Task task ->
+                        if (task == retrolambdaTask) {
+                            retrolambdaTask.setEnabled(!set.allJava.isEmpty())
+                        }
                     }
 
                     project.tasks.findByName(set.classesTaskName).dependsOn(retrolambdaTask)
