@@ -21,6 +21,7 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.TestVariant
+import com.android.build.gradle.api.UnitTestVariant
 import groovy.transform.CompileStatic
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -56,6 +57,9 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             android.testVariants.all { TestVariant variant ->
                 configureCompileJavaTask(project, variant, variant.javaCompile, transform)
             }
+            android.unitTestVariants.all { UnitTestVariant variant ->
+                configureUnitTestTask(project, variant.name, variant.javaCompile)
+            }
 
         } else {
             def android = project.extensions.getByType(AppExtension)
@@ -66,6 +70,9 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             }
             android.testVariants.all { TestVariant variant ->
                 configureCompileJavaTask(project, variant, variant.javaCompile, transform)
+            }
+            android.unitTestVariants.all { UnitTestVariant variant ->
+                configureUnitTestTask(project, variant.name, variant.javaCompile)
             }
         }
     }
@@ -86,13 +93,6 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
         if (extractAnnotations) {
             extractAnnotations.deleteAllActions()
             project.logger.warn("$extractAnnotations.name is incompatible with java 8 sources and has been disabled.")
-        }
-
-        def compileUnitTest = (JavaCompile) project.tasks.find { Task task ->
-            task.name.startsWith("compile${variant.name.capitalize()}UnitTestJava")
-        }
-        if (compileUnitTest) {
-            configureUnitTestTask(project, variant.name, compileUnitTest)
         }
     }
 
