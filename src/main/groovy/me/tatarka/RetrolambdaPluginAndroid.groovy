@@ -123,7 +123,8 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
         }
 
         JavaCompile compileUnitTest = (JavaCompile) project.tasks.find { task -> 
-            task.name.startsWith("compile${variant.capitalize()}UnitTestJava") 
+            task.name.startsWith("compile${variant.capitalize()}UnitTestJava") ||
+            task.name.startsWith("compile${variant.capitalize()}UnitTestJavaWithJavac")
         }
         if (compileUnitTest) {
             configureUnitTestTask(project, variant, compileUnitTest)
