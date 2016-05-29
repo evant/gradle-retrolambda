@@ -1,6 +1,5 @@
 package me.tatarka
 import com.android.build.api.transform.*
-import com.android.utils.Pair
 import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileStatic
 import org.gradle.api.Project
@@ -19,7 +18,7 @@ class RetrolambdaTransform extends Transform {
 
     private final Project project
     private final RetrolambdaExtension retrolambda
-    private final Map<Pair<String, String>, JavaCompile> javaCompileTasks = new HashMap<>()
+    private final Map<String, JavaCompile> javaCompileTasks = new HashMap<>()
 
     public RetrolambdaTransform(Project project, RetrolambdaExtension retrolambda) {
         this.project = project
@@ -31,8 +30,8 @@ class RetrolambdaTransform extends Transform {
      * possible moment when the java compile task runs. While a Transform currently doesn't have any
      * variant information, we can guess the variant based off the input path.
      */
-    public void putJavaCompileTask(String flavorName, String buildTypeName, JavaCompile javaCompileTask) {
-        javaCompileTasks.put(Pair.of(flavorName, buildTypeName), javaCompileTask)
+    public void putJavaCompileTask(String dirName, JavaCompile javaCompileTask) {
+        javaCompileTasks.put(dirName, javaCompileTask)
     }
 
     @Override
@@ -88,25 +87,47 @@ class RetrolambdaTransform extends Transform {
         }
     }
 
+    /**
+     * @see com.android.builder.core.VariantConfiguration#getDirName()
+     */
+    private JavaCompile findJavaCompileForInput(File inputDir) {
+
+        String dirName = null
+        // always use forward slashes
+        for (File dir = inputDir; dir != null; dir = dir.parentFile) {
+            String name0 = dir.name
+            def parent0 = dir.parentFile
+            if (parent0 != null) {
+                String name1 = "$parent0.name/$name0"
+                def parent1 = parent0.parentFile
+                if (parent1 != null) {
+                    String name2 = "$parent1.name/$name1"
+                    if (javaCompileTasks.containsKey(name2)) {
+                        dirName = name2
+                        break;
+                    }
+                }
+                if (javaCompileTasks.containsKey(name1)) {
+                    dirName = name1
+                    break;
+                }
+            }
+            if (javaCompileTasks.containsKey(name0)) {
+                dirName = name0
+                break;
+            }
+        }
+
+        if (dirName == null) {
+            throw new ProjectConfigurationException("Unable to determine the build variant for $inputDir", null);
+        }
+
+        return javaCompileTasks.get(dirName)
+    }
+
     private FileCollection getClasspath(File inputFile, Collection<TransformInput> referencedInputs) {
-        String buildName = inputFile.name
-        String flavorName = inputFile.parentFile.name
 
-        // If either one starts with a number or is 'folders', it's probably the result of a transform, keep moving
-        // up the dir structure until we find the right folders.
-        // Yes I know this is bad, but hopefully per-variant transforms will land soon.
-        File current = inputFile
-        while (Character.isDigit(buildName.charAt(0)) || Character.isDigit(flavorName.charAt(0)) || buildName.equals("folders") || flavorName.equals("folders")) {
-            current = current.parentFile
-            buildName = current.name
-            flavorName = current.parentFile.name
-        }
-
-        def javaCompileTask = javaCompileTasks.get(Pair.of(flavorName, buildName))
-        if (javaCompileTask == null) {
-            // Flavor might not exist
-            javaCompileTask = javaCompileTasks.get(Pair.of("", buildName))
-        }
+        def javaCompileTask = findJavaCompileForInput(inputFile)
 
         def classpathFiles = javaCompileTask.classpath
         referencedInputs.each { TransformInput input -> classpathFiles += project.files(input.directoryInputs*.file) }

@@ -87,7 +87,7 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             ensureCompileOnJava8(retrolambda, javaCompileTask)
         }
 
-        transform.putJavaCompileTask(variant.flavorName, variant.buildType.name, javaCompileTask)
+        transform.putJavaCompileTask(variant.dirName, javaCompileTask)
 
         def extractAnnotations = project.tasks.findByName("extract${variant.name.capitalize()}Annotations")
         if (extractAnnotations) {
