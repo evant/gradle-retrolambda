@@ -1,6 +1,6 @@
 package me.tatarka
+
 import com.android.build.api.transform.*
-import com.android.utils.Pair
 import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileStatic
 import org.gradle.api.Project
@@ -11,6 +11,7 @@ import org.gradle.api.tasks.compile.JavaCompile
 
 import static com.android.build.api.transform.Status.*
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
+
 /**
  * Transform java 8 class files to java 5, 6, or 7 use retrolambda
  */
@@ -19,7 +20,7 @@ class RetrolambdaTransform extends Transform {
 
     private final Project project
     private final RetrolambdaExtension retrolambda
-    private final Map<Pair<String, String>, JavaCompile> javaCompileTasks = new HashMap<>()
+    private final Map<String, JavaCompile> javaCompileTasks = new HashMap<>()
 
     public RetrolambdaTransform(Project project, RetrolambdaExtension retrolambda) {
         this.project = project
@@ -31,8 +32,8 @@ class RetrolambdaTransform extends Transform {
      * possible moment when the java compile task runs. While a Transform currently doesn't have any
      * variant information, we can guess the variant based off the input path.
      */
-    public void putJavaCompileTask(String flavorName, String buildTypeName, JavaCompile javaCompileTask) {
-        javaCompileTasks.put(Pair.of(flavorName, buildTypeName), javaCompileTask)
+    public void putJavaCompileTask(String dirName, JavaCompile javaCompileTask) {
+        javaCompileTasks.put(dirName, javaCompileTask)
     }
 
     @Override
@@ -102,10 +103,10 @@ class RetrolambdaTransform extends Transform {
             flavorName = current.parentFile.name
         }
 
-        def javaCompileTask = javaCompileTasks.get(Pair.of(flavorName, buildName))
+        def javaCompileTask = javaCompileTasks.get(flavorName + '/' + buildName)
         if (javaCompileTask == null) {
             // Flavor might not exist
-            javaCompileTask = javaCompileTasks.get(Pair.of("", buildName))
+            javaCompileTask = javaCompileTasks.get(buildName)
         }
 
         def classpathFiles = javaCompileTask.classpath
@@ -121,6 +122,7 @@ class RetrolambdaTransform extends Transform {
             // need to run but can't without the bootClasspath. Just fail and ask the user to rebuild.
             throw new ProjectConfigurationException("Unable to obtain the bootClasspath. This may happen if your javaCompile tasks didn't run but retrolambda did. You must rebuild your project or otherwise force javaCompile to run.", null)
         }
+
         return classpathFiles
     }
 

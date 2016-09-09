@@ -43,9 +43,10 @@ dependencies {
     provided "com.android.tools.build:gradle:$androidPluginVersion"
 
     testCompile gradleTestKit()
+    testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:2.1.0'
     testCompile "com.android.tools.build:gradle:$androidPluginVersion"
-    testCompile 'com.neenbedankt.gradle.plugins:android-apt:1.7'
+    testCompile 'com.neenbedankt.gradle.plugins:android-apt:1.8'
 }
 
 idea {

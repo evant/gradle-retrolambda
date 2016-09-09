@@ -1,3 +1,7 @@
+#### 3.3.0
+- Fixed certain cases where android tests would fail to compile because wrong classpath was used.
+- Bumped default retrolambda version to `2.3.0`
+
 #### 3.3.0-beta4
 - Merged in all changes up to `3.2.5`
 - Supports running with other transforms (this is a bit hackey, hopefully we'll get per-variant

@@ -58,12 +58,12 @@ public class AndroidLibPluginTest {
                         "}\n" +
                         "\n" +
                         "android {\n" +
-                        "    compileSdkVersion 23\n" +
-                        "    buildToolsVersion '23.0.1'\n" +
+                        "    compileSdkVersion 24\n" +
+                        "    buildToolsVersion '24.0.2'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
                         "        minSdkVersion 15\n" +
-                        "        targetSdkVersion 23\n" +
+                        "        targetSdkVersion 24\n" +
                         "    }\n" +
                         "}");
 
@@ -127,12 +127,12 @@ public class AndroidLibPluginTest {
                         "}\n" +
                         "\n" +
                         "android {\n" +
-                        "    compileSdkVersion 23\n" +
-                        "    buildToolsVersion '23.0.1'\n" +
+                        "    compileSdkVersion 24\n" +
+                        "    buildToolsVersion '24.0.2'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
                         "        minSdkVersion 15\n" +
-                        "        targetSdkVersion 23\n" +
+                        "        targetSdkVersion 24\n" +
                         "    }\n" +
                         "}\n" +
                         "\n" +
@@ -210,11 +210,11 @@ public class AndroidLibPluginTest {
                         "\n" +
                         "android {\n" +
                         "    compileSdkVersion 23\n" +
-                        "    buildToolsVersion '23.0.1'\n" +
+                        "    buildToolsVersion '24.0.2'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
                         "        minSdkVersion 15\n" +
-                        "        targetSdkVersion 23\n" +
+                        "        targetSdkVersion 24\n" +
                         "        testInstrumentationRunner \"android.support.test.runner.AndroidJUnitRunner\"\n" +
                         "    }\n" +
                         "}\n" +

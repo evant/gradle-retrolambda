@@ -10,12 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        tools:text="Hello, retrolambda!" />
+        tools:text="Hello, Retrolambda!" />
 
     <TextView
         android:id="@+id/text_lib"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        tools:text="Hello, retrolambda (from lib)!" />
+        tools:text="Hello, Retrolambda (from lib)!" />
 </LinearLayout>
