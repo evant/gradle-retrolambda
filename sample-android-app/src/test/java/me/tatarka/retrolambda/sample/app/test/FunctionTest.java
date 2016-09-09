@@ -24,13 +24,13 @@ public class FunctionTest {
     @Test
     public void testGetHello() {
         Resources res = mock(Resources.class);
-        when(res.getString(R.string.hello)).thenReturn("Hello, retrolambda!");
-        assertThat(module.provideHello().run(res)).isEqualTo("Hello, retrolambda!");
+        when(res.getString(R.string.hello)).thenReturn("Hello, Retrolambda!");
+        assertThat(module.provideHello().run(res)).isEqualTo("Hello, Retrolambda!");
     }
 
     @Test
     public void testGetHelloLib() {
-        assertThat(module.provideLibHello().run()).isEqualTo("Hello, retrolambda (from lib)!");
+        assertThat(module.provideLibHello().run()).isEqualTo("Hello, Retrolambda (from lib)!");
     }
     
     @Test
