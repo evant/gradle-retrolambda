@@ -8,7 +8,6 @@ import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.internal.reflect.DirectInstantiator
 
 import static com.android.build.api.transform.Status.*
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
@@ -68,7 +67,7 @@ class RetrolambdaTransform extends Transform {
                 exec.inputDir = inputFile
                 exec.outputDir = outputDir
                 exec.bytecodeVersion = javaVersionToBytecode(retrolambda.javaVersion)
-                exec.classpath = getClasspath(inputFile, referencedInputs) + project.files(inputFile)
+                exec.classpath = getClasspath(outputDir, referencedInputs) + project.files(inputFile)
                 exec.includedFiles = changed
                 exec.defaultMethods = retrolambda.defaultMethods
                 exec.jvmArgs = retrolambda.jvmArgs
@@ -91,29 +90,27 @@ class RetrolambdaTransform extends Transform {
         }
     }
 
-    private FileCollection getClasspath(File inputFile, Collection<TransformInput> referencedInputs) {
-        String buildName = inputFile.name
-        String flavorName = inputFile.parentFile.name
+    private FileCollection getClasspath(File outputDir, Collection<TransformInput> referencedInputs) {
+        // Extract the variant from the output path assuming it's in the form like:
+        // - 'build/intermediates/transforms/retrolambda/<VARIANT>
+        // - 'build/intermediates/transforms/retrolambda/<VARIANT>/folders/1/1/retrolambda
+        // This will no longer be needed when the transform api supports per-variant transforms
+        String[] parts = outputDir.path.split("build/intermediates/transforms/retrolambda/|/folders/[0-9]+")
 
-        // If either one starts with a number or is 'folders', it's probably the result of a transform, keep moving
-        // up the dir structure until we find the right folders.
-        // Yes I know this is bad, but hopefully per-variant transforms will land soon.
-        File current = inputFile
-        while (Character.isDigit(buildName.charAt(0)) || Character.isDigit(flavorName.charAt(0)) || buildName.equals("folders") || flavorName.equals("folders")) {
-            current = current.parentFile
-            buildName = current.name
-            flavorName = current.parentFile.name
+        if (parts.length < 2) {
+            throw new ProjectConfigurationException("Could not extract variant from output dir: " + outputDir, null)
         }
 
-        def javaCompileTask = javaCompileTasks.get(flavorName + '/' + buildName)
+        String variantName = parts[1];
+        def javaCompileTask = javaCompileTasks.get(variantName)
+
         if (javaCompileTask == null) {
-            // Flavor might not exist
-            javaCompileTask = javaCompileTasks.get(buildName)
+            throw new ProjectConfigurationException("Missing javaCompileTask for variant: " + variantName, null)
         }
 
         def classpathFiles = javaCompileTask.classpath
         for (TransformInput input : referencedInputs) {
-             classpathFiles += project.files(input.directoryInputs*.file) 
+            classpathFiles += project.files(input.directoryInputs*.file)
         }
 
         // bootClasspath isn't set until the last possible moment because it's expensive to look
@@ -137,7 +134,7 @@ class RetrolambdaTransform extends Transform {
 
     @Override
     Set<QualifiedContent.ContentType> getInputTypes() {
-        return Collections.<QualifiedContent.ContentType>singleton(QualifiedContent.DefaultContentType.CLASSES)
+        return Collections.<QualifiedContent.ContentType> singleton(QualifiedContent.DefaultContentType.CLASSES)
     }
 
     @Override

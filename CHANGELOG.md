@@ -1,3 +1,6 @@
+#### 3.3.1
+- Fixed retrolambda classpath when running and android test with multiple flavors.
+
 #### 3.3.0
 - Fixed certain cases where android tests would fail to compile because wrong classpath was used.
 - Bumped default retrolambda version to `2.3.0`
