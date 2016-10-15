@@ -8,24 +8,41 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.runners.Parameterized;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Collection;
 
-import static me.tatarka.TestHelpers.writeBuildFile;
+import static me.tatarka.TestHelpers.getPluginClasspath;
+import static me.tatarka.TestHelpers.newestSupportedAndroidPluginVersion;
+import static me.tatarka.TestHelpers.oldestSupportedAndroidPluginVersion;
 import static me.tatarka.TestHelpers.writeFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(JUnit4.class)
+@RunWith(Parameterized.class)
 public class AndroidAppPluginTest {
-    static final String androidVersion = "1.5.0";
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                oldestSupportedAndroidPluginVersion(),
+                newestSupportedAndroidPluginVersion()
+        });
+    }
 
     @Rule
     public final TemporaryFolder testProjectDir = new TemporaryFolder();
+    private final String androidVersion;
+    private final String gradleVersion;
     private File rootDir;
     private File buildFile;
+
+    public AndroidAppPluginTest(String androidVersion, String gradleVersion) {
+        this.androidVersion = androidVersion;
+        this.gradleVersion = gradleVersion;
+    }
 
     @Before
     public void setup() throws Exception {
@@ -35,16 +52,18 @@ public class AndroidAppPluginTest {
 
     @Test
     public void assembleDebug() throws Exception {
-        writeBuildFile(buildFile,
+        writeFile(buildFile,
                 //language="Groovy"
                 "buildscript {\n" +
+                        "    System.properties['com.android.build.gradle.overrideVersionCheck'] = 'true'\n" +
+                        "    \n" +
                         "    repositories {\n" +
                         "        jcenter()\n" +
                         "    }\n" +
                         "    \n" +
                         "    dependencies {\n" +
-                        "        classpath files($pluginClasspath)\n" +
-                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
+                        "        classpath files(" + getPluginClasspath() + ")\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion + "'\n" +
                         "    }\n" +
                         "}\n" +
                         "\n" +
@@ -88,6 +107,7 @@ public class AndroidAppPluginTest {
 
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
+                .withGradleVersion(gradleVersion)
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("assembleDebug", "--stacktrace")
                 .forwardStdError(errorOutput)
@@ -104,7 +124,7 @@ public class AndroidAppPluginTest {
 
     @Test
     public void assembleDebugIncremental() throws Exception {
-        writeBuildFile(buildFile,
+        writeFile(buildFile,
                 //language="Groovy"
                 "buildscript {\n" +
                         "    repositories {\n" +
@@ -112,8 +132,8 @@ public class AndroidAppPluginTest {
                         "    }\n" +
                         "    \n" +
                         "    dependencies {\n" +
-                        "        classpath files($pluginClasspath)\n" +
-                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
+                        "        classpath files(" + getPluginClasspath() + ")\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion + "'\n" +
                         "    }\n" +
                         "}\n" +
                         "\n" +
@@ -157,6 +177,7 @@ public class AndroidAppPluginTest {
 
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
+                .withGradleVersion(gradleVersion)
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("assembleDebug", "--stacktrace")
                 .forwardStdError(errorOutput)
@@ -177,6 +198,7 @@ public class AndroidAppPluginTest {
 
         errorOutput = new StringWriter();
         result = GradleRunner.create()
+                .withGradleVersion(gradleVersion)
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("assembleDebug", "--stacktrace")
                 .forwardStdError(errorOutput)
@@ -193,7 +215,7 @@ public class AndroidAppPluginTest {
 
     @Test
     public void unitTest() throws Exception {
-        writeBuildFile(buildFile,
+        writeFile(buildFile,
                 //language="Groovy"
                 "buildscript {\n" +
                         "    repositories {\n" +
@@ -201,8 +223,8 @@ public class AndroidAppPluginTest {
                         "    }\n" +
                         "    \n" +
                         "    dependencies {\n" +
-                        "        classpath files($pluginClasspath)\n" +
-                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
+                        "        classpath files(" + getPluginClasspath() + ")\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion + "'\n" +
                         "    }\n" +
                         "}\n" +
                         "\n" +
@@ -265,6 +287,7 @@ public class AndroidAppPluginTest {
 
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
+                .withGradleVersion(gradleVersion)
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("test", "--stacktrace")
                 .forwardStdError(errorOutput)
@@ -272,10 +295,10 @@ public class AndroidAppPluginTest {
 
         assertThat(errorOutput.toString()).isNullOrEmpty();
     }
-    
+
     @Test
     public void withKotlin() throws Exception {
-        writeBuildFile(buildFile,
+        writeFile(buildFile,
                 //language="Groovy"
                 "buildscript {\n" +
                         "    repositories {\n" +
@@ -283,8 +306,8 @@ public class AndroidAppPluginTest {
                         "    }\n" +
                         "    \n" +
                         "    dependencies {\n" +
-                        "        classpath files($pluginClasspath)\n" +
-                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
+                        "        classpath files(" + getPluginClasspath() + ")\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion + "'\n" +
                         "        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.4'" +
                         "    }\n" +
                         "}\n" +
@@ -320,7 +343,7 @@ public class AndroidAppPluginTest {
 
         File javaFile1 = new File(rootDir, "src/main/java/test/MainActivity.java");
         File javaFile2 = new File(rootDir, "src/main/java/test/JavaFile.java");
-        
+
         File kotlinFile = new File(rootDir, "src/main/kotlin/test/KotlinFile.kt");
 
         writeFile(javaFile1, "package test;" +
@@ -334,14 +357,14 @@ public class AndroidAppPluginTest {
                 "        new KotlinFile().doThis();" +
                 "    }\n" +
                 "}");
-        
+
         writeFile(javaFile2, "package test;" +
                 "public class JavaFile {\n" +
                 "   public void doThat() {\n" +
                 "       System.out.println(\"That\");" +
                 "   }" +
                 "}");
-        
+
         writeFile(kotlinFile, "package test\n" +
                 "import kotlin.io.println\n" +
                 "class KotlinFile {\n" +
@@ -353,6 +376,7 @@ public class AndroidAppPluginTest {
 
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
+                .withGradleVersion(gradleVersion)
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("assembleDebug", "--stacktrace")
                 .forwardStdError(errorOutput)

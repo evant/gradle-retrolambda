@@ -36,7 +36,7 @@ public class RetrolambdaPluginGroovy implements Plugin<Project> {
         project.afterEvaluate {
             project.sourceSets.all { SourceSet set ->
                 if (project.retrolambda.isIncluded(set.name)) {
-                    def name = set.name.capitalize()
+                    def name = RetrolambdaUtil.capitalize(set.name)
                     def taskName = "compileRetrolambdaGroovy$name"
                     def oldOutputDir = set.output.classesDir
                     def newOutputDir = project.file("$project.buildDir/retrolambda/$set.name")

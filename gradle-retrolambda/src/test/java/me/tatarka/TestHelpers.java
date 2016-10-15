@@ -1,8 +1,20 @@
 package me.tatarka;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Properties;
 
 public class TestHelpers {
+    
+    private static final String OLDEST_SUPPORTED_ANDROID_GRADLE_PLUGIN_VERSION = "1.5.0";
+    private static final String OLDEST_SUPPORTED_GRADLE_VERSION = "2.5";
+    private static final String NEWEST_SUPPORTED_GRADLE_VERSION = "2.14.1";
 
     /**
      * Taken from https://docs.gradle.org/current/userguide/test_kit.html and modified for java.
@@ -23,10 +35,6 @@ public class TestHelpers {
         return classpath.toString();
     }
 
-    public static void writeBuildFile(File buildFile, String content) throws IOException {
-        writeFile(buildFile, content.replace("$pluginClasspath", getPluginClasspath()));
-    }
-
     public static void writeFile(File file, String content) throws IOException {
         //noinspection ResultOfMethodCallIgnored
         file.getParentFile().mkdirs();
@@ -35,6 +43,21 @@ public class TestHelpers {
             writer.write(content);
         } finally {
             writer.close();
+        }
+    }
+
+    public static String[] oldestSupportedAndroidPluginVersion() {
+        return new String[]{OLDEST_SUPPORTED_ANDROID_GRADLE_PLUGIN_VERSION, OLDEST_SUPPORTED_GRADLE_VERSION};
+    }
+
+    public static String[] newestSupportedAndroidPluginVersion() {
+        try {
+            Properties properties = new Properties();
+            properties.load(new FileInputStream("../gradle.properties"));
+            String androidPluginVersion = properties.getProperty("androidPluginVersion");
+            return new String[]{androidPluginVersion, NEWEST_SUPPORTED_GRADLE_VERSION};
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

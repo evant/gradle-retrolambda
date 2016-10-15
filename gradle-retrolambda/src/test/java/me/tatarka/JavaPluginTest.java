@@ -11,13 +11,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 
-import static me.tatarka.TestHelpers.writeBuildFile;
+import static me.tatarka.TestHelpers.getPluginClasspath;
 import static me.tatarka.TestHelpers.writeFile;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
 @RunWith(JUnit4.class)
 public class JavaPluginTest {
@@ -34,9 +32,9 @@ public class JavaPluginTest {
 
     @Test
     public void assemble() throws Exception {
-        writeBuildFile(buildFile, "buildscript {\n" +
+        writeFile(buildFile, "buildscript {\n" +
                 "    dependencies {\n" +
-                "        classpath files($pluginClasspath)\n" +
+                "        classpath files(" + getPluginClasspath() + ")\n" +
                 "    }\n" +
                 "}\n" +
                 "\n" +
@@ -74,9 +72,9 @@ public class JavaPluginTest {
 
     @Test
     public void test() throws Exception {
-        writeBuildFile(buildFile, "buildscript {\n" +
+        writeFile(buildFile, "buildscript {\n" +
                 "    dependencies {\n" +
-                "        classpath files($pluginClasspath)\n" +
+                "        classpath files(" + getPluginClasspath() + ")\n" +
                 "    }\n" +
                 "}\n" +
                 "\n" +
@@ -135,9 +133,9 @@ public class JavaPluginTest {
 
     @Test
     public void run() throws Exception {
-        writeBuildFile(buildFile, "buildscript {\n" +
+        writeFile(buildFile, "buildscript {\n" +
                 "    dependencies {\n" +
-                "        classpath files($pluginClasspath)\n" +
+                "        classpath files(" + getPluginClasspath() + ")\n" +
                 "    }\n" +
                 "}\n" +
                 "\n" +

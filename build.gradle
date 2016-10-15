@@ -1,5 +1,9 @@
 allprojects {
-    group = 'me.tatarka'
-    version = '3.3.0'
-    ext.androidPluginVersion = '2.2.1'
+    group = project.property('group')
+    version = project.property('version')
+    ext.androidPluginVersion = project.property('androidPluginVersion')
+}
+
+task test {
+    dependsOn gradle.includedBuild('gradle-retrolambda').task(':test')
 }

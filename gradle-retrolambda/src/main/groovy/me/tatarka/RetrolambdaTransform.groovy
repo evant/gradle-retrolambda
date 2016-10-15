@@ -8,6 +8,7 @@ import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.internal.reflect.DirectInstantiator
 
 import static com.android.build.api.transform.Status.*
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
@@ -40,17 +41,18 @@ class RetrolambdaTransform extends Transform {
     void transform(Context context, Collection<TransformInput> inputs, Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider, boolean isIncremental) throws IOException, TransformException, InterruptedException {
         context.logging.captureStandardOutput(LogLevel.INFO)
 
-        inputs.each { TransformInput input ->
+        for (TransformInput input : inputs) {
             def outputDir = outputProvider.getContentLocation("retrolambda", outputTypes, scopes, Format.DIRECTORY)
 
             // Instead of looping, it might be better to figure out a way to pass multiple input
             // dirs into retrolambda. Luckily, the common case is only one.
-            input.directoryInputs.each { DirectoryInput directoryInput ->
+            for (DirectoryInput directoryInput : input.directoryInputs) {
                 File inputFile = directoryInput.file
                 FileCollection changed
                 if (isIncremental) {
                     changed = project.files()
-                    directoryInput.changedFiles.each { File file, Status status ->
+                    for (Map.Entry<File, Status> entry : directoryInput.changedFiles) {
+                        File file = entry.key; Status status = entry.value
                         if (status == ADDED || status == CHANGED) {
                             changed += project.files(file);
                         }
@@ -110,7 +112,9 @@ class RetrolambdaTransform extends Transform {
         }
 
         def classpathFiles = javaCompileTask.classpath
-        referencedInputs.each { TransformInput input -> classpathFiles += project.files(input.directoryInputs*.file) }
+        for (TransformInput input : referencedInputs) {
+             classpathFiles += project.files(input.directoryInputs*.file) 
+        }
 
         // bootClasspath isn't set until the last possible moment because it's expensive to look
         // up the android sdk path.
@@ -133,7 +137,7 @@ class RetrolambdaTransform extends Transform {
 
     @Override
     Set<QualifiedContent.ContentType> getInputTypes() {
-        return Collections.singleton(QualifiedContent.DefaultContentType.CLASSES)
+        return Collections.<QualifiedContent.ContentType>singleton(QualifiedContent.DefaultContentType.CLASSES)
     }
 
     @Override

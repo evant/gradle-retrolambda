@@ -3,31 +3,46 @@ package me.tatarka;
 
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
-import org.gradle.tooling.GradleConnector;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.runners.Parameterized;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Collection;
 
-import static me.tatarka.TestHelpers.writeBuildFile;
+import static me.tatarka.TestHelpers.getPluginClasspath;
+import static me.tatarka.TestHelpers.newestSupportedAndroidPluginVersion;
+import static me.tatarka.TestHelpers.oldestSupportedAndroidPluginVersion;
 import static me.tatarka.TestHelpers.writeFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(JUnit4.class)
+@RunWith(Parameterized.class)
 public class AndroidLibPluginTest {
-    static final String androidVersion = "1.5.0";
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                oldestSupportedAndroidPluginVersion(),
+                newestSupportedAndroidPluginVersion()
+        });
+    }
 
     @Rule
     public final TemporaryFolder testProjectDir = new TemporaryFolder();
+    private final String androidVersion;
+    private final String gradleVersion;
     private File rootDir;
     private File buildFile;
+
+    public AndroidLibPluginTest(String androidVersion, String gradleVersion) {
+        this.androidVersion = androidVersion;
+        this.gradleVersion = gradleVersion;
+    }
 
     @Before
     public void setup() throws Exception {
@@ -37,7 +52,7 @@ public class AndroidLibPluginTest {
 
     @Test
     public void assembleDebug() throws Exception {
-        writeBuildFile(buildFile,
+        writeFile(buildFile,
                 //language="Groovy"
                 "buildscript {\n" +
                         "    repositories {\n" +
@@ -45,8 +60,8 @@ public class AndroidLibPluginTest {
                         "    }\n" +
                         "    \n" +
                         "    dependencies {\n" +
-                        "        classpath files($pluginClasspath)\n" +
-                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
+                        "        classpath files(" + getPluginClasspath() + ")\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion + "'\n" +
                         "    }\n" +
                         "}\n" +
                         "\n" +
@@ -72,8 +87,8 @@ public class AndroidLibPluginTest {
         writeFile(manifestFile,
                 //language="XML"
                 "<manifest package=\"test\">\n" +
-                "    <application/>\n" +
-                "</manifest>");
+                        "    <application/>\n" +
+                        "</manifest>");
 
         File javaFile = new File(rootDir, "src/main/java/MainActivity.java");
 
@@ -90,6 +105,7 @@ public class AndroidLibPluginTest {
 
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
+                .withGradleVersion(gradleVersion)
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("assembleDebug", "--stacktrace")
                 .forwardStdError(errorOutput)
@@ -106,7 +122,7 @@ public class AndroidLibPluginTest {
 
     @Test
     public void unitTest() throws Exception {
-        writeBuildFile(buildFile,
+        writeFile(buildFile,
                 //language="Groovy"
                 "buildscript {\n" +
                         "    repositories {\n" +
@@ -114,8 +130,8 @@ public class AndroidLibPluginTest {
                         "    }\n" +
                         "    \n" +
                         "    dependencies {\n" +
-                        "        classpath files($pluginClasspath)\n" +
-                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
+                        "        classpath files(" + getPluginClasspath() + ")\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion + "'\n" +
                         "    }\n" +
                         "}\n" +
                         "\n" +
@@ -178,6 +194,7 @@ public class AndroidLibPluginTest {
 
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
+                .withGradleVersion(gradleVersion)
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("test", "--stacktrace")
                 .forwardStdError(errorOutput)
@@ -188,7 +205,7 @@ public class AndroidLibPluginTest {
 
     @Test
     public void androidTest() throws Exception {
-        writeBuildFile(buildFile,
+        writeFile(buildFile,
                 //language="Groovy"
                 "buildscript {\n" +
                         "    repositories {\n" +
@@ -196,8 +213,8 @@ public class AndroidLibPluginTest {
                         "    }\n" +
                         "    \n" +
                         "    dependencies {\n" +
-                        "        classpath files($pluginClasspath)\n" +
-                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
+                        "        classpath files(" + getPluginClasspath() + ")\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion + "'\n" +
                         "    }\n" +
                         "}\n" +
                         "\n" +
@@ -262,6 +279,7 @@ public class AndroidLibPluginTest {
 
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
+                .withGradleVersion(gradleVersion)
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("connectedCheck", "--stacktrace")
                 .forwardStdError(errorOutput)

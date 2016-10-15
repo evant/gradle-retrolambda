@@ -8,7 +8,7 @@ retrolambda, giving you lambda goodness on java 6 or 7. It relies on the
 wonderful [retrolambda](https://github.com/orfjackal/retrolambda) by Esko
 Luontola.
 
-Note: The minimum android gradle plugin is `1.5.0`.
+Note: The minimum android gradle plugin is `1.5.0` and the minimum gradle plugin is `2.5`.
 
 Usage
 ----

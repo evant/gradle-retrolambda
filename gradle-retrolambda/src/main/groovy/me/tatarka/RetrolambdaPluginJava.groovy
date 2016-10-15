@@ -45,7 +45,7 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
 
             javaPlugin.sourceSets.all { SourceSet set ->
                 if (retrolambda.isIncluded(set.name)) {
-                    def name = set.name.capitalize()
+                    def name = RetrolambdaUtil.capitalize(set.name)
                     def taskName = "compileRetrolambda$name"
                     def oldOutputDir = set.output.classesDir
                     def newOutputDir = project.file("$project.buildDir/retrolambda/$set.name")
