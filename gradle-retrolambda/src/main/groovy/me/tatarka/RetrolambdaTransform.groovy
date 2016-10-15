@@ -121,7 +121,7 @@ class RetrolambdaTransform extends Transform {
         def javaCompileTask = javaCompileTasks.get(variantName)
 
         if (javaCompileTask == null) {
-            throw new ProjectConfigurationException("Missing javaCompileTask for variant: " + variantName, null)
+            throw new ProjectConfigurationException("Missing javaCompileTask for variant: " + variantName + " from output dir: " + outputDir, null)
         }
 
         def classpathFiles = javaCompileTask.classpath
