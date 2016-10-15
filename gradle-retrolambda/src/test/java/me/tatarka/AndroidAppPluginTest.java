@@ -272,4 +272,98 @@ public class AndroidAppPluginTest {
 
         assertThat(errorOutput.toString()).isNullOrEmpty();
     }
+    
+    @Test
+    public void withKotlin() throws Exception {
+        writeBuildFile(buildFile,
+                //language="Groovy"
+                "buildscript {\n" +
+                        "    repositories {\n" +
+                        "        jcenter()\n" +
+                        "    }\n" +
+                        "    \n" +
+                        "    dependencies {\n" +
+                        "        classpath files($pluginClasspath)\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion +"'\n" +
+                        "        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.0.4'" +
+                        "    }\n" +
+                        "}\n" +
+                        "\n" +
+                        "apply plugin: 'com.android.application'\n" +
+                        "apply plugin: 'me.tatarka.retrolambda'\n" +
+                        "apply plugin: 'kotlin-android'\n" +
+                        "\n" +
+                        "repositories {\n" +
+                        "    mavenCentral()\n" +
+                        "}\n" +
+                        "\n" +
+                        "android {\n" +
+                        "    compileSdkVersion 24\n" +
+                        "    buildToolsVersion '24.0.2'\n" +
+                        "    \n" +
+                        "    defaultConfig {\n" +
+                        "        minSdkVersion 15\n" +
+                        "        targetSdkVersion 24\n" +
+                        "    }\n" +
+                        "}\n" +
+                        "dependencies {\n" +
+                        "   compile 'org.jetbrains.kotlin:kotlin-stdlib:1.0.4'\n" +
+                        "}");
+
+        File manifestFile = new File(rootDir, "src/main/AndroidManifest.xml");
+
+        writeFile(manifestFile,
+                //language="XML"
+                "<manifest package=\"test\">\n" +
+                        "    <application/>\n" +
+                        "</manifest>");
+
+        File javaFile1 = new File(rootDir, "src/main/java/test/MainActivity.java");
+        File javaFile2 = new File(rootDir, "src/main/java/test/JavaFile.java");
+        
+        File kotlinFile = new File(rootDir, "src/main/kotlin/test/KotlinFile.kt");
+
+        writeFile(javaFile1, "package test;" +
+                "import android.app.Activity;" +
+                "import android.os.Bundle;" +
+                "import android.util.Log;" +
+                "public class MainActivity extends Activity {\n" +
+                "    public void onCreate(Bundle savedInstanceState) {\n" +
+                "        Runnable lambda = () -> Log.d(\"MainActivity\", \"Hello, Lambda!\");\n" +
+                "        lambda.run();\n" +
+                "        new KotlinFile().doThis();" +
+                "    }\n" +
+                "}");
+        
+        writeFile(javaFile2, "package test;" +
+                "public class JavaFile {\n" +
+                "   public void doThat() {\n" +
+                "       System.out.println(\"That\");" +
+                "   }" +
+                "}");
+        
+        writeFile(kotlinFile, "package test\n" +
+                "import kotlin.io.println\n" +
+                "class KotlinFile {\n" +
+                "public fun doThis() {\n" +
+                "   println(\"This\")\n" +
+                "   JavaFile().doThat()\n" +
+                "}\n" +
+                "}");
+
+        StringWriter errorOutput = new StringWriter();
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("assembleDebug", "--stacktrace")
+                .forwardStdError(errorOutput)
+                .build();
+
+        assertThat(errorOutput.toString()).isNullOrEmpty();
+
+        File mainClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity.class");
+        File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity$$Lambda$1.class");
+
+        assertThat(mainClassFile).exists();
+        assertThat(lambdaClassFile).exists();
+    }
 }
