@@ -7,3 +7,11 @@ allprojects {
 task test {
     dependsOn gradle.includedBuild('gradle-retrolambda').task(':test')
 }
+
+task install {
+    dependsOn gradle.includedBuild('gradle-retrolambda').task(':install')
+}
+
+task uploadArchives {
+    dependsOn gradle.includedBuild('gradle-retrolambda').task(':uploadArchives')
+}
