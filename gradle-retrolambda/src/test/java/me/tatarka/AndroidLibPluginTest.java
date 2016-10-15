@@ -106,7 +106,7 @@ public class AndroidLibPluginTest {
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
-                .withProjectDir(testProjectDir.getRoot())
+                .withProjectDir(rootDir)
                 .withArguments("assembleDebug", "--stacktrace")
                 .forwardStdError(errorOutput)
                 .build();
@@ -195,7 +195,7 @@ public class AndroidLibPluginTest {
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
-                .withProjectDir(testProjectDir.getRoot())
+                .withProjectDir(rootDir)
                 .withArguments("test", "--stacktrace")
                 .forwardStdError(errorOutput)
                 .build();
@@ -280,7 +280,7 @@ public class AndroidLibPluginTest {
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
-                .withProjectDir(testProjectDir.getRoot())
+                .withProjectDir(rootDir)
                 .withArguments("connectedCheck", "--stacktrace")
                 .forwardStdError(errorOutput)
                 .build();

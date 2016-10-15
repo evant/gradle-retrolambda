@@ -56,7 +56,7 @@ public class JavaPluginTest {
 
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
+                .withProjectDir(rootDir)
                 .withArguments("assemble", "--stacktrace")
                 .forwardStdError(errorOutput)
                 .build();
@@ -123,7 +123,7 @@ public class JavaPluginTest {
 
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
+                .withProjectDir(rootDir)
                 .withArguments("test", "--stacktrace")
                 .forwardStdError(errorOutput)
                 .build();
@@ -166,7 +166,7 @@ public class JavaPluginTest {
 
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
+                .withProjectDir(rootDir)
                 .withArguments("run")
                 .forwardStdError(errorOutput)
                 .build();
