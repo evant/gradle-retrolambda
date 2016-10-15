@@ -23,13 +23,7 @@ import org.gradle.api.Task
 import org.gradle.api.tasks.SourceSet
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
-/**
- * Created with IntelliJ IDEA.
- * User: evan
- * Date: 8/4/13
- * Time: 1:36 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class RetrolambdaPluginGroovy implements Plugin<Project> {
     @Override
     void apply(Project project) {
@@ -42,7 +36,7 @@ public class RetrolambdaPluginGroovy implements Plugin<Project> {
                     def newOutputDir = project.file("$project.buildDir/retrolambda/$set.name")
 
                     /* No compileJavaTaskName present, so re-use any modifications applied to compileJava and remap to Groovy */
-                    def compileGroovyTaskName = set.compileJavaTaskName.replace(/Java/,/Groovy/)
+                    def compileGroovyTaskName = set.compileJavaTaskName.replace(/Java/, /Groovy/)
                     def compileGroovyTask = project.tasks.getByName(compileGroovyTaskName)
 
                     compileGroovyTask.destinationDir = newOutputDir
@@ -53,7 +47,7 @@ public class RetrolambdaPluginGroovy implements Plugin<Project> {
                         javaVersion = project.retrolambda.javaVersion
                         jvmArgs = project.retrolambda.jvmArgs
                     }
-                    
+
                     // enable retrolambdaTask dynamically, based on up-to-date source set before running 
                     project.gradle.taskGraph.beforeTask { Task task ->
                         if (task == retrolambdaTask) {

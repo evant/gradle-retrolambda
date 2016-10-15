@@ -28,7 +28,6 @@ ext.androidPluginVersion = props['androidPluginVersion']
 
 sourceCompatibility = '1.6'
 
-
 repositories {
     jcenter()
     mavenCentral()

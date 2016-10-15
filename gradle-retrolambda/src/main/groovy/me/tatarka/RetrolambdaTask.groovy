@@ -29,6 +29,7 @@ import org.gradle.api.tasks.incremental.IncrementalTaskInputs
 import org.gradle.api.tasks.incremental.InputFileDetails
 
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
+
 /**
  * A task that runs retrolambda
  */
@@ -48,14 +49,14 @@ class RetrolambdaTask extends DefaultTask {
 
     @Input
     List<String> jvmArgs = []
-    
+
     @TaskAction
     def execute(IncrementalTaskInputs inputs) {
         def retrolambda = project.extensions.getByType(RetrolambdaExtension)
 
         List<InputFileDetails> changes = []
         inputs.outOfDate { changes += it }
-        
+
         // Ensure output is cleared if build is not incremental.
         if (inputs.incremental && !changes.isEmpty() && !retrolambda.incremental) {
             outputDir.eachFile { it.delete() }

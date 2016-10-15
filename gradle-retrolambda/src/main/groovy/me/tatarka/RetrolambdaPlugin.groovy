@@ -17,19 +17,15 @@
 package me.tatarka
 
 import groovy.transform.CompileStatic
-import org.gradle.api.*
+import org.gradle.api.JavaVersion
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.plugins.ApplicationPlugin
 import org.gradle.api.plugins.GroovyPlugin
 import org.gradle.api.plugins.JavaPlugin
 
-/**
- * Created with IntelliJ IDEA.
- * User: evan
- * Date: 8/4/13
- * Time: 1:34 PM
- * To change this template use File | Settings | File Templates.
- */
 @CompileStatic
 public class RetrolambdaPlugin implements Plugin<Project> {
     protected static String retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:2.3.0"

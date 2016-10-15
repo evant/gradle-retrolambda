@@ -23,13 +23,6 @@ import org.gradle.api.ProjectConfigurationException
 
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
 
-/**
- * Created with IntelliJ IDEA.
- * User: evan
- * Date: 8/4/13
- * Time: 1:33 PM
- * To change this template use File | Settings | File Templates.
- */
 @CompileStatic
 public class RetrolambdaExtension {
     int bytecodeVersion = 50

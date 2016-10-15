@@ -28,13 +28,6 @@ import org.gradle.api.tasks.testing.Test
 
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
 
-/**
- * Created with IntelliJ IDEA.
- * User: evan
- * Date: 8/4/13
- * Time: 1:36 PM
- * To change this template use File | Settings | File Templates.
- */
 @CompileStatic
 public class RetrolambdaPluginJava implements Plugin<Project> {
     @Override
