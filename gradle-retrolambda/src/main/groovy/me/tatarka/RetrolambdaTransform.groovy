@@ -111,17 +111,17 @@ class RetrolambdaTransform extends Transform {
         // - 'build/intermediates/transforms/retrolambda/<VARIANT>
         // - 'build/intermediates/transforms/retrolambda/<VARIANT>/folders/1/1/retrolambda
         // This will no longer be needed when the transform api supports per-variant transforms
-        String[] parts = outputDir.path.split("build/intermediates/transforms/retrolambda/|/folders/[0-9]+")
+        String[] parts = outputDir.toURI().path.split('build/intermediates/transforms/retrolambda/|/folders/[0-9]+')
 
         if (parts.length < 2) {
-            throw new ProjectConfigurationException("Could not extract variant from output dir: " + outputDir, null)
+            throw new ProjectConfigurationException('Could not extract variant from output dir: ' + outputDir, null)
         }
 
         String variantName = parts[1];
         def javaCompileTask = javaCompileTasks.get(variantName)
 
         if (javaCompileTask == null) {
-            throw new ProjectConfigurationException("Missing javaCompileTask for variant: " + variantName + " from output dir: " + outputDir, null)
+            throw new ProjectConfigurationException('Missing javaCompileTask for variant: ' + variantName + ' from output dir: ' + outputDir, null)
         }
 
         def classpathFiles = javaCompileTask.classpath

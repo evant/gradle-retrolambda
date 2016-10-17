@@ -24,7 +24,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:3.3.0'
+         classpath 'me.tatarka:gradle-retrolambda:3.3.1'
       }
    }
 
@@ -39,7 +39,7 @@ Usage
    alternatively, you can use the new plugin syntax for gradle `2.1+`
    ```groovy
    plugins {
-      id "me.tatarka.retrolambda" version "3.3.0"
+      id "me.tatarka.retrolambda" version "3.3.1"
    }
    ```
 
