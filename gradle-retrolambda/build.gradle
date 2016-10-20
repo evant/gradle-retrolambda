@@ -167,7 +167,7 @@ if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.pa
     def grgit = Grgit.open("$projectDir/..")
 
     task checkRelease << {
-        def readmeVersion = file("$project.rootProject.projectDir/README.md").readLines().find { it.contains('me.tatarka:gradle-retrolambda:') }?.trim()
+        def readmeVersion = file("$project.rootProject.projectDir/../README.md").readLines().find { it.contains('me.tatarka:gradle-retrolambda:') }?.trim()
         
         if (readmeVersion == null) {
             throw new ProjectConfigurationException("Missing README version string", null)
@@ -177,7 +177,7 @@ if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.pa
             throw new ProjectConfigurationException("README version string: $readmeVersion must match release version: $version", null)
         }
         
-        def changelogVersion = file("$project.rootProject.projectDir/CHANGELOG.md").readLines().find { it.contains("### $version") }
+        def changelogVersion = file("$project.rootProject.projectDir/../CHANGELOG.md").readLines().find { it.contains("### $version") }
         if (changelogVersion == null) {
             throw new ProjectConfigurationException("CHANGELOG does not contain changes for release version: $version", null)
         }
