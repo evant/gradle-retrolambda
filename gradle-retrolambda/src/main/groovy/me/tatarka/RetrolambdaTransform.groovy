@@ -108,10 +108,10 @@ class RetrolambdaTransform extends Transform {
 
     private FileCollection getClasspath(File outputDir, Collection<TransformInput> referencedInputs) {
         // Extract the variant from the output path assuming it's in the form like:
-        // - 'build/intermediates/transforms/retrolambda/<VARIANT>
-        // - 'build/intermediates/transforms/retrolambda/<VARIANT>/folders/1/1/retrolambda
+        // - '*/intermediates/transforms/retrolambda/<VARIANT>
+        // - '*/intermediates/transforms/retrolambda/<VARIANT>/folders/1/1/retrolambda
         // This will no longer be needed when the transform api supports per-variant transforms
-        String[] parts = outputDir.toURI().path.split('build/intermediates/transforms/retrolambda/|/folders/[0-9]+')
+        String[] parts = outputDir.toURI().path.split('/intermediates/transforms/retrolambda/|/folders/[0-9]+')
 
         if (parts.length < 2) {
             throw new ProjectConfigurationException('Could not extract variant from output dir: ' + outputDir, null)
