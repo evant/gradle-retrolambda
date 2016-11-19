@@ -1,18 +1,14 @@
-package me.tatarka.sample.app.test;
+package me.tatarka.retrolamba.sample.test;
 
-import android.support.test.espresso.ViewAssertion;
-import android.support.test.espresso.assertion.ViewAssertions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.widget.TextView;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import me.tatarka.retrolambda.sample.app.MainActivity;
 import me.tatarka.retrolambda.sample.app.R;
 import me.tatarka.retrolambda.sample.app.ResFunction;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;

@@ -19,6 +19,8 @@ package me.tatarka
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import com.android.build.gradle.TestExtension
+import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.TestVariant
 import com.android.build.gradle.api.UnitTestVariant
@@ -35,11 +37,10 @@ import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
 public class RetrolambdaPluginAndroid implements Plugin<Project> {
     @Override
     void apply(Project project) {
-        def isLibrary = project.plugins.hasPlugin(LibraryPlugin)
         def retrolambda = project.extensions.getByType(RetrolambdaExtension)
         def transform = new RetrolambdaTransform(project, retrolambda)
 
-        if (isLibrary) {
+        if (project.plugins.hasPlugin(LibraryPlugin)) {
             def android = project.extensions.getByType(LibraryExtension)
             android.registerTransform(transform)
 
@@ -52,7 +53,13 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             android.unitTestVariants.all { UnitTestVariant variant ->
                 configureUnitTestTask(project, variant.name, variant.javaCompile)
             }
+        } else if (project.plugins.hasPlugin(TestPlugin)) {
+            def android = project.extensions.getByType(TestExtension)
+            android.registerTransform(transform)
 
+            android.applicationVariants.all { BaseVariant variant ->
+                configureCompileJavaTask(project, variant, variant.javaCompile, transform)
+            }
         } else {
             def android = project.extensions.getByType(AppExtension)
             android.registerTransform(transform)

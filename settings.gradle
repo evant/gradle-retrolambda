@@ -3,6 +3,7 @@ rootProject.name = 'gradle-retrolambda-project'
 include ':sample-java',
         ':sample-java-default-methods',
         ':sample-android-app',
-        ':sample-android-lib'
+        ':sample-android-lib',
+        ':sample-android-test'
 
 includeBuild './gradle-retrolambda'
