@@ -1,3 +1,7 @@
+#### 3.4.0
+- Support build dirs with custom names
+- Support com.android.test modules
+
 #### 3.3.1
 - Fixed retrolambda classpath when running and android test with multiple flavors.
 
