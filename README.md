@@ -41,6 +41,9 @@ Usage
    plugins {
       id "me.tatarka.retrolambda" version "3.4.0"
    }
+
+   apply plugin: 'com.android.application' //or apply plugin: 'java'
+   apply plugin: 'me.tatarka.retrolambda'
    ```
 
 3. There is no step three!
