@@ -42,6 +42,7 @@ class RetrolambdaExec {
     List<String> jvmArgs;
     int bytecodeVersion;
     boolean defaultMethods;
+    boolean quiet;
 
     private final Project project;
 
@@ -72,6 +73,7 @@ class RetrolambdaExec {
                     "-Dretrolambda.outputDir=$outputDir",
                     "-Dretrolambda.classpath=${path}",
                     "-Dretrolambda.bytecodeVersion=$bytecodeVersion",
+                    "-Dretrolambda.quiet=$quiet",
             ]
 
             VersionNumber retrolambdaVersion = retrolambdaVersion(retrolambdaConfig)

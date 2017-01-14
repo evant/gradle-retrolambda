@@ -87,6 +87,7 @@ class RetrolambdaTransform extends Transform {
                 exec.includedFiles = changed
                 exec.defaultMethods = retrolambda.defaultMethods
                 exec.jvmArgs = retrolambda.jvmArgs
+                exec.quiet = retrolambda.quiet
                 exec.exec()
             }
         }
@@ -171,6 +172,7 @@ class RetrolambdaTransform extends Transform {
                 .put("incremental", retrolambda.incremental)
                 .put("defaultMethods", retrolambda.defaultMethods)
                 .put("jdk", retrolambda.tryGetJdk())
+                .put("quiet", retrolambda.quiet)
                 .build();
     }
 

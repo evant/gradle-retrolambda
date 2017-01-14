@@ -31,6 +31,7 @@ public class RetrolambdaExtension {
     List<String> jvmArgs = []
     boolean incremental = true
     boolean defaultMethods = false
+    boolean quiet = false
     boolean isOnJava8 = (System.properties.'java.version' as String).startsWith('1.8')
 
     private Project project
@@ -49,6 +50,14 @@ public class RetrolambdaExtension {
 
     public void include(Object... e) {
         includes.addAll(e.collect { i -> i.toString() })
+    }
+
+    public void quiet(boolean value) {
+        quiet = value
+    }
+
+    public boolean isQuiet() {
+        return quiet
     }
 
     public void jvmArgs(String... args) {

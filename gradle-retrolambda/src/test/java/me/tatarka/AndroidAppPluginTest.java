@@ -75,12 +75,12 @@ public class AndroidAppPluginTest {
                         "}\n" +
                         "\n" +
                         "android {\n" +
-                        "    compileSdkVersion 24\n" +
-                        "    buildToolsVersion '24.0.2'\n" +
+                        "    compileSdkVersion 25\n" +
+                        "    buildToolsVersion '25.0.2'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
                         "        minSdkVersion 15\n" +
-                        "        targetSdkVersion 24\n" +
+                        "        targetSdkVersion 25\n" +
                         "    }\n" +
                         "}");
 
@@ -145,12 +145,12 @@ public class AndroidAppPluginTest {
                         "}\n" +
                         "\n" +
                         "android {\n" +
-                        "    compileSdkVersion 24\n" +
-                        "    buildToolsVersion '24.0.2'\n" +
+                        "    compileSdkVersion 25\n" +
+                        "    buildToolsVersion '25.0.2'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
                         "        minSdkVersion 15\n" +
-                        "        targetSdkVersion 24\n" +
+                        "        targetSdkVersion 25\n" +
                         "    }\n" +
                         "}");
 
@@ -236,12 +236,12 @@ public class AndroidAppPluginTest {
                         "}\n" +
                         "\n" +
                         "android {\n" +
-                        "    compileSdkVersion 24\n" +
-                        "    buildToolsVersion '24.0.2'\n" +
+                        "    compileSdkVersion 25\n" +
+                        "    buildToolsVersion '25.0.2'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
                         "        minSdkVersion 15\n" +
-                        "        targetSdkVersion 24\n" +
+                        "        targetSdkVersion 25\n" +
                         "    }\n" +
                         "}\n" +
                         "\n" +
@@ -319,12 +319,12 @@ public class AndroidAppPluginTest {
                         "}\n" +
                         "\n" +
                         "android {\n" +
-                        "    compileSdkVersion 23\n" +
-                        "    buildToolsVersion '24.0.2'\n" +
+                        "    compileSdkVersion 25\n" +
+                        "    buildToolsVersion '25.0.2'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
                         "        minSdkVersion 15\n" +
-                        "        targetSdkVersion 24\n" +
+                        "        targetSdkVersion 25\n" +
                         "        testInstrumentationRunner \"android.support.test.runner.AndroidJUnitRunner\"\n" +
                         "    }\n" +
                         "}\n" +
@@ -406,12 +406,12 @@ public class AndroidAppPluginTest {
                         "}\n" +
                         "\n" +
                         "android {\n" +
-                        "    compileSdkVersion 24\n" +
-                        "    buildToolsVersion '24.0.2'\n" +
+                        "    compileSdkVersion 25\n" +
+                        "    buildToolsVersion '25.0.2'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
                         "        minSdkVersion 15\n" +
-                        "        targetSdkVersion 24\n" +
+                        "        targetSdkVersion 25\n" +
                         "    }\n" +
                         "}\n" +
                         "dependencies {\n" +

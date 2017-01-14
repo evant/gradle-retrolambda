@@ -50,6 +50,9 @@ class RetrolambdaTask extends DefaultTask {
     @Input
     List<String> jvmArgs = []
 
+    @Input
+    boolean quiet
+
     @TaskAction
     def execute(IncrementalTaskInputs inputs) {
         def retrolambda = project.extensions.getByType(RetrolambdaExtension)
@@ -79,6 +82,7 @@ class RetrolambdaTask extends DefaultTask {
             }
             exec.defaultMethods = retrolambda.defaultMethods
             exec.jvmArgs = jvmArgs
+            exec.quiet = quiet && retrolambda.quiet
             exec.exec()
         }
 
