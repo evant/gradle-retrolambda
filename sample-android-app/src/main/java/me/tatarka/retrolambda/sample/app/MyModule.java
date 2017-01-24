@@ -24,6 +24,6 @@ public class MyModule {
 
     @Provides
     public me.tatarka.retrolambda.sample.lib.Function provideLibHello() {
-        return Lib.getHello();
+        return Lib.getHello(Lib.MODE_A);
     }
 }
