@@ -10,11 +10,11 @@ buildscript {
     
     dependencies {
         classpath 'org.ajoberstar:gradle-git:0.11.2'
-//        classpath "com.gradle.publish:plugin-publish-plugin:0.9.0"
+        classpath "com.gradle.publish:plugin-publish-plugin:0.9.7"
     }
 }
 
-//apply plugin: "com.gradle.plugin-publish"
+apply plugin: "com.gradle.plugin-publish"
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'signing'
@@ -96,19 +96,19 @@ artifacts {
     archives sourcesJar
 }
 
-//pluginBundle {
-//    website = 'https://github.com/evant/gradle-retrolambda'
-//    vcsUrl = 'https://github.com/evant/gradle-retrolambda.git'
-//    description = 'https://github.com/evant/gradle-retrolambda.git'
-//    tags = ['java', 'android', 'lambda']
-//
-//    plugins {
-//        retrolambdaPlugin {
-//            id = 'me.tatarka.retrolambda'
-//            displayName = 'gradle-retrolambda'
-//        }
-//    }
-//}
+pluginBundle {
+    website = 'https://github.com/evant/gradle-retrolambda'
+    vcsUrl = 'https://github.com/evant/gradle-retrolambda.git'
+    description = 'https://github.com/evant/gradle-retrolambda.git'
+    tags = ['java', 'android', 'lambda']
+
+    plugins {
+        retrolambdaPlugin {
+            id = 'me.tatarka.retrolambda'
+            displayName = 'gradle-retrolambda'
+        }
+    }
+}
 
 signing {
     sign configurations.archives
