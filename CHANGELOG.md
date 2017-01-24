@@ -1,3 +1,7 @@
+#### 3.5.0
+- Don't disable extractAnnotation task on android libs as it now supports java 8 sourcesS.
+- Bumped default retrolambda version to `2.5.0`
+
 #### 3.4.0
 - Support build dirs with custom names
 - Support com.android.test modules
