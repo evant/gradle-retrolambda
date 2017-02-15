@@ -39,7 +39,7 @@ Usage
    alternatively, you can use the new plugin syntax for gradle `2.1+`
    ```groovy
    plugins {
-      id "me.tatarka.retrolambda" version "3.4.0"
+      id "me.tatarka.retrolambda" version "3.5.0"
    }
    ```
 
