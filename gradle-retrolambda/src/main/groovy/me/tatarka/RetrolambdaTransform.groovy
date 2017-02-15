@@ -72,7 +72,9 @@ class RetrolambdaTransform extends Transform {
                             changed += project.files(file);
                         }
                         if (status == CHANGED || status == REMOVED) {
-                            deleteRelated(toOutput(inputFile, outputDir, file))
+                            File output = toOutput(inputFile, outputDir, file)
+                            output.delete()
+                            deleteRelated(output)
                         }
                     }
                 } else {

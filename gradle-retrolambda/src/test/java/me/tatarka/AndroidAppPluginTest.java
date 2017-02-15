@@ -214,6 +214,93 @@ public class AndroidAppPluginTest {
     }
 
     @Test
+    public void assembleDebugIncrementalShouldntLeak() throws Exception {
+        writeFile(buildFile,
+            //language="Groovy"
+            "buildscript {\n" +
+                "    repositories {\n" +
+                "        jcenter()\n" +
+                "    }\n" +
+                "    \n" +
+                "    dependencies {\n" +
+                "        classpath files(" + getPluginClasspath() + ")\n" +
+                "        classpath 'com.android.tools.build:gradle:" + androidVersion + "'\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "apply plugin: 'com.android.application'\n" +
+                "apply plugin: 'me.tatarka.retrolambda'\n" +
+                "\n" +
+                "repositories {\n" +
+                "    mavenCentral()\n" +
+                "}\n" +
+                "\n" +
+                "android {\n" +
+                "    compileSdkVersion 24\n" +
+                "    buildToolsVersion '24.0.2'\n" +
+                "    \n" +
+                "    defaultConfig {\n" +
+                "        minSdkVersion 15\n" +
+                "        targetSdkVersion 24\n" +
+                "    }\n" +
+                "}");
+
+        File manifestFile = new File(rootDir, "src/main/AndroidManifest.xml");
+
+        writeFile(manifestFile,
+            //language="XML"
+            "<manifest package=\"test\">\n" +
+                "    <application/>\n" +
+                "</manifest>");
+
+        File javaFile = new File(rootDir, "src/main/java/MainActivity.java");
+
+        writeFile(javaFile, "package test;" +
+            "import android.app.Activity;" +
+            "import android.os.Bundle;" +
+            "import android.util.Log;" +
+            "public class MainActivity extends Activity {\n" +
+            "    public void onCreate(Bundle savedInstanceState) {\n" +
+            "        Runnable lambda = () -> Log.d(\"MainActivity\", \"Hello, Lambda!\");\n" +
+            "        lambda.run();\n" +
+            "    }\n" +
+            "}");
+
+        StringWriter errorOutput = new StringWriter();
+        BuildResult result = GradleRunner.create()
+            .withGradleVersion(gradleVersion)
+            .withProjectDir(rootDir)
+            .withArguments("assembleDebug", "--stacktrace")
+            .forwardStdError(errorOutput)
+            .build();
+
+        assertThat(errorOutput.toString()).isNullOrEmpty();
+
+
+        File mainClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity.class");
+        File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity$$Lambda$1.class");
+
+        assertThat(mainClassFile).exists();
+        assertThat(lambdaClassFile).exists();
+
+        // delete the java file
+        javaFile.delete();
+
+        errorOutput = new StringWriter();
+        result = GradleRunner.create()
+            .withGradleVersion(gradleVersion)
+            .withProjectDir(rootDir)
+            .withArguments("assembleDebug", "--stacktrace")
+            .forwardStdError(errorOutput)
+            .build();
+
+        assertThat(errorOutput.toString()).isNullOrEmpty();
+
+        assertThat(mainClassFile).doesNotExist();
+        assertThat(lambdaClassFile).doesNotExist();
+    }
+
+    @Test
     public void unitTest() throws Exception {
         writeFile(buildFile,
                 //language="Groovy"
