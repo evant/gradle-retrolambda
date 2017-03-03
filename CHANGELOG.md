@@ -1,5 +1,12 @@
+#### 3.6.0
+- *Deprecated* oldJdk (and reading from JAVA6/JAVA7_HOME).
+- *Deprecated* running gradle with java 6 or 7.
+- Fixed incremental build sometimes leaving deleted classes (madisp)
+- No longer fail if old jdk is not defined. Instead run with the current jdk.
+- Bumped default retrolambda version to `2.5.1`
+
 #### 3.5.0
-- Don't disable extractAnnotation task on android libs as it now supports java 8 sourcesS.
+- Don't disable extractAnnotation task on android libs as it now supports java 8 sourcess.
 - Bumped default retrolambda version to `2.5.0`
 
 #### 3.4.0

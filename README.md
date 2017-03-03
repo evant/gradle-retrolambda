@@ -13,7 +13,7 @@ Note: The minimum android gradle plugin is `1.5.0` and the minimum gradle plugin
 Usage
 ----
 
-1. Download [jdk8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
+1. Download [jdk8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) and set it as your default.
 
 2. Add the following to your build.gradle
 
@@ -24,7 +24,7 @@ Usage
       }
 
       dependencies {
-         classpath 'me.tatarka:gradle-retrolambda:3.5.0'
+         classpath 'me.tatarka:gradle-retrolambda:3.6.0'
       }
    }
 
@@ -39,7 +39,7 @@ Usage
    alternatively, you can use the new plugin syntax for gradle `2.1+`
    ```groovy
    plugins {
-      id "me.tatarka.retrolambda" version "3.5.0"
+      id "me.tatarka.retrolambda" version "3.6.0"
    }
    ```
 
@@ -50,18 +50,9 @@ files with the output of retrolambda.
 
 Configuration
 -------------
-
-Configuration is entirely optional, the plugin will by default pick up the
-`JAVA5_HOME`/`JAVA6_HOME`/`JAVA7_HOME`/`JAVA8_HOME` environment variables. It's also smart
-enough to figure out what version of java you are running gradle with. For
-example, if you have java8 set as your default, you only need to define
-`JAVA5_HOME`/`JAVA6_HOME`/`JAVA7_HOME`. If you need to though, you can add a block like the
-following to configure the plugin:
-
+You can add a block like the following to configure the plugin:
 ```groovy
 retrolambda {
-  jdk System.getenv("JAVA8_HOME")
-  oldJdk System.getenv("JAVA6_HOME")
   javaVersion JavaVersion.VERSION_1_6
   jvmArgs '-arg1', '-arg2'
   defaultMethods false
@@ -69,16 +60,7 @@ retrolambda {
 }
 ```
 
-- `jdk` Set the path to the java 8 jdk. The default is found using the
-    environment variable `JAVA8_HOME`. If you a running gradle with java 5, 6 or 7,
-    you must have either `JAVA8_HOME` or this property set.
-- `oldJdk` Sets the path to the java 5, 6 or 7 jdk. The default is found using the
-    environment variable `JAVA5_HOME`/`JAVA6_HOME`/`JAVA7_HOME`. If you are running gradle
-    with java 8 and wish to run unit tests, you must have either
-    `JAVA5_HOME`/`JAVA6_HOME`/`JAVA7_HOME` or this property set. This is so the tests can be
-    run with the correct java version.
-- `javaVersion` Set the java version to compile to. The default is 6. Only 5, 6 or
-    7 are accepted.
+- `javaVersion` Set the java version to compile to. The default is 6. Only 5, 6 or 7 are accepted.
 - `include 'Debug', 'Release'` Sets which sets/variants to run through
     retrolambda. The default is all of them.
 - `exclude 'Test'` Sets which sets/variants to not run through retrolambda. Only
@@ -92,7 +74,7 @@ retrolambda {
 ### Using a Different Version of the retrolambda.jar
 
 The default version of retrolambda used is
-`'net.orfjackal.retrolambda:retrolambda:2.5.0'`. If you want to use a different
+`'net.orfjackal.retrolambda:retrolambda:2.5.1'`. If you want to use a different
 one, you can configure it in your dependencies.
 
 ```groovy
@@ -101,6 +83,27 @@ dependencies {
   retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:+'
   // Or a local version
   // retrolambdaConfig files('libs/retrolambda.jar')
+}
+```
+
+### Deprecated Features
+
+If you are running with java 6 or 7 you should really consider updating. However, you may use the
+bellow configuration instead.
+
+Set the environment variable `JAVA8_HOME` to point to the java 8 jdk. Alternatively, you can set the
+`jdk` property.
+```groovy
+retrolambda {
+  jdk System.getenv("JAVA8_HOME")
+}
+```
+
+You can force unit tests to be run with an older version of java by setting
+ JAVA5_HOME`/`JAVA6_HOME`/`JAVA7_HOME` or with the `oldJdk` property.
+```groovy
+retrolambda {
+  oldJdk System.getenv("JAVA6_HOME")
 }
 ```
 
@@ -127,7 +130,9 @@ This plugin is fully compatible with proguard (since `v2.4.0`). In your proguard
 Known Issues
 ---------------
 ### Lint fails on java files that have lambdas.
-Android's lint doesn't understand java 8 syntax and will fail silently or loudly. There is now an [experimental fork](https://github.com/evant/android-retrolambda-lombok) that fixes the issue.
+First try updating to the latest version of the android gradle plugin. Newer versions of lint are
+compatible with java 8 sources. If you can't for some reason, you can still use the
+[experimental fork](https://github.com/evant/android-retrolambda-lombok) to fix the issue.
 
 ### Using Google Play Services causes retrolambda to fail
 Version `5.0.77` contains bytecode that is incompatible with retrolambda. This should be fixed in
@@ -141,17 +146,6 @@ retrolambda {
   jvmArgs '-noverify'
 }
 ```
-
-### Compiling for android-L doesn't work when using Android Studio's sdk manager.
-For some reason only known to the gods, when using Android Studio's sdk manager,
-there is no `android-L` directory sdk directory. Instead, it happily builds
-using the `android-20` directory instead. To work around this, you can symlink
-the `android-L` directory to point to `android-20`. See
-[#36](https://github.com/evant/gradle-retrolambda/issues/36).
-
-### Build fails with using `android-apt`
-This is because `android-apt` modifies the `javaCompile` task and this plugin
-replaces it. Since `v2.4.1` this is fixed, you just need to ensure you apply this plugin _last_.
 
 Updates
 -------
