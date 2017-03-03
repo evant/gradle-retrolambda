@@ -117,7 +117,9 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
         if (!retrolambda.onJava8) {
             // Set JDK 8 for the compiler task
             def javac = "${retrolambda.tryGetJdk()}/bin/javac"
-            if (!checkIfExecutableExists(javac)) throw new ProjectConfigurationException("Cannot find executable: $javac", null)
+            if (!checkIfExecutableExists(javac)) {
+                throw new ProjectConfigurationException("Cannot find executable: $javac", null)
+            }
             javaCompile.options.fork = true
             javaCompile.options.forkOptions.executable = javac
         }
@@ -126,7 +128,9 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
     private static ensureRunOnJava8(RetrolambdaExtension retrolambda, Test test) {
         if (!retrolambda.onJava8) {
             def java = "${retrolambda.tryGetJdk()}/bin/java"
-            if (!checkIfExecutableExists(java)) throw new ProjectConfigurationException("Cannot find executable: $java", null)
+            if (!checkIfExecutableExists(java)) {
+                throw new ProjectConfigurationException("Cannot find executable: $java", null)
+            }
             test.executable java
         }
     }

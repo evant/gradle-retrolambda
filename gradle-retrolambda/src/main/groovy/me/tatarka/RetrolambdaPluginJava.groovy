@@ -76,10 +76,15 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
 
             project.tasks.getByName("test").doFirst { Test task ->
                 if (retrolambda.onJava8) {
-                    //Ensure the tests run on java6/7
-                    def oldJava = "${retrolambda.tryGetOldJdk()}/bin/java"
-                    if (!checkIfExecutableExists(oldJava)) throw new ProjectConfigurationException("Cannot find executable: $oldJava", null)
-                    task.executable oldJava
+                    //Run tests on java6/7 if the property is defined.
+                    String oldJdkPath = retrolambda.oldJdk
+                    if (oldJdkPath != null) {
+                        def oldJava = "$oldJdkPath/bin/java"
+                        if (!checkIfExecutableExists(oldJava)) {
+                            throw new ProjectConfigurationException("Cannot find executable: $oldJava", null)
+                        }
+                        task.executable oldJava
+                    }
                 }
             }
         }

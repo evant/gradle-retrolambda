@@ -28,13 +28,16 @@ import org.gradle.api.plugins.JavaPlugin
 
 @CompileStatic
 public class RetrolambdaPlugin implements Plugin<Project> {
-    protected static String retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:2.5.0"
+    protected static String retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:2.5.1"
 
     @Override
     void apply(Project project) {
-        project.extensions.create('retrolambda', RetrolambdaExtension, project)
-
+        def retrolambda = project.extensions.create('retrolambda', RetrolambdaExtension, project)
         def retrolambdaConfig = project.configurations.create("retrolambdaConfig")
+
+        if (!retrolambda.isOnJava8) {
+            project.logger.warn("running gradle with java ${JavaVersion.current().majorVersion} is deprecated and will be removed in a future version.")
+        }
 
         retrolambdaConfig.defaultDependencies { DependencySet dependencies ->
             dependencies.add(project.dependencies.create(retrolambdaCompile))

@@ -28,6 +28,8 @@ public class RetrolambdaPluginGroovy implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.afterEvaluate {
+            def retrolambda = project.extensions.getByType(RetrolambdaExtension)
+
             project.sourceSets.all { SourceSet set ->
                 if (project.retrolambda.isIncluded(set.name)) {
                     def name = RetrolambdaUtil.capitalize(set.name)
@@ -44,8 +46,8 @@ public class RetrolambdaPluginGroovy implements Plugin<Project> {
                         inputDir = newOutputDir
                         outputDir = oldOutputDir
                         classpath = set.compileClasspath + project.files(newOutputDir)
-                        javaVersion = project.retrolambda.javaVersion
-                        jvmArgs = project.retrolambda.jvmArgs
+                        javaVersion = retrolambda.javaVersion
+                        jvmArgs = retrolambda.jvmArgs
                     }
 
                     // enable retrolambdaTask dynamically, based on up-to-date source set before running 
@@ -61,18 +63,23 @@ public class RetrolambdaPluginGroovy implements Plugin<Project> {
                         // Set JDK 8 for compiler task
                         compileGroovyTask.doFirst {
                             it.options.fork = true
-                            it.options.forkOptions.executable = "${project.retrolambda.tryGetJdk()}/bin/javac"
+                            it.options.forkOptions.executable = "${retrolambda.tryGetJdk()}/bin/javac"
                         }
                     }
                 }
             }
 
             project.tasks.getByName("test").doFirst {
-                if (project.retrolambda.onJava8) {
-                    //Ensure the tests run on java6/7
-                    def oldJava = "${project.retrolambda.tryGetOldJdk()}/bin/java"
-                    if (!checkIfExecutableExists(oldJava)) throw new ProjectConfigurationException("Cannot find executable: $oldJava", null)
-                    executable oldJava
+                if (retrolambda.onJava8) {
+                    //Run tests on java6/7 if the property is defined.
+                    String oldJdkPath = retrolambda.oldJdk
+                    if (oldJdkPath != null) {
+                        def oldJava = "$oldJdkPath/bin/java"
+                        if (!checkIfExecutableExists(oldJava)) {
+                            throw new ProjectConfigurationException("Cannot find executable: $oldJava", null)
+                        }
+                        task.executable oldJava
+                    }
                 }
             }
         }

@@ -18,6 +18,7 @@ package me.tatarka
 
 import groovy.transform.CompileStatic
 import org.gradle.api.JavaVersion
+import org.gradle.api.Nullable
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 
@@ -31,7 +32,7 @@ public class RetrolambdaExtension {
     List<String> jvmArgs = []
     boolean incremental = true
     boolean defaultMethods = false
-    boolean isOnJava8 = (System.properties.'java.version' as String).startsWith('1.8')
+    boolean isOnJava8 = JavaVersion.current().java8Compatible
 
     private Project project
     private String jdk = null
@@ -105,23 +106,21 @@ public class RetrolambdaExtension {
         return jdk
     }
 
+    @Deprecated
     public void setOldJdk(String path) {
         oldJdk = path
         oldJdkSet = true
     }
 
+    @Nullable
+    @Deprecated
     public String getOldJdk() {
         if (!oldJdkSet) {
             oldJdk = findOldJdk()
             oldJdkSet = true
         }
-        return oldJdk
-    }
-
-    String tryGetOldJdk() {
-        String oldJdk = getOldJdk()
-        if (oldJdk == null) {
-            throw new ProjectConfigurationException("When running gradle with java 8, you must set the path to the old jdk, either with property retrolambda.oldJdk or environment variable JAVA5_HOME/JAVA6_HOME/JAVA7_HOME", null)
+        if (oldJdk != null) {
+            project.logger.warn("running unit tests with an old jdk is deprecated an will be removed in a later version.")
         }
         return oldJdk
     }
