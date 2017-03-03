@@ -31,7 +31,3 @@ jar {
 retrolambda {
     javaVersion JavaVersion.VERSION_1_6
 }
-
-task buildscriptDependencies << {
-    println project.buildscript.configurations.classpath.asPath
-}

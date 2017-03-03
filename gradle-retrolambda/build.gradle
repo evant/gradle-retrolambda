@@ -166,7 +166,7 @@ if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.pa
 
     def grgit = Grgit.open("$projectDir/..")
 
-    task checkRelease << {
+    task checkRelease { doLast {
         def readmeVersion = file("$project.rootProject.projectDir/../README.md").readLines().find { it.contains('me.tatarka:gradle-retrolambda:') }?.trim()
         
         if (readmeVersion == null) {
@@ -190,20 +190,16 @@ if (project.hasProperty('sonatype.username') && project.hasProperty('sonatype.pa
         } else if (branchName != 'master') {
             throw new ProjectConfigurationException("Branch: $branchName must be master", null)
         }
-    }
+    } }
 
-    task tagRelease(dependsOn: [checkRelease]) << {
+    task tagRelease(dependsOn: [checkRelease]) { doLast {
         grgit.tag.add {
             name = "v$version"
             message = "Release of $version"
         }
-    }
+    } }
     
     if (!version.endsWith('SNAPSHOT')) {
         uploadArchives.dependsOn(tagRelease)
     }
-}
-
-task printBuildScriptClasspath << {
-    println project.buildscript.configurations.classpath.asPath
 }
