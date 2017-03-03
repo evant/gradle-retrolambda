@@ -100,7 +100,7 @@ retrolambda {
 ```
 
 You can force unit tests to be run with an older version of java by setting
- JAVA5_HOME`/`JAVA6_HOME`/`JAVA7_HOME` or with the `oldJdk` property.
+ `JAVA5_HOME`/`JAVA6_HOME`/`JAVA7_HOME` or with the `oldJdk` property.
 ```groovy
 retrolambda {
   oldJdk System.getenv("JAVA6_HOME")
