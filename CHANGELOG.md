@@ -6,7 +6,7 @@
 - Bumped default retrolambda version to `2.5.1`
 
 #### 3.5.0
-- Don't disable extractAnnotation task on android libs as it now supports java 8 sourcess.
+- Don't disable extractAnnotation task on android libs as it now supports java 8 sources.
 - Bumped default retrolambda version to `2.5.0`
 
 #### 3.4.0
