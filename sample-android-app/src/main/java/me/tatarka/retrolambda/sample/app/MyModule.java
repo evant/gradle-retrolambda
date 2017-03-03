@@ -5,9 +5,6 @@ import dagger.Module;
 import dagger.Provides;
 import me.tatarka.retrolambda.sample.lib.Lib;
 
-/**
- * Created by evan on 4/2/15.
- */
 @Module
 public class MyModule {
     @Provides

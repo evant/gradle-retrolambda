@@ -11,10 +11,6 @@ import java.io.InputStreamReader;
 import java.util.Properties;
 
 public class TestHelpers {
-    
-    private static final String OLDEST_SUPPORTED_ANDROID_GRADLE_PLUGIN_VERSION = "1.5.0";
-    private static final String OLDEST_SUPPORTED_GRADLE_VERSION = "2.5";
-    private static final String NEWEST_SUPPORTED_GRADLE_VERSION = "2.14.1";
 
     /**
      * Taken from https://docs.gradle.org/current/userguide/test_kit.html and modified for java.
@@ -47,15 +43,26 @@ public class TestHelpers {
     }
 
     public static String[] oldestSupportedAndroidPluginVersion() {
-        return new String[]{OLDEST_SUPPORTED_ANDROID_GRADLE_PLUGIN_VERSION, OLDEST_SUPPORTED_GRADLE_VERSION};
+        return new String[]{
+                /*androidPluginVersion=*/"1.5.0",
+                /*gradleVersion=*/"2.5",
+                /*buildToolsVersion=*/"24.0.2"
+        };
     }
 
     public static String[] newestSupportedAndroidPluginVersion() {
+        return new String[]{
+                /*androidPluginVersion=*/currentAndroidPluginVersion(),
+                /*gradleVersion=*/"3.4",
+                /*buildToolsVersion=*/"25.0.0"
+        };
+    }
+
+    private static String currentAndroidPluginVersion() {
         try {
             Properties properties = new Properties();
             properties.load(new FileInputStream("../gradle.properties"));
-            String androidPluginVersion = properties.getProperty("androidPluginVersion");
-            return new String[]{androidPluginVersion, NEWEST_SUPPORTED_GRADLE_VERSION};
+            return properties.getProperty("androidPluginVersion");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

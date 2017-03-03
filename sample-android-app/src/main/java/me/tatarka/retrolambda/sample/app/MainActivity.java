@@ -7,9 +7,6 @@ import android.widget.Toast;
 
 import javax.inject.Inject;
 
-/**
- * Created by evan on 3/29/15.
- */
 public class MainActivity extends AppCompatActivity {
     @Inject
     ResFunction hello;

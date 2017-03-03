@@ -19,7 +19,7 @@ import static me.tatarka.TestHelpers.writeFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(JUnit4.class)
-public class JavaPluginTest {
+public class GroovyPluginTest {
     @Rule
     public final TemporaryFolder testProjectDir = new TemporaryFolder();
     private File rootDir;
@@ -39,11 +39,15 @@ public class JavaPluginTest {
                 "    }\n" +
                 "}\n" +
                 "\n" +
-                "apply plugin: 'java'\n" +
+                "apply plugin: 'groovy'\n" +
                 "apply plugin: 'me.tatarka.retrolambda'\n" +
                 "\n" +
                 "repositories {\n" +
                 "    mavenCentral()\n" +
+                "}\n" +
+                "\n" +
+                "dependencies {\n" +
+                "    compile 'org.codehaus.groovy:groovy-all:2.4.7'\n" +
                 "}");
 
         File javaFile = new File(rootDir, "src/main/java/Main.java");
@@ -79,7 +83,7 @@ public class JavaPluginTest {
                 "    }\n" +
                 "}\n" +
                 "\n" +
-                "apply plugin: 'java'\n" +
+                "apply plugin: 'groovy'\n" +
                 "apply plugin: 'me.tatarka.retrolambda'\n" +
                 "\n" +
                 "repositories {\n" +
@@ -87,6 +91,7 @@ public class JavaPluginTest {
                 "}\n" +
                 "\n" +
                 "dependencies {\n" +
+                "    compile 'org.codehaus.groovy:groovy-all:2.4.7'\n" +
                 "    testCompile 'junit:junit:4.12'\n" +
                 "}\n" +
                 "\n" +
@@ -140,12 +145,16 @@ public class JavaPluginTest {
                 "    }\n" +
                 "}\n" +
                 "\n" +
-                "apply plugin: 'java'\n" +
+                "apply plugin: 'groovy'\n" +
                 "apply plugin: 'application'\n" +
                 "apply plugin: 'me.tatarka.retrolambda'\n" +
                 "\n" +
                 "repositories {\n" +
                 "    mavenCentral()\n" +
+                "}\n" +
+                "\n" +
+                "dependencies {\n" +
+                "    compile 'org.codehaus.groovy:groovy-all:2.4.7'\n" +
                 "}\n" +
                 "\n" +
                 "mainClassName = \"Main\"\n" +

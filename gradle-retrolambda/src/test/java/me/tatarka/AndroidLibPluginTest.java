@@ -3,6 +3,7 @@ package me.tatarka;
 
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
+import org.gradle.testkit.runner.TaskOutcome;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,12 +37,14 @@ public class AndroidLibPluginTest {
     public final TemporaryFolder testProjectDir = new TemporaryFolder();
     private final String androidVersion;
     private final String gradleVersion;
+    private final String buildToolsVersion;
     private File rootDir;
     private File buildFile;
 
-    public AndroidLibPluginTest(String androidVersion, String gradleVersion) {
+    public AndroidLibPluginTest(String androidVersion, String gradleVersion, String buildToolsVersion) {
         this.androidVersion = androidVersion;
         this.gradleVersion = gradleVersion;
+        this.buildToolsVersion = buildToolsVersion;
     }
 
     @Before
@@ -74,7 +77,7 @@ public class AndroidLibPluginTest {
                         "\n" +
                         "android {\n" +
                         "    compileSdkVersion 24\n" +
-                        "    buildToolsVersion '24.0.2'\n" +
+                        "    buildToolsVersion '" + buildToolsVersion + "'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
                         "        minSdkVersion 15\n" +
@@ -111,7 +114,7 @@ public class AndroidLibPluginTest {
                 .forwardStdError(errorOutput)
                 .build();
 
-        assertThat(errorOutput.toString()).isNullOrEmpty();
+        assertThat(result.task(":assembleDebug").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
 
         File mainClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity.class");
         File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity$$Lambda$1.class");
@@ -144,7 +147,7 @@ public class AndroidLibPluginTest {
                         "\n" +
                         "android {\n" +
                         "    compileSdkVersion 24\n" +
-                        "    buildToolsVersion '24.0.2'\n" +
+                        "    buildToolsVersion '" + buildToolsVersion + "'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
                         "        minSdkVersion 15\n" +
@@ -200,7 +203,7 @@ public class AndroidLibPluginTest {
                 .forwardStdError(errorOutput)
                 .build();
 
-        assertThat(errorOutput.toString()).isNullOrEmpty();
+        assertThat(result.task(":test").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
     }
 
     @Test
@@ -227,7 +230,7 @@ public class AndroidLibPluginTest {
                         "\n" +
                         "android {\n" +
                         "    compileSdkVersion 23\n" +
-                        "    buildToolsVersion '24.0.2'\n" +
+                        "    buildToolsVersion '" + buildToolsVersion + "'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
                         "        minSdkVersion 15\n" +
@@ -285,6 +288,6 @@ public class AndroidLibPluginTest {
                 .forwardStdError(errorOutput)
                 .build();
 
-        assertThat(errorOutput.toString()).isNullOrEmpty();
+        assertThat(result.task(":connectedCheck").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
     }
 }
