@@ -89,7 +89,7 @@ dependencies {
 ### Deprecated Features
 
 If you are running with java 6 or 7 you should really consider updating. However, you may use the
-bellow configuration instead.
+below configuration instead.
 
 Set the environment variable `JAVA8_HOME` to point to the java 8 jdk. Alternatively, you can set the
 `jdk` property.
