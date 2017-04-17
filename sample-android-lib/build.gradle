@@ -5,7 +5,7 @@ buildscript {
 
     dependencies {
         classpath "com.android.tools.build:gradle:$androidPluginVersion"
-        classpath "me.tatarka:gradle-retrolambda:$version"
+//        classpath "me.tatarka:gradle-retrolambda:$version"
     }
 }
 
@@ -14,7 +14,7 @@ repositories {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'me.tatarka.retrolambda'
+//apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 25
@@ -41,5 +41,5 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-annotations:25.2.0'
+    compile 'com.android.support:support-annotations:25.3.1'
 }

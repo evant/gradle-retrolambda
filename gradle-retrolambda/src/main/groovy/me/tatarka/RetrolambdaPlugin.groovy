@@ -28,7 +28,7 @@ import org.gradle.api.plugins.JavaPlugin
 
 @CompileStatic
 public class RetrolambdaPlugin implements Plugin<Project> {
-    protected static String retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:2.5.1"
+    protected static String retrolambdaCompile = "net.orfjackal.retrolambda:retrolambda:2.6.0-SNAPSHOT"
 
     @Override
     void apply(Project project) {

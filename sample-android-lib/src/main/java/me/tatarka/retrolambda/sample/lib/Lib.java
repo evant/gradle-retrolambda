@@ -4,9 +4,6 @@ import android.support.annotation.IntDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-/**
- * Created by evan on 3/29/15.
- */
 public class Lib {
 
     @Retention(RetentionPolicy.SOURCE)

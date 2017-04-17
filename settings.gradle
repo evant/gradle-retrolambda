@@ -7,3 +7,5 @@ include ':sample-java',
         ':sample-android-test'
 
 includeBuild './gradle-retrolambda'
+include 'sample-java8-lib'
+

@@ -57,6 +57,7 @@ retrolambda {
   jvmArgs '-arg1', '-arg2'
   defaultMethods false
   incremental true
+  processLibraries false
 }
 ```
 
@@ -70,6 +71,8 @@ retrolambda {
    limitation in retrolamba, this will set `incremental` to false. The default is false.
 - `incremental` Setting this to false forces all of your class files to be run through retrolambda
    instead of only the ones that have changed. The default is true.
+- `processLibraries` This will run external dependencies through retrolambda as well. This is only supported on android
+   projects currently.
 
 ### Using a Different Version of the retrolambda.jar
 

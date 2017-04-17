@@ -30,6 +30,10 @@ public class RetrolambdaPluginGroovy implements Plugin<Project> {
         project.afterEvaluate {
             def retrolambda = project.extensions.getByType(RetrolambdaExtension)
 
+            if (retrolambda.processLibraries) {
+                throw new ProjectConfigurationException("processLibraries not supported for groovy projects", null)
+            }
+
             project.sourceSets.all { SourceSet set ->
                 if (project.retrolambda.isIncluded(set.name)) {
                     def name = RetrolambdaUtil.capitalize(set.name)

@@ -2,6 +2,7 @@ package me.tatarka.retrolambda.sample.app.test;
 
 import android.content.res.Resources;
 
+import me.tatarka.retrolambda.sample.javalib.JavaLib;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -30,7 +31,12 @@ public class FunctionTest {
 
     @Test
     public void testGetHelloLib() {
-        assertThat(module.provideLibHello().run()).isEqualTo("Hello, Retrolambda (from lib, mode a)!");
+        assertThat(module.provideLibHello().run()).isEqualTo("Hello, Retrolambda (from lib mode a)!");
+    }
+
+    @Test
+    public void testGetHelloJavaLib() {
+        assertThat(JavaLib.getHello().run()).isEqualTo("Hello, Retrolambda (from java lib)!");
     }
 
     @Test

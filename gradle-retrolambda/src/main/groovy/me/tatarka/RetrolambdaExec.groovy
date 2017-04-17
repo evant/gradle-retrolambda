@@ -33,17 +33,18 @@ import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
 @CompileStatic
 class RetrolambdaExec {
 
-    private static final int COMMANDLINE_LENGTH_LIMIT = 3496;
+    private static final int COMMANDLINE_LENGTH_LIMIT = 3496
 
     FileCollection classpath
-    File inputDir;
-    File outputDir;
+    File inputDir
+    File outputDir
     FileCollection includedFiles
-    List<String> jvmArgs;
-    int bytecodeVersion;
-    boolean defaultMethods;
+    FileCollection jars
+    List<String> jvmArgs
+    int bytecodeVersion
+    boolean defaultMethods
 
-    private final Project project;
+    private final Project project
 
     RetrolambdaExec(Project project) {
         this.project = project;
@@ -82,13 +83,7 @@ class RetrolambdaExec {
 
             boolean supportIncludeFiles = requireVersion(retrolambdaVersion, '2.1.0')
             if (supportIncludeFiles && classpathLengthGreaterThanLimit(path)) {
-                File classpathFile = File.createTempFile("inc-", ".path")
-                classpathFile.withWriter('UTF-8') { writer ->
-                    for (String item : this.classpath) {
-                        writer.write(item + "\n")
-                    }
-                }
-                classpathFile.deleteOnExit();
+                File classpathFile = writeArgFile(classpath, ".path")
                 exec.jvmArgs "-Dretrolambda.classpathFile=${classpathFile.absolutePath}"
             } else {
                 exec.jvmArgs "-Dretrolambda.classpath=${path}"
@@ -96,20 +91,27 @@ class RetrolambdaExec {
 
             if (includedFiles != null) {
                 if (supportIncludeFiles && changeFileLengthGreaterThanLimit(includedFiles)) {
-                    def includedFile = File.createTempFile("inc-", ".list")
-                    includedFile.withWriter('UTF-8') { writer ->
-                        for (File file : includedFiles) {
-                            writer.write(file.toString() + "\n")
-                        }
-                    }
-                    includedFile.deleteOnExit();
+                    File includedFile = writeArgFile(includedFiles, ".list")
                     exec.jvmArgs "-Dretrolambda.includedFilesFile=${includedFile.absolutePath}"
                 } else {
-                    def includedArg = "-Dretrolambda.includedFiles=${includedFiles.join(File.pathSeparator)}"
+                    String includedArg = "-Dretrolambda.includedFiles=${includedFiles.asPath}"
                     exec.jvmArgs includedArg
                     project.logger.quiet(includedArg)
                 }
 
+            }
+
+            if (jars != null && !jars.isEmpty()) {
+                boolean supportsJars = requireVersion(retrolambdaVersion, '2.6.0-SNAPSHOT')
+                if (!supportsJars) {
+                    throw new ProjectConfigurationException("processing jars not supported, requires retrolambda 2.6.0-SNAPSHOT", null)
+                }
+                if (changeFileLengthGreaterThanLimit(jars)) {
+                    File jarsFile = writeArgFile(jars, ".jars")
+                    exec.jvmArgs "-Dretrolambda.jarsFile=${jarsFile.absolutePath}"
+                } else {
+                    exec.jvmArgs "-Dretrolambda.jars=${jars.asPath}"
+                }
             }
 
             if (defaultMethods) {
@@ -122,12 +124,23 @@ class RetrolambdaExec {
         }
     }
 
+    private static File writeArgFile(Iterable lines, String ext) {
+        File file = File.createTempFile("inc-", ext)
+        file.withWriter('UTF-8') { writer ->
+            for (String line : lines) {
+                writer.write(line + "\n")
+            }
+        }
+        file.deleteOnExit()
+        return file
+    }
+
     private static boolean classpathLengthGreaterThanLimit(String path) {
         return path.length() > COMMANDLINE_LENGTH_LIMIT
     }
 
     private static boolean changeFileLengthGreaterThanLimit(FileCollection includedFiles) {
-        int total = 0;
+        int total = 0
         for (File file : includedFiles) {
             total += file.toString().length();
             if (total > COMMANDLINE_LENGTH_LIMIT) {

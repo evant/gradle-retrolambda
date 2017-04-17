@@ -21,9 +21,15 @@ import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.file.DeleteSpec
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileTree
+import org.gradle.api.internal.file.archive.ZipFileTree
+import org.gradle.api.internal.file.collections.FileTreeAdapter
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.compile.JavaCompile
+
+import java.nio.file.Paths
 
 import static com.android.build.api.transform.Status.*
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
@@ -56,46 +62,82 @@ class RetrolambdaTransform extends Transform {
     void transform(Context context, Collection<TransformInput> inputs, Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider, boolean isIncremental) throws IOException, TransformException, InterruptedException {
         context.logging.captureStandardOutput(LogLevel.INFO)
 
-        for (TransformInput input : inputs) {
-            def outputDir = outputProvider.getContentLocation("retrolambda", outputTypes, scopes, Format.DIRECTORY)
+        RetrolambdaArgs args = new RetrolambdaArgs(referencedInputs)
+        args.outputDir = outputProvider.getContentLocation("retrolambda", outputTypes, scopes, Format.DIRECTORY)
 
-            // Instead of looping, it might be better to figure out a way to pass multiple input
-            // dirs into retrolambda. Luckily, the common case is only one.
-            for (DirectoryInput directoryInput : input.directoryInputs) {
-                File inputFile = directoryInput.file
-                FileCollection changed
-                if (isIncremental) {
-                    changed = project.files()
-                    for (Map.Entry<File, Status> entry : directoryInput.changedFiles) {
-                        File file = entry.key; Status status = entry.value
-                        if (status == ADDED || status == CHANGED) {
-                            changed += project.files(file);
-                        }
-                        if (status == CHANGED || status == REMOVED) {
-                            File output = toOutput(inputFile, outputDir, file)
+        for (TransformInput input : inputs) {
+            for (JarInput jarInput : input.getJarInputs()) {
+                println("jar input: ${jarInput.file} status:${jarInput.status} incremental: ${isIncremental}")
+                File file = jarInput.file
+                if (jarInput.status != NOTCHANGED) {
+                    FileTree zipTree = project.zipTree(file)
+                    zipTree.each {
+                        File output = toOutput(zipTreeRoot(zipTree), args.outputDir, new File(it.path))
+                        if (output.exists()) {
                             output.delete()
                             deleteRelated(output)
                         }
                     }
-                } else {
-                    changed = null
                 }
+                if (isIncremental) {
+                    if (jarInput.status == ADDED || jarInput.status == CHANGED) {
+                        args.jars.add(file)
+                    }
+                } else {
+                    args.jars.add(file)
+                }
+            }
 
-                def exec = new RetrolambdaExec(project)
-                exec.inputDir = inputFile
-                exec.outputDir = outputDir
-                exec.bytecodeVersion = javaVersionToBytecode(retrolambda.javaVersion)
-                exec.classpath = getClasspath(outputDir, referencedInputs) + project.files(inputFile)
-                exec.includedFiles = changed
-                exec.defaultMethods = retrolambda.defaultMethods
-                exec.jvmArgs = retrolambda.jvmArgs
-                exec.exec()
+            for (DirectoryInput directoryInput : input.directoryInputs) {
+                if (args.inputDir != null) {
+                    // Retrolambda can only support 1 input dir, just run it with what we got.
+                    runRetrolambda(args)
+                    args = new RetrolambdaArgs(referencedInputs)
+                }
+                args.inputDir = directoryInput.file
+                if (isIncremental) {
+                    for (Map.Entry<File, Status> entry : directoryInput.changedFiles) {
+                        File file = entry.key; Status status = entry.value
+                        if (status == ADDED || status == CHANGED) {
+                            args.includedFiles.add(file)
+                        }
+                        if (status == CHANGED || status == REMOVED) {
+                            File output = toOutput(args.inputDir, args.outputDir, file)
+                            output.delete()
+                            deleteRelated(output)
+                        }
+                    }
+                }
             }
         }
+
+        runRetrolambda(args)
+    }
+
+    private void runRetrolambda(RetrolambdaArgs args) {
+        RetrolambdaExec exec = new RetrolambdaExec(project)
+        exec.inputDir = args.inputDir
+        exec.outputDir = args.outputDir
+        exec.bytecodeVersion = javaVersionToBytecode(retrolambda.javaVersion)
+        exec.classpath = getClasspath(args.outputDir, args.referencedInputs) + project.files(args.inputDir)
+        if (!args.includedFiles.isEmpty()) {
+            exec.includedFiles = project.files(args.includedFiles)
+        }
+        if (!args.jars.isEmpty()) {
+            exec.jars = project.files(args.jars)
+        }
+        exec.defaultMethods = retrolambda.defaultMethods
+        exec.jvmArgs = retrolambda.jvmArgs
+        exec.exec()
     }
 
     private static File toOutput(File inputDir, File outputDir, File file) {
         return outputDir.toPath().resolve(inputDir.toPath().relativize(file.toPath())).toFile()
+    }
+
+    private static File zipTreeRoot(FileTree files) {
+        //TODO: is there a way to do this without internal apis?
+        return (((FileTreeAdapter) files).tree as ZipFileTree).mirror.dir
     }
 
     private void deleteRelated(File file) {
@@ -157,7 +199,16 @@ class RetrolambdaTransform extends Transform {
 
     @Override
     Set<QualifiedContent.Scope> getScopes() {
-        return Collections.singleton(QualifiedContent.Scope.PROJECT)
+        EnumSet<QualifiedContent.Scope> set = EnumSet.of(
+                QualifiedContent.Scope.PROJECT,
+                QualifiedContent.Scope.SUB_PROJECTS
+        )
+        if (retrolambda.processLibraries) {
+            set.add(QualifiedContent.Scope.EXTERNAL_LIBRARIES)
+            set.add(QualifiedContent.Scope.PROJECT_LOCAL_DEPS)
+            set.add(QualifiedContent.Scope.SUB_PROJECTS_LOCAL_DEPS)
+        }
+        return set
     }
 
     @Override
@@ -172,12 +223,26 @@ class RetrolambdaTransform extends Transform {
                 .put("jvmArgs", retrolambda.jvmArgs)
                 .put("incremental", retrolambda.incremental)
                 .put("defaultMethods", retrolambda.defaultMethods)
+                .put("processLibraries", retrolambda.processLibraries)
                 .put("jdk", retrolambda.tryGetJdk())
-                .build();
+                .build()
     }
 
     @Override
     public boolean isIncremental() {
         return retrolambda.incremental
+    }
+
+    private static class RetrolambdaArgs {
+        final Collection<TransformInput> referencedInputs
+
+        File inputDir
+        File outputDir
+        List<File> includedFiles = new ArrayList<>()
+        List<File> jars = new ArrayList<>()
+
+        RetrolambdaArgs(Collection<TransformInput> referencedInputs) {
+            this.referencedInputs = referencedInputs
+        }
     }
 }

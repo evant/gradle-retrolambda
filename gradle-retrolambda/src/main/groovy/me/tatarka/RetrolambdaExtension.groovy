@@ -32,6 +32,7 @@ public class RetrolambdaExtension {
     List<String> jvmArgs = []
     boolean incremental = true
     boolean defaultMethods = false
+    boolean processLibraries = false
     boolean isOnJava8 = JavaVersion.current().java8Compatible
 
     private Project project
@@ -132,8 +133,16 @@ public class RetrolambdaExtension {
         return true
     }
 
+    public void setProcessLibraries(boolean value) {
+        processLibraries = value
+    }
+
+    public boolean isProcessLibraries() {
+        return processLibraries
+    }
+
     public boolean isOnJava8() {
-        return isOnJava8;
+        return isOnJava8
     }
     
     private String findJdk() {

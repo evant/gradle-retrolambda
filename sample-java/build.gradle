@@ -13,6 +13,7 @@ apply plugin: 'application'
 apply plugin: 'me.tatarka.retrolambda'
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 

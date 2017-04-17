@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
+import me.tatarka.retrolambda.sample.javalib.JavaLib;
 
 import javax.inject.Inject;
 
@@ -31,7 +32,10 @@ public class MainActivity extends AppCompatActivity {
         TextView textLib = (TextView) findViewById(R.id.text_lib);
         textLib.setText(libHello.run());
 
-        ResFunction lambda = (res) -> "Foo2";
+        TextView textJavaLib = (TextView) findViewById(R.id.text_java_lib);
+        textJavaLib.setText(JavaLib.getHello().run());
+
+        ResFunction lambda = (res) -> "Foo";
 
         Toast.makeText(this, lambda.run(null), Toast.LENGTH_SHORT).show();
     }

@@ -36,6 +36,10 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
             def retrolambda = project.extensions.getByType(RetrolambdaExtension)
             def javaPlugin = project.convention.getPlugin(JavaPluginConvention)
 
+            if (retrolambda.processLibraries) {
+                throw new ProjectConfigurationException("processLibraries not supported for java projects", null)
+            }
+
             javaPlugin.sourceSets.all { SourceSet set ->
                 if (retrolambda.isIncluded(set.name)) {
                     def name = RetrolambdaUtil.capitalize(set.name)
