@@ -15,7 +15,7 @@ Usage
 
 1. Download [jdk8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) and set it as your default.
 
-2. Add the following to your build.gradle
+2. Add the following to your **Project** build.gradle
 
    ```groovy
    buildscript {
@@ -32,7 +32,11 @@ Usage
    repositories {
       mavenCentral()
    }
+   ```
 
+   And the following to your **Module** build.gradle
+
+   ```groovy
    apply plugin: 'com.android.application' //or apply plugin: 'java'
    apply plugin: 'me.tatarka.retrolambda'
    ```
