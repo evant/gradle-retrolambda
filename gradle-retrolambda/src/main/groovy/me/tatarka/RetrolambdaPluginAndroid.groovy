@@ -34,7 +34,7 @@ import org.gradle.api.tasks.testing.Test
 import static me.tatarka.RetrolambdaPlugin.checkIfExecutableExists
 
 @CompileStatic
-public class RetrolambdaPluginAndroid implements Plugin<Project> {
+class RetrolambdaPluginAndroid implements Plugin<Project> {
     @Override
     void apply(Project project) {
         def retrolambda = project.extensions.getByType(RetrolambdaExtension)
@@ -45,10 +45,10 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             android.registerTransform(transform)
 
             android.libraryVariants.all { BaseVariant variant ->
-                configureCompileJavaTask(project, variant, variant.javaCompile, transform)
+                configureCompileJavaTask(project, variant, transform)
             }
             android.testVariants.all { TestVariant variant ->
-                configureCompileJavaTask(project, variant, variant.javaCompile, transform)
+                configureCompileJavaTask(project, variant, transform)
             }
             android.unitTestVariants.all { UnitTestVariant variant ->
                 configureUnitTestTask(project, variant.name, variant.javaCompile)
@@ -58,17 +58,17 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
             android.registerTransform(transform)
 
             android.applicationVariants.all { BaseVariant variant ->
-                configureCompileJavaTask(project, variant, variant.javaCompile, transform)
+                configureCompileJavaTask(project, variant, transform)
             }
         } else {
             def android = project.extensions.getByType(AppExtension)
             android.registerTransform(transform)
 
             android.applicationVariants.all { BaseVariant variant ->
-                configureCompileJavaTask(project, variant, variant.javaCompile, transform)
+                configureCompileJavaTask(project, variant, transform)
             }
             android.testVariants.all { TestVariant variant ->
-                configureCompileJavaTask(project, variant, variant.javaCompile, transform)
+                configureCompileJavaTask(project, variant, transform)
             }
             android.unitTestVariants.all { UnitTestVariant variant ->
                 configureUnitTestTask(project, variant.name, variant.javaCompile)
@@ -76,17 +76,16 @@ public class RetrolambdaPluginAndroid implements Plugin<Project> {
         }
     }
 
-    private
-    static configureCompileJavaTask(Project project, BaseVariant variant, JavaCompile javaCompileTask, RetrolambdaTransform transform) {
-        javaCompileTask.doFirst {
+    private static configureCompileJavaTask(Project project, BaseVariant variant, RetrolambdaTransform transform) {
+        variant.javaCompile.doFirst {
             def retrolambda = project.extensions.getByType(RetrolambdaExtension)
             def rt = "$retrolambda.jdk/jre/lib/rt.jar"
 
-            javaCompileTask.classpath = javaCompileTask.classpath + project.files(rt)
-            ensureCompileOnJava8(retrolambda, javaCompileTask)
+            variant.javaCompile.classpath = variant.javaCompile.classpath + project.files(rt)
+            ensureCompileOnJava8(retrolambda, variant.javaCompile)
         }
 
-        transform.putJavaCompileTask(variant.dirName, javaCompileTask)
+        transform.putVariant(variant)
     }
 
     private

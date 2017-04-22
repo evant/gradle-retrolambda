@@ -8,6 +8,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Properties;
 
 public class TestHelpers {
@@ -53,7 +58,7 @@ public class TestHelpers {
     public static String[] newestSupportedAndroidPluginVersion() {
         return new String[]{
                 /*androidPluginVersion=*/currentAndroidPluginVersion(),
-                /*gradleVersion=*/"3.4",
+                /*gradleVersion=*/"4.0-20170417000025+0000",
                 /*buildToolsVersion=*/"25.0.0"
         };
     }
@@ -66,5 +71,21 @@ public class TestHelpers {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static File findFile(File dir, final String name) throws IOException {
+        final File[] result = new File[1];
+        Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
+                if (path.endsWith(name)) {
+                    result[0] = path.toFile();
+                    return FileVisitResult.TERMINATE;
+                } else {
+                    return FileVisitResult.CONTINUE;
+                }
+            }
+        });
+        return result[0];
     }
 }

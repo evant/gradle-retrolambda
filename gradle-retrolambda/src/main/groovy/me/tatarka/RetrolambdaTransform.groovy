@@ -17,13 +17,12 @@
 package me.tatarka
 
 import com.android.build.api.transform.*
+import com.android.build.gradle.api.BaseVariant
 import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.file.FileCollection
-import org.gradle.api.logging.LogLevel
-import org.gradle.api.tasks.compile.JavaCompile
 
 import static com.android.build.api.transform.Status.*
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
@@ -36,9 +35,9 @@ class RetrolambdaTransform extends Transform {
 
     private final Project project
     private final RetrolambdaExtension retrolambda
-    private final Map<String, JavaCompile> javaCompileTasks = new HashMap<>()
+    private final List<BaseVariant> variants = new ArrayList<>()
 
-    public RetrolambdaTransform(Project project, RetrolambdaExtension retrolambda) {
+    RetrolambdaTransform(Project project, RetrolambdaExtension retrolambda) {
         this.project = project
         this.retrolambda = retrolambda
     }
@@ -48,13 +47,14 @@ class RetrolambdaTransform extends Transform {
      * possible moment when the java compile task runs. While a Transform currently doesn't have any
      * variant information, we can guess the variant based off the input path.
      */
-    public void putJavaCompileTask(String dirName, JavaCompile javaCompileTask) {
-        javaCompileTasks.put(dirName, javaCompileTask)
+    void putVariant(BaseVariant variant) {
+        variants.add(variant)
+
     }
 
     @Override
     void transform(Context context, Collection<TransformInput> inputs, Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider, boolean isIncremental) throws IOException, TransformException, InterruptedException {
-        context.logging.captureStandardOutput(LogLevel.INFO)
+//        context.logging.captureStandardOutput(LogLevel.INFO)
 
         for (TransformInput input : inputs) {
             def outputDir = outputProvider.getContentLocation("retrolambda", outputTypes, scopes, Format.DIRECTORY)
@@ -85,7 +85,7 @@ class RetrolambdaTransform extends Transform {
                 exec.inputDir = inputFile
                 exec.outputDir = outputDir
                 exec.bytecodeVersion = javaVersionToBytecode(retrolambda.javaVersion)
-                exec.classpath = getClasspath(outputDir, referencedInputs) + project.files(inputFile)
+                exec.classpath = getClasspath(context, outputDir, referencedInputs) + project.files(inputFile)
                 exec.includedFiles = changed
                 exec.defaultMethods = retrolambda.defaultMethods
                 exec.jvmArgs = retrolambda.jvmArgs
@@ -98,7 +98,7 @@ class RetrolambdaTransform extends Transform {
         return outputDir.toPath().resolve(inputDir.toPath().relativize(file.toPath())).toFile()
     }
 
-    private void deleteRelated(File file) {
+    private static void deleteRelated(File file) {
         def className = file.name.replaceFirst(/\.class$/, '')
         // Delete any generated Lambda classes
         file.parentFile.eachFile {
@@ -108,32 +108,21 @@ class RetrolambdaTransform extends Transform {
         }
     }
 
-    private FileCollection getClasspath(File outputDir, Collection<TransformInput> referencedInputs) {
-        // Extract the variant from the output path assuming it's in the form like:
-        // - '*/intermediates/transforms/retrolambda/<VARIANT>
-        // - '*/intermediates/transforms/retrolambda/<VARIANT>/folders/1/1/retrolambda
-        // This will no longer be needed when the transform api supports per-variant transforms
-        String[] parts = outputDir.toURI().path.split('/intermediates/transforms/retrolambda/|/folders/[0-9]+')
+    private FileCollection getClasspath(Context context, File outputDir, Collection<TransformInput> referencedInputs) {
+        BaseVariant variant = getVariant(context, outputDir)
 
-        if (parts.length < 2) {
-            throw new ProjectConfigurationException('Could not extract variant from output dir: ' + outputDir, null)
+        if (variant == null) {
+            throw new ProjectConfigurationException('Missing variant for output dir: ' + outputDir, null)
         }
 
-        String variantName = parts[1];
-        def javaCompileTask = javaCompileTasks.get(variantName)
-
-        if (javaCompileTask == null) {
-            throw new ProjectConfigurationException('Missing javaCompileTask for variant: ' + variantName + ' from output dir: ' + outputDir, null)
-        }
-
-        def classpathFiles = javaCompileTask.classpath
+        FileCollection classpathFiles = variant.javaCompile.classpath
         for (TransformInput input : referencedInputs) {
             classpathFiles += project.files(input.directoryInputs*.file)
         }
 
         // bootClasspath isn't set until the last possible moment because it's expensive to look
         // up the android sdk path.
-        def bootClasspath = javaCompileTask.options.bootClasspath
+        String bootClasspath = variant.javaCompile.options.bootClasspath
         if (bootClasspath) {
             classpathFiles += project.files(bootClasspath.tokenize(File.pathSeparator))
         } else {
@@ -145,8 +134,35 @@ class RetrolambdaTransform extends Transform {
         return classpathFiles
     }
 
+    private BaseVariant getVariant(Context context, File outputDir) {
+        try {
+            String variantName = context.variantName
+            for (BaseVariant variant : variants) {
+                if (variant.name == variantName) {
+                    return variant
+                }
+            }
+        } catch (NoSuchMethodError e) {
+            // Extract the variant from the output path assuming it's in the form like:
+            // - '*/intermediates/transforms/retrolambda/<VARIANT>
+            // - '*/intermediates/transforms/retrolambda/<VARIANT>/folders/1/1/retrolambda
+            // This will no longer be needed when the transform api supports per-variant transforms
+            String[] parts = outputDir.toURI().path.split('/intermediates/transforms/retrolambda/|/folders/[0-9]+')
+            if (parts.length < 2) {
+                throw new ProjectConfigurationException('Could not extract variant from output dir: ' + outputDir, null)
+            }
+            String variantPath = parts[1]
+            for (BaseVariant variant : variants) {
+                if (variant.dirName == variantPath) {
+                    return variant
+                }
+            }
+        }
+        return null
+    }
+
     @Override
-    public String getName() {
+    String getName() {
         return "retrolambda"
     }
 
@@ -166,18 +182,18 @@ class RetrolambdaTransform extends Transform {
     }
 
     @Override
-    public Map<String, Object> getParameterInputs() {
+    Map<String, Object> getParameterInputs() {
         return ImmutableMap.<String, Object> builder()
                 .put("bytecodeVersion", retrolambda.bytecodeVersion)
                 .put("jvmArgs", retrolambda.jvmArgs)
                 .put("incremental", retrolambda.incremental)
                 .put("defaultMethods", retrolambda.defaultMethods)
                 .put("jdk", retrolambda.tryGetJdk())
-                .build();
+                .build()
     }
 
     @Override
-    public boolean isIncremental() {
+    boolean isIncremental() {
         return retrolambda.incremental
     }
 }

@@ -16,6 +16,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static me.tatarka.TestHelpers.findFile;
 import static me.tatarka.TestHelpers.getPluginClasspath;
 import static me.tatarka.TestHelpers.newestSupportedAndroidPluginVersion;
 import static me.tatarka.TestHelpers.oldestSupportedAndroidPluginVersion;
@@ -116,8 +117,8 @@ public class AndroidLibPluginTest {
 
         assertThat(result.task(":assembleDebug").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
 
-        File mainClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity.class");
-        File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity$$Lambda$1.class");
+        File mainClassFile = findFile(rootDir, "MainActivity.class");
+        File lambdaClassFile = findFile(rootDir, "MainActivity$$Lambda$1.class");
 
         assertThat(mainClassFile).exists();
         assertThat(lambdaClassFile).exists();
@@ -240,8 +241,8 @@ public class AndroidLibPluginTest {
                         "}\n" +
                         "\n" +
                         "dependencies {\n" +
-                        "    androidTestCompile 'com.android.support.test:runner:0.4'\n" +
-                        "    androidTestCompile 'com.android.support.test:rules:0.4'\n" +
+                        "    androidTestCompile 'com.android.support.test:runner:0.5'\n" +
+                        "    androidTestCompile 'com.android.support.test:rules:0.5'\n" +
                         "}");
 
         File manifestFile = new File(rootDir, "src/main/AndroidManifest.xml");
@@ -252,9 +253,9 @@ public class AndroidLibPluginTest {
                         "    <application/>\n" +
                         "</manifest>");
 
-        File javaFile = new File(rootDir, "src/main/java/Main.java");
+        File javaFile = new File(rootDir, "src/main/java/test/Main.java");
 
-        writeFile(javaFile, "import java.util.concurrent.Callable;\n" +
+        writeFile(javaFile, "package test;\nimport java.util.concurrent.Callable;\n" +
                 "\n" +
                 "public class Main {\n" +
                 "    public static Callable<String> f() {\n" +
@@ -262,9 +263,9 @@ public class AndroidLibPluginTest {
                 "    }\n" +
                 "}");
 
-        File testJavaFile = new File(rootDir, "src/androidTest/java/Test.java");
+        File testJavaFile = new File(rootDir, "src/androidTest/java/test/Test.java");
 
-        writeFile(testJavaFile, "import org.junit.Assert;\n" +
+        writeFile(testJavaFile, "package test;\nimport org.junit.Assert;\n" +
                 "import org.junit.runner.RunWith;\n" +
                 "import android.support.test.runner.AndroidJUnit4;\n" +
                 "\n" +
@@ -284,7 +285,7 @@ public class AndroidLibPluginTest {
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("connectedCheck", "--stacktrace")
+                .withArguments("install", "--stacktrace")
                 .forwardStdError(errorOutput)
                 .build();
 
