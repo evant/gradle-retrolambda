@@ -31,6 +31,7 @@ import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.compile.JavaCompile
 
 import java.nio.file.Paths
+import org.gradle.api.logging.LogLevel
 
 import static com.android.build.api.transform.Status.*
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
