@@ -23,6 +23,7 @@ import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.file.FileCollection
+import org.gradle.api.logging.LogLevel
 
 import static com.android.build.api.transform.Status.*
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
@@ -54,7 +55,7 @@ class RetrolambdaTransform extends Transform {
 
     @Override
     void transform(Context context, Collection<TransformInput> inputs, Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider, boolean isIncremental) throws IOException, TransformException, InterruptedException {
-//        context.logging.captureStandardOutput(LogLevel.INFO)
+        context.logging.captureStandardOutput(LogLevel.INFO)
 
         for (TransformInput input : inputs) {
             def outputDir = outputProvider.getContentLocation("retrolambda", outputTypes, scopes, Format.DIRECTORY)
