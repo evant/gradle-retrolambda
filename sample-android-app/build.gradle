@@ -18,24 +18,24 @@ repositories {
 }
 
 dependencies {
-    compile project(':sample-android-lib')
-    compile project(':sample-java8-lib')
+    implementation project(':sample-android-lib')
+    implementation project(':sample-java8-lib')
 
-    compile 'com.google.dagger:dagger:2.6'
+    implementation 'com.google.dagger:dagger:2.6'
     annotationProcessor "com.google.dagger:dagger-compiler:2.6"
-    provided 'javax.annotation:jsr250-api:1.0'
+    compileOnly 'javax.annotation:jsr250-api:1.0'
 
-    compile 'com.android.support:appcompat-v7:25.3.1'
+    api 'com.android.support:appcompat-v7:25.3.1'
 
-    androidTestCompile 'com.android.support:support-annotations:25.3.1'
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support.test:rules:0.5'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
-    androidTestCompile 'org.assertj:assertj-core:2.5.0'
+    androidTestImplementation  'com.android.support:support-annotations:25.3.1'
+    androidTestImplementation 'com.android.support.test:runner:0.5'
+    androidTestImplementation 'com.android.support.test:rules:0.5'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2'
+    androidTestImplementation 'org.assertj:assertj-core:2.5.0'
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:2.5.0'
-    testCompile 'org.mockito:mockito-core:2.0.23-beta'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.assertj:assertj-core:2.5.0'
+    testImplementation 'org.mockito:mockito-core:2.0.23-beta'
 }
 
 android {
@@ -71,12 +71,16 @@ android {
         exclude 'LICENSE.txt'
     }
 
-    productFlavors {
-        free {}
-        paid {}
-    }
+    flavorDimensions "price"
 
-    publishNonDefault true
+    productFlavors {
+        free {
+            dimension "price"
+        }
+        paid {
+            dimension "price"
+        }
+    }
 }
 
 retrolambda {

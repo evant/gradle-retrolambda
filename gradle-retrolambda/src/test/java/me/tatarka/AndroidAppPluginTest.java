@@ -1,9 +1,5 @@
 package me.tatarka;
 
-
-import com.android.ide.common.internal.WaitableExecutor;
-
-import org.gradle.api.tasks.TaskReference;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.TaskOutcome;
@@ -19,6 +15,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static me.tatarka.TestHelpers.findFile;
 import static me.tatarka.TestHelpers.getPluginClasspath;
 import static me.tatarka.TestHelpers.newestSupportedAndroidPluginVersion;
 import static me.tatarka.TestHelpers.oldestSupportedAndroidPluginVersion;
@@ -121,8 +118,8 @@ public class AndroidAppPluginTest {
 
         assertThat(result.task(":assembleDebug").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
 
-        File mainClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity.class");
-        File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity$$Lambda$1.class");
+        File mainClassFile = findFile(rootDir, "MainActivity.class");
+        File lambdaClassFile = findFile(rootDir, "MainActivity$$Lambda$1.class");
 
         assertThat(mainClassFile).exists();
         assertThat(lambdaClassFile).exists();
@@ -212,8 +209,8 @@ public class AndroidAppPluginTest {
 
         assertThat(result.task(":assembleDebug").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
 
-        File mainClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity.class");
-        File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity$$Lambda$1.class");
+        File mainClassFile = findFile(rootDir, "MainActivity.class");
+        File lambdaClassFile = findFile(rootDir, "MainActivity$$Lambda$1.class");
 
         assertThat(mainClassFile).exists();
         assertThat(lambdaClassFile).exists();
@@ -222,69 +219,69 @@ public class AndroidAppPluginTest {
     @Test
     public void assembleDebugIncrementalShouldntLeak() throws Exception {
         writeFile(buildFile,
-            //language="Groovy"
-            "buildscript {\n" +
-                "    repositories {\n" +
-                "        jcenter()\n" +
-                "    }\n" +
-                "    \n" +
-                "    dependencies {\n" +
-                "        classpath files(" + getPluginClasspath() + ")\n" +
-                "        classpath 'com.android.tools.build:gradle:" + androidVersion + "'\n" +
-                "    }\n" +
-                "}\n" +
-                "\n" +
-                "apply plugin: 'com.android.application'\n" +
-                "apply plugin: 'me.tatarka.retrolambda'\n" +
-                "\n" +
-                "repositories {\n" +
-                "    mavenCentral()\n" +
-                "}\n" +
-                "\n" +
-                "android {\n" +
-                "    compileSdkVersion 24\n" +
-                "    buildToolsVersion '" + buildToolsVersion + "'\n" +
-                "    \n" +
-                "    defaultConfig {\n" +
-                "        minSdkVersion 15\n" +
-                "        targetSdkVersion 24\n" +
-                "    }\n" +
-                "}");
+                //language="Groovy"
+                "buildscript {\n" +
+                        "    repositories {\n" +
+                        "        jcenter()\n" +
+                        "    }\n" +
+                        "    \n" +
+                        "    dependencies {\n" +
+                        "        classpath files(" + getPluginClasspath() + ")\n" +
+                        "        classpath 'com.android.tools.build:gradle:" + androidVersion + "'\n" +
+                        "    }\n" +
+                        "}\n" +
+                        "\n" +
+                        "apply plugin: 'com.android.application'\n" +
+                        "apply plugin: 'me.tatarka.retrolambda'\n" +
+                        "\n" +
+                        "repositories {\n" +
+                        "    mavenCentral()\n" +
+                        "}\n" +
+                        "\n" +
+                        "android {\n" +
+                        "    compileSdkVersion 24\n" +
+                        "    buildToolsVersion '" + buildToolsVersion + "'\n" +
+                        "    \n" +
+                        "    defaultConfig {\n" +
+                        "        minSdkVersion 15\n" +
+                        "        targetSdkVersion 24\n" +
+                        "    }\n" +
+                        "}");
 
         File manifestFile = new File(rootDir, "src/main/AndroidManifest.xml");
 
         writeFile(manifestFile,
-            //language="XML"
-            "<manifest package=\"test\">\n" +
-                "    <application/>\n" +
-                "</manifest>");
+                //language="XML"
+                "<manifest package=\"test\">\n" +
+                        "    <application/>\n" +
+                        "</manifest>");
 
         File javaFile = new File(rootDir, "src/main/java/MainActivity.java");
 
         writeFile(javaFile, "package test;" +
-            "import android.app.Activity;" +
-            "import android.os.Bundle;" +
-            "import android.util.Log;" +
-            "public class MainActivity extends Activity {\n" +
-            "    public void onCreate(Bundle savedInstanceState) {\n" +
-            "        Runnable lambda = () -> Log.d(\"MainActivity\", \"Hello, Lambda!\");\n" +
-            "        lambda.run();\n" +
-            "    }\n" +
-            "}");
+                "import android.app.Activity;" +
+                "import android.os.Bundle;" +
+                "import android.util.Log;" +
+                "public class MainActivity extends Activity {\n" +
+                "    public void onCreate(Bundle savedInstanceState) {\n" +
+                "        Runnable lambda = () -> Log.d(\"MainActivity\", \"Hello, Lambda!\");\n" +
+                "        lambda.run();\n" +
+                "    }\n" +
+                "}");
 
         StringWriter errorOutput = new StringWriter();
         BuildResult result = GradleRunner.create()
-            .withGradleVersion(gradleVersion)
-            .withProjectDir(rootDir)
-            .withArguments("assembleDebug", "--stacktrace")
-            .forwardStdError(errorOutput)
-            .build();
+                .withGradleVersion(gradleVersion)
+                .withProjectDir(rootDir)
+                .withArguments("assembleDebug", "--stacktrace")
+                .forwardStdError(errorOutput)
+                .build();
 
         assertThat(result.task(":assembleDebug").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
 
 
-        File mainClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity.class");
-        File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity$$Lambda$1.class");
+        File mainClassFile = findFile(rootDir, "MainActivity.class");
+        File lambdaClassFile = findFile(rootDir, "MainActivity$$Lambda$1.class");
 
         assertThat(mainClassFile).exists();
         assertThat(lambdaClassFile).exists();
@@ -294,11 +291,11 @@ public class AndroidAppPluginTest {
 
         errorOutput = new StringWriter();
         result = GradleRunner.create()
-            .withGradleVersion(gradleVersion)
-            .withProjectDir(rootDir)
-            .withArguments("assembleDebug", "--stacktrace")
-            .forwardStdError(errorOutput)
-            .build();
+                .withGradleVersion(gradleVersion)
+                .withProjectDir(rootDir)
+                .withArguments("assembleDebug", "--stacktrace")
+                .forwardStdError(errorOutput)
+                .build();
 
         assertThat(result.task(":assembleDebug").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
 
@@ -562,8 +559,8 @@ public class AndroidAppPluginTest {
 
         assertThat(result.task(":assembleDebug").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
 
-        File mainClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity.class");
-        File lambdaClassFile = new File(rootDir, "build/intermediates/transforms/retrolambda/debug/folders/1/1/retrolambda/test/MainActivity$$Lambda$1.class");
+        File mainClassFile = findFile(rootDir, "MainActivity.class");
+        File lambdaClassFile = findFile(rootDir, "MainActivity$$Lambda$1.class");
 
         assertThat(mainClassFile).exists();
         assertThat(lambdaClassFile).exists();

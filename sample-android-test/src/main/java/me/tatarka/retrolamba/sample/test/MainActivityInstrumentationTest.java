@@ -31,7 +31,7 @@ public class MainActivityInstrumentationTest {
     @Test
     public void testHelloRetrolambdaLib() {
         TextView textLib = (TextView) activityRule.getActivity().findViewById(R.id.text_lib);
-        assertThat(textLib.getText().toString()).isEqualTo("Hello, Retrolambda (from lib)!");
+        assertThat(textLib.getText().toString()).isEqualTo("Hello, Retrolambda (from lib, mode a)!");
     }
 
     @Test
@@ -43,6 +43,6 @@ public class MainActivityInstrumentationTest {
     @Test
     public void testWithEspresso() {
         onView(withId(R.id.text)).check((view, ex) -> matches(withText("Hello, Retrolambda!")));
-        onView(withId(R.id.text_lib)).check(matches(withText("Hello, Retrolambda (from lib)!")));
+        onView(withId(R.id.text_lib)).check(matches(withText("Hello, Retrolambda (from lib, mode a)!")));
     }
 }

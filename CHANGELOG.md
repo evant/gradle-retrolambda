@@ -2,6 +2,9 @@
 - Added support for processing libraries with `retrolambda.processLibraries true` on android projects. This
 requires retrolambda 2.6.0-SNAPSHOT. It will work with external jars/aars as well as java/android modules.
 
+#### 3.6.1
+- Support Android Gradle Plugin 2.5
+
 #### 3.6.0
 - *Deprecated* oldJdk (and reading from JAVA6/JAVA7_HOME).
 - *Deprecated* running gradle with java 6 or 7.
