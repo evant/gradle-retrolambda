@@ -21,6 +21,8 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestExtension
 import com.android.build.gradle.TestPlugin
+import com.android.build.gradle.FeaturePlugin
+import com.android.build.gradle.FeatureExtension
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.TestVariant
 import com.android.build.gradle.api.UnitTestVariant
@@ -59,6 +61,19 @@ class RetrolambdaPluginAndroid implements Plugin<Project> {
 
             android.applicationVariants.all { BaseVariant variant ->
                 configureCompileJavaTask(project, variant, transform)
+            }
+        } else if (project.plugins.hasPlugin(FeaturePlugin)) {
+            def android = project.extensions.getByType(FeatureExtension)
+            android.registerTransform(transform)
+
+            android.featureVariants.all { BaseVariant variant ->
+                configureCompileJavaTask(project, variant, transform)
+            }
+            android.testVariants.all { TestVariant variant ->
+                configureCompileJavaTask(project, variant, transform)
+            }
+            android.unitTestVariants.all { UnitTestVariant variant ->
+                configureUnitTestTask(project, variant.name, variant.javaCompile)
             }
         } else {
             def android = project.extensions.getByType(AppExtension)
