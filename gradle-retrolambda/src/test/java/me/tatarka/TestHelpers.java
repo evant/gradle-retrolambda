@@ -55,11 +55,19 @@ public class TestHelpers {
         };
     }
 
+    public static String[] oldestSupportedAndroidFeaturePluginVersion() {
+        return new String[]{
+                /*androidPluginVersion=*/"3.0.0-alpha3",
+                /*gradleVersion=*/"4.0-milestone-1",
+                /*buildToolsVersion=*/"25.0.2"
+        };
+    }
+
     public static String[] newestSupportedAndroidPluginVersion() {
         return new String[]{
                 /*androidPluginVersion=*/currentAndroidPluginVersion(),
                 /*gradleVersion=*/"4.0-20170417000025+0000",
-                /*buildToolsVersion=*/"25.0.0"
+                /*buildToolsVersion=*/"25.0.2"
         };
     }
 
