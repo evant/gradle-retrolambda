@@ -16,12 +16,12 @@
 
 package me.tatarka
 
+import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestExtension
 import com.android.build.gradle.TestPlugin
-import com.android.build.gradle.FeaturePlugin
 import com.android.build.gradle.FeatureExtension
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.TestVariant
