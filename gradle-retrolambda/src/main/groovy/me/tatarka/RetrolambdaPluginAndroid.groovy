@@ -87,6 +87,9 @@ class RetrolambdaPluginAndroid implements Plugin<Project> {
                 android.featureVariants.all { BaseVariant variant ->
                     configureCompileJavaTask(project, variant, transform)
                 }
+                android.libraryVariants.all { BaseVariant variant ->
+                    configureCompileJavaTask(project, variant, transform)
+                }
                 android.testVariants.all { TestVariant variant ->
                     configureCompileJavaTask(project, variant, transform)
                 }
