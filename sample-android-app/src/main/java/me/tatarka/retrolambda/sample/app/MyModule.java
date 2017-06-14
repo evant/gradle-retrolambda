@@ -1,8 +1,10 @@
 package me.tatarka.retrolambda.sample.app;
 
 import android.content.res.Resources;
+
 import dagger.Module;
 import dagger.Provides;
+import me.tatarka.retrolambda.sample.feature.Feature;
 import me.tatarka.retrolambda.sample.lib.Lib;
 
 @Module
@@ -22,5 +24,10 @@ public class MyModule {
     @Provides
     public me.tatarka.retrolambda.sample.lib.Function provideLibHello() {
         return Lib.getHello(Lib.MODE_A);
+    }
+
+    @Provides
+    public me.tatarka.retrolambda.sample.feature.Function provideFeatureHello() {
+        return Feature.getHello(Lib.MODE_A);
     }
 }

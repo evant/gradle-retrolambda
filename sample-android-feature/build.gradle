@@ -14,7 +14,7 @@ repositories {
     jcenter()
 }
 
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.feature'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {

@@ -62,6 +62,10 @@ public class RetrolambdaPlugin implements Plugin<Project> {
             project.apply plugin: RetrolambdaPluginAndroid
         }
 
+        project.plugins.withId('com.android.feature') {
+            project.apply plugin: RetrolambdaPluginAndroid
+        }
+
         project.plugins.withId('com.android.library') {
             project.apply plugin: RetrolambdaPluginAndroid
         }

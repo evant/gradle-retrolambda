@@ -18,7 +18,6 @@ import java.util.Collection;
 
 import static me.tatarka.TestHelpers.getPluginClasspath;
 import static me.tatarka.TestHelpers.newestSupportedAndroidPluginVersion;
-import static me.tatarka.TestHelpers.oldestSupportedAndroidPluginVersion;
 import static me.tatarka.TestHelpers.writeFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -66,6 +65,7 @@ public class AndroidTestPluginTest {
                         "    System.properties['com.android.build.gradle.overrideVersionCheck'] = 'true'\n" +
                         "    \n" +
                         "    repositories {\n" +
+                        "        maven { url 'https://maven.google.com' }\n" +
                         "        jcenter()\n" +
                         "    }\n" +
                         "    \n" +
@@ -99,7 +99,8 @@ public class AndroidTestPluginTest {
 
         writeFile(appManifestFile,
                 //language="XML"
-                "<manifest package=\"test.app\">\n" +
+                "<manifest package=\"test.app\" " +
+                            "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
 
@@ -118,6 +119,7 @@ public class AndroidTestPluginTest {
                 //language="Groovy"
                 "buildscript {\n" +
                         "    repositories {\n" +
+                        "        maven { url 'https://maven.google.com' }\n" +
                         "        jcenter()\n" +
                         "    }\n" +
                         "    \n" +
@@ -157,7 +159,8 @@ public class AndroidTestPluginTest {
 
         writeFile(testManifestFile,
                 //language="XML"
-                "<manifest package=\"test.test\">\n" +
+                "<manifest package=\"test.test\" " +
+                            "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
 
@@ -183,7 +186,7 @@ public class AndroidTestPluginTest {
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("connectedCheck", "--stacktrace")
+                .withArguments("connectedCheck", "--stacktrace", "-Pandroid.enableAapt2=false")
                 .forwardStdError(errorOutput)
                 .build();
 

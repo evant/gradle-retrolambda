@@ -1,5 +1,6 @@
 buildscript {
     repositories {
+        maven { url 'https://maven.google.com' }
         jcenter()
     }
 
@@ -18,6 +19,7 @@ repositories {
 
 dependencies {
     implementation project(':sample-android-lib')
+    implementation project(':sample-android-feature')
 
     implementation 'com.google.dagger:dagger:2.6'
     annotationProcessor "com.google.dagger:dagger-compiler:2.6"
