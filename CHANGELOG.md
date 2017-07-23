@@ -1,3 +1,8 @@
+#### 3.7.0
+_2017-07-23_
+- Support android gradle plugin 3.0
+- Support android feature modules
+
 #### 3.6.1
 _2017-04-22_
 - Support Android Gradle Plugin 2.5
