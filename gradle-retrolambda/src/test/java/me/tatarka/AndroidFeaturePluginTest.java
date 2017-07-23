@@ -19,17 +19,17 @@ import java.util.Collection;
 import static me.tatarka.TestHelpers.findFile;
 import static me.tatarka.TestHelpers.getPluginClasspath;
 import static me.tatarka.TestHelpers.newestSupportedAndroidPluginVersion;
-import static me.tatarka.TestHelpers.oldestSupportedAndroidPluginVersion;
+import static me.tatarka.TestHelpers.oldestSupportedAndroidFeaturePluginVersion;
 import static me.tatarka.TestHelpers.writeFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
-public class AndroidLibPluginTest {
+public class AndroidFeaturePluginTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                oldestSupportedAndroidPluginVersion(),
+                oldestSupportedAndroidFeaturePluginVersion(),
                 newestSupportedAndroidPluginVersion()
         });
     }
@@ -42,7 +42,7 @@ public class AndroidLibPluginTest {
     private File rootDir;
     private File buildFile;
 
-    public AndroidLibPluginTest(String androidVersion, String gradleVersion, String buildToolsVersion) {
+    public AndroidFeaturePluginTest(String androidVersion, String gradleVersion, String buildToolsVersion) {
         this.androidVersion = androidVersion;
         this.gradleVersion = gradleVersion;
         this.buildToolsVersion = buildToolsVersion;
@@ -70,7 +70,7 @@ public class AndroidLibPluginTest {
                         "    }\n" +
                         "}\n" +
                         "\n" +
-                        "apply plugin: 'com.android.library'\n" +
+                        "apply plugin: 'com.android.feature'\n" +
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +
@@ -142,7 +142,7 @@ public class AndroidLibPluginTest {
                         "    }\n" +
                         "}\n" +
                         "\n" +
-                        "apply plugin: 'com.android.library'\n" +
+                        "apply plugin: 'com.android.feature'\n" +
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +
@@ -227,7 +227,7 @@ public class AndroidLibPluginTest {
                         "    }\n" +
                         "}\n" +
                         "\n" +
-                        "apply plugin: 'com.android.library'\n" +
+                        "apply plugin: 'com.android.feature'\n" +
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +
@@ -291,7 +291,7 @@ public class AndroidLibPluginTest {
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("install", "--stacktrace", "-Pandroid.enableAapt2=false")
+                .withArguments("installDebugAndroidTest", "--stacktrace", "-Pandroid.enableAapt2=false")
                 .forwardStdError(errorOutput)
                 .build();
 

@@ -6,7 +6,7 @@ buildscript {
 
     dependencies {
         classpath "com.android.tools.build:gradle:$androidPluginVersion"
-//        classpath "me.tatarka:gradle-retrolambda:$version"
+        classpath "me.tatarka:gradle-retrolambda:$version"
     }
 }
 
@@ -14,8 +14,8 @@ repositories {
     jcenter()
 }
 
-apply plugin: 'com.android.library'
-//apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.android.feature'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 25

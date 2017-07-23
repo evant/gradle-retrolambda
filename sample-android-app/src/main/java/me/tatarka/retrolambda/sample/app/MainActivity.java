@@ -15,6 +15,9 @@ public class MainActivity extends AppCompatActivity {
     @Inject
     me.tatarka.retrolambda.sample.lib.Function libHello;
 
+    @Inject
+    me.tatarka.retrolambda.sample.feature.Function libFeature;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         textJavaLib.setText(JavaLib.getHello().run());
 
         ResFunction lambda = (res) -> "Foo";
+        TextView textFeature = (TextView) findViewById(R.id.text_feature);
+        textFeature.setText(libFeature.run());
 
         Toast.makeText(this, lambda.run(null), Toast.LENGTH_SHORT).show();
     }

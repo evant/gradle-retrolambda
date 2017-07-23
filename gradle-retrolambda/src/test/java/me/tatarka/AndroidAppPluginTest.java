@@ -61,6 +61,7 @@ public class AndroidAppPluginTest {
                         "    System.properties['com.android.build.gradle.overrideVersionCheck'] = 'true'\n" +
                         "    \n" +
                         "    repositories {\n" +
+                        "        maven { url 'https://maven.google.com' }\n" +
                         "        jcenter()\n" +
                         "    }\n" +
                         "    \n" +
@@ -91,7 +92,8 @@ public class AndroidAppPluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"test\">\n" +
+                "<manifest package=\"test\" " +
+                            "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
 
@@ -112,7 +114,7 @@ public class AndroidAppPluginTest {
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("assembleDebug", "--stacktrace")
+                .withArguments("assembleDebug", "--stacktrace", "-Pandroid.enableAapt2=false")
                 .forwardStdError(errorOutput)
                 .build();
 
@@ -131,6 +133,7 @@ public class AndroidAppPluginTest {
                 //language="Groovy"
                 "buildscript {\n" +
                         "    repositories {\n" +
+                        "        maven { url 'https://maven.google.com' }\n" +
                         "        jcenter()\n" +
                         "    }\n" +
                         "    \n" +
@@ -161,7 +164,8 @@ public class AndroidAppPluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"test\">\n" +
+                "<manifest package=\"test\" " +
+                            "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
 
@@ -182,7 +186,7 @@ public class AndroidAppPluginTest {
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("assembleDebug", "--stacktrace")
+                .withArguments("assembleDebug", "--stacktrace", "-Pandroid.enableAapt2=false")
                 .forwardStdError(errorOutput)
                 .build();
 
@@ -203,7 +207,7 @@ public class AndroidAppPluginTest {
         result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("assembleDebug", "--stacktrace")
+                .withArguments("assembleDebug", "--stacktrace", "-Pandroid.enableAapt2=false")
                 .forwardStdError(errorOutput)
                 .build();
 
@@ -222,6 +226,7 @@ public class AndroidAppPluginTest {
                 //language="Groovy"
                 "buildscript {\n" +
                         "    repositories {\n" +
+                        "        maven { url 'https://maven.google.com' }\n" +
                         "        jcenter()\n" +
                         "    }\n" +
                         "    \n" +
@@ -252,7 +257,8 @@ public class AndroidAppPluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"test\">\n" +
+                "<manifest package=\"test\" " +
+                            "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
 
@@ -273,7 +279,7 @@ public class AndroidAppPluginTest {
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("assembleDebug", "--stacktrace")
+                .withArguments("assembleDebug", "--stacktrace", "-Pandroid.enableAapt2=false")
                 .forwardStdError(errorOutput)
                 .build();
 
@@ -293,7 +299,7 @@ public class AndroidAppPluginTest {
         result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("assembleDebug", "--stacktrace")
+                .withArguments("assembleDebug", "--stacktrace", "-Pandroid.enableAapt2=false")
                 .forwardStdError(errorOutput)
                 .build();
 
@@ -309,6 +315,7 @@ public class AndroidAppPluginTest {
                 //language="Groovy"
                 "buildscript {\n" +
                         "    repositories {\n" +
+                        "        maven { url 'https://maven.google.com' }\n" +
                         "        jcenter()\n" +
                         "    }\n" +
                         "    \n" +
@@ -343,7 +350,8 @@ public class AndroidAppPluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"test\">\n" +
+                "<manifest package=\"test\" " +
+                            "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
 
@@ -379,7 +387,7 @@ public class AndroidAppPluginTest {
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("test", "--stacktrace")
+                .withArguments("test", "--stacktrace", "-Pandroid.enableAapt2=false")
                 .forwardStdError(errorOutput)
                 .build();
 
@@ -392,6 +400,7 @@ public class AndroidAppPluginTest {
                 //language="Groovy"
                 "buildscript {\n" +
                         "    repositories {\n" +
+                        "        maven { url 'https://maven.google.com' }\n" +
                         "        jcenter()\n" +
                         "    }\n" +
                         "    \n" +
@@ -428,7 +437,8 @@ public class AndroidAppPluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"com.example.test\">\n" +
+                "<manifest package=\"com.example.test\" " +
+                            "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
 
@@ -464,7 +474,7 @@ public class AndroidAppPluginTest {
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("connectedCheck", "--stacktrace")
+                .withArguments("connectedCheck", "--stacktrace", "-Pandroid.enableAapt2=false")
                 .forwardStdError(errorOutput)
                 .build();
 
@@ -477,6 +487,7 @@ public class AndroidAppPluginTest {
                 //language="Groovy"
                 "buildscript {\n" +
                         "    repositories {\n" +
+                        "        maven { url 'https://maven.google.com' }\n" +
                         "        jcenter()\n" +
                         "    }\n" +
                         "    \n" +
@@ -512,7 +523,8 @@ public class AndroidAppPluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"test\">\n" +
+                "<manifest package=\"test\" " +
+                            "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
 
@@ -553,7 +565,7 @@ public class AndroidAppPluginTest {
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("assembleDebug", "--stacktrace")
+                .withArguments("assembleDebug", "--stacktrace", "-Pandroid.enableAapt2=false")
                 .forwardStdError(errorOutput)
                 .build();
 
