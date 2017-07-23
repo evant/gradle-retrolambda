@@ -84,7 +84,7 @@ public class RetrolambdaPlugin implements Plugin<Project> {
      * @param file
      * @return
      */
-    static String checkIfExecutableExists(String file) {
+    static boolean checkIfExecutableExists(String file) {
         new File(file).exists() || new File(file + '.exe').exists()
     }
 

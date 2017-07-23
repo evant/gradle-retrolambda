@@ -186,7 +186,7 @@ public class AndroidTestPluginTest {
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("connectedCheck", "--stacktrace", "-Pandroid.enableAapt2=false")
+                .withArguments("connectedCheck", "--stacktrace")
                 .forwardStdError(errorOutput)
                 .build();
 

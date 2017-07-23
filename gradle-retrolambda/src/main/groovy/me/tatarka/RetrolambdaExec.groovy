@@ -67,11 +67,11 @@ class RetrolambdaExec {
 
             exec.classpath = project.files(retrolambdaConfig)
             exec.main = 'net.orfjackal.retrolambda.Main'
-            exec.jvmArgs = [
-                    "-Dretrolambda.inputDir=$inputDir",
-                    "-Dretrolambda.outputDir=$outputDir",
-                    "-Dretrolambda.classpath=${path}",
-                    "-Dretrolambda.bytecodeVersion=$bytecodeVersion",
+            exec.jvmArgs = (Iterable) [
+                    '-Dretrolambda.inputDir=' + String.valueOf(inputDir),
+                    '-Dretrolambda.outputDir=' + String.valueOf(outputDir),
+                    '-Dretrolambda.classpath=' + path,
+                    '-Dretrolambda.bytecodeVersion=' + String.valueOf(bytecodeVersion),
             ]
 
             VersionNumber retrolambdaVersion = retrolambdaVersion(retrolambdaConfig)
@@ -148,7 +148,8 @@ class RetrolambdaExec {
 
     }
 
-    private static boolean requireVersion(VersionNumber retrolambdaVersion, String version, boolean fallback = false) {
+    private
+    static boolean requireVersion(VersionNumber retrolambdaVersion, String version, boolean fallback = false) {
         if (retrolambdaVersion == null) {
             // Don't know version, assume fallback
             return fallback

@@ -113,7 +113,7 @@ public class AndroidLibPluginTest {
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("assembleDebug", "--stacktrace", "-Pandroid.enableAapt2=false")
+                .withArguments("assembleDebug", "--stacktrace")
                 .forwardStdError(errorOutput)
                 .build();
 
@@ -204,7 +204,7 @@ public class AndroidLibPluginTest {
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("test", "--stacktrace", "-Pandroid.enableAapt2=false")
+                .withArguments("test", "--stacktrace")
                 .forwardStdError(errorOutput)
                 .build();
 
@@ -291,7 +291,7 @@ public class AndroidLibPluginTest {
         BuildResult result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("install", "--stacktrace", "-Pandroid.enableAapt2=false")
+                .withArguments("connectedCheck", "--stacktrace")
                 .forwardStdError(errorOutput)
                 .build();
 

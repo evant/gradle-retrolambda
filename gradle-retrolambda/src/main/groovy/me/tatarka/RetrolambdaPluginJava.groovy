@@ -46,13 +46,14 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                     def compileJavaTask = project.tasks.getByName(set.compileJavaTaskName) as JavaCompile
                     compileJavaTask.destinationDir = newOutputDir
 
-                    def retrolambdaTask = project.task(taskName, dependsOn: compileJavaTask, type: RetrolambdaTask) { RetrolambdaTask task ->
-                        task.inputDir = newOutputDir
-                        task.outputDir = oldOutputDir
-                        task.classpath = set.compileClasspath + project.files(newOutputDir)
-                        task.javaVersion = retrolambda.javaVersion
-                        task.jvmArgs = retrolambda.jvmArgs
-                        task.enabled = !set.allJava.isEmpty()
+                    def retrolambdaTask = project.task(taskName, dependsOn: compileJavaTask, type: RetrolambdaTask) { Task task ->
+                        RetrolambdaTask t = task as RetrolambdaTask
+                        t.inputDir = newOutputDir
+                        t.outputDir = oldOutputDir
+                        t.classpath = set.compileClasspath + project.files(newOutputDir)
+                        t.javaVersion = retrolambda.javaVersion
+                        t.jvmArgs = retrolambda.jvmArgs
+                        t.enabled = !set.allJava.isEmpty()
                     }
 
                     // enable retrolambdaTask dynamically, based on up-to-date source set before running 
