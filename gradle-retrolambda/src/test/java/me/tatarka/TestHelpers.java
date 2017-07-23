@@ -51,7 +51,7 @@ public class TestHelpers {
         return new String[]{
                 /*androidPluginVersion=*/"1.5.0",
                 /*gradleVersion=*/"2.5",
-                /*buildToolsVersion=*/"24.0.2"
+                /*buildToolsVersion=*/"24.0.3"
         };
     }
 
@@ -66,8 +66,8 @@ public class TestHelpers {
     public static String[] newestSupportedAndroidPluginVersion() {
         return new String[]{
                 /*androidPluginVersion=*/currentAndroidPluginVersion(),
-                /*gradleVersion=*/"4.0-20170417000025+0000",
-                /*buildToolsVersion=*/"25.0.2"
+                /*gradleVersion=*/"4.1-milestone-1",
+                /*buildToolsVersion=*/"26.0.0"
         };
     }
 

@@ -14,6 +14,7 @@ import org.junit.runners.JUnit4;
 import java.io.File;
 import java.io.StringWriter;
 
+import static me.tatarka.TestHelpers.findFile;
 import static me.tatarka.TestHelpers.getPluginClasspath;
 import static me.tatarka.TestHelpers.writeFile;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,8 +69,8 @@ public class GroovyPluginTest {
 
         assertThat(result.task(":assemble").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
 
-        File mainClassFile = new File(rootDir, "build/classes/main/Main.class");
-        File lambdaClassFile = new File(rootDir, "build/classes/main/Main$$Lambda$1.class");
+        File mainClassFile = findFile(rootDir, "Main.class");
+        File lambdaClassFile = findFile(rootDir, "Main$$Lambda$1.class");
 
         assertThat(mainClassFile).exists();
         assertThat(lambdaClassFile).exists();
