@@ -20,10 +20,13 @@ import com.android.build.api.transform.*
 import com.android.build.gradle.api.BaseVariant
 import com.google.common.collect.ImmutableMap
 import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
+import groovy.transform.TypeCheckingMode
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.tasks.compile.CompileOptions
 
 import static com.android.build.api.transform.Status.*
 import static me.tatarka.RetrolambdaPlugin.javaVersionToBytecode
@@ -123,7 +126,7 @@ class RetrolambdaTransform extends Transform {
 
         // bootClasspath isn't set until the last possible moment because it's expensive to look
         // up the android sdk path.
-        String bootClasspath = variant.javaCompile.options.bootClasspath
+        String bootClasspath = getBootClasspath(variant.javaCompile.options)
         if (bootClasspath) {
             classpathFiles += project.files(bootClasspath.tokenize(File.pathSeparator))
         } else {
@@ -133,6 +136,14 @@ class RetrolambdaTransform extends Transform {
         }
 
         return classpathFiles
+    }
+
+    @TypeChecked(TypeCheckingMode.SKIP)
+    private static String getBootClasspath(CompileOptions options) {
+        if (options.hasProperty('bootClasspath')) {
+            return options.bootClasspath
+        }
+        return options.bootstrapClasspath?.asPath
     }
 
     private BaseVariant getVariant(Context context, File outputDir) {
