@@ -12,8 +12,8 @@ task install {
     dependsOn gradle.includedBuild('gradle-retrolambda').task(':install')
 }
 
-task uploadArchives {
-    dependsOn gradle.includedBuild('gradle-retrolambda').task(':uploadArchives')
+task publish {
+    dependsOn gradle.includedBuild('gradle-retrolambda').task(':publish')
 }
 
 task publishPlugins {
