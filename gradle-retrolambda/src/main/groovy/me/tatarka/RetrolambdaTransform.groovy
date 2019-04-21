@@ -116,7 +116,7 @@ class RetrolambdaTransform extends Transform {
         BaseVariant variant = getVariant(context, outputDir)
 
         if (variant == null) {
-            throw new ProjectConfigurationException('Missing variant for output dir: ' + outputDir, null)
+            throw new ProjectConfigurationException('Missing variant for output dir: ' + outputDir, (Throwable) null)
         }
 
         FileCollection classpathFiles = variant.javaCompile.classpath
@@ -132,7 +132,7 @@ class RetrolambdaTransform extends Transform {
         } else {
             // If this is null it means the javaCompile task didn't need to run, however, we still
             // need to run but can't without the bootClasspath. Just fail and ask the user to rebuild.
-            throw new ProjectConfigurationException("Unable to obtain the bootClasspath. This may happen if your javaCompile tasks didn't run but retrolambda did. You must rebuild your project or otherwise force javaCompile to run.", null)
+            throw new ProjectConfigurationException("Unable to obtain the bootClasspath. This may happen if your javaCompile tasks didn't run but retrolambda did. You must rebuild your project or otherwise force javaCompile to run.", (Throwable) null)
         }
 
         return classpathFiles
@@ -161,7 +161,7 @@ class RetrolambdaTransform extends Transform {
             // This will no longer be needed when the transform api supports per-variant transforms
             String[] parts = outputDir.toURI().path.split('/intermediates/transforms/retrolambda/|/folders/[0-9]+')
             if (parts.length < 2) {
-                throw new ProjectConfigurationException('Could not extract variant from output dir: ' + outputDir, null)
+                throw new ProjectConfigurationException('Could not extract variant from output dir: ' + outputDir, (Throwable) null)
             }
             String variantPath = parts[1]
             for (BaseVariant variant : variants) {

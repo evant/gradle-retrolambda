@@ -101,7 +101,7 @@ public class RetrolambdaExtension {
     String tryGetJdk() {
         String jdk = getJdk()
         if (jdk == null) {
-            throw new ProjectConfigurationException("When running gradle with java 5, 6 or 7, you must set the path to jdk8, either with property retrolambda.jdk or environment variable JAVA8_HOME", null)
+            throw new ProjectConfigurationException("When running gradle with java 5, 6 or 7, you must set the path to jdk8, either with property retrolambda.jdk or environment variable JAVA8_HOME", (Throwable) null)
         }
         return jdk
     }

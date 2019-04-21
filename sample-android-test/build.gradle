@@ -18,12 +18,11 @@ apply plugin: 'com.android.test'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    compileSdkVersion 26
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 26
 
         testApplicationId 'me.tatarka.retrolambda.sample.test'
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
@@ -53,9 +52,9 @@ android {
 }
 
 dependencies {
-    implementation 'com.android.support:support-annotations:25.3.1'
-    implementation 'com.android.support.test:runner:0.5'
-    implementation 'com.android.support.test:rules:0.5'
-    implementation 'com.android.support.test.espresso:espresso-core:2.2.2'
+    implementation 'com.android.support:support-annotations:26.0.0'
+    implementation 'com.android.support.test:runner:1.0.2'
+    implementation 'com.android.support.test:rules:1.0.2'
+    implementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'org.assertj:assertj-core:2.5.0'
 }

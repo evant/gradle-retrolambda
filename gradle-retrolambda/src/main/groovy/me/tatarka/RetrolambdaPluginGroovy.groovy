@@ -34,7 +34,7 @@ public class RetrolambdaPluginGroovy implements Plugin<Project> {
                 if (project.retrolambda.isIncluded(set.name)) {
                     def name = RetrolambdaUtil.capitalize(set.name)
                     def taskName = "compileRetrolambdaGroovy$name"
-                    def oldOutputDir = set.output.classesDir
+                    def oldOutputDir = RetrolambdaUtil.groovyOutputDir(set)
                     def newOutputDir = project.file("$project.buildDir/retrolambda/$set.name")
 
                     /* No compileJavaTaskName present, so re-use any modifications applied to compileJava and remap to Groovy */
