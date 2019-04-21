@@ -16,11 +16,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static me.tatarka.TestHelpers.findFile;
-import static me.tatarka.TestHelpers.getPluginClasspath;
-import static me.tatarka.TestHelpers.newestSupportedAndroidPluginVersion;
-import static me.tatarka.TestHelpers.oldestSupportedAndroidFeaturePluginVersion;
-import static me.tatarka.TestHelpers.writeFile;
+import static me.tatarka.TestHelpers.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
@@ -39,19 +35,22 @@ public class AndroidFeaturePluginTest {
     private final String androidVersion;
     private final String gradleVersion;
     private final String buildToolsVersion;
+    private final String compileSdkVersion;
     private File rootDir;
     private File buildFile;
 
-    public AndroidFeaturePluginTest(String androidVersion, String gradleVersion, String buildToolsVersion) {
+    public AndroidFeaturePluginTest(String androidVersion, String gradleVersion, String buildToolsVersion, String kotlinVersion) {
         this.androidVersion = androidVersion;
         this.gradleVersion = gradleVersion;
         this.buildToolsVersion = buildToolsVersion;
+        this.compileSdkVersion = buildToolsVersion.substring(0, buildToolsVersion.indexOf('.'));
     }
 
     @Before
     public void setup() throws Exception {
         rootDir = testProjectDir.getRoot();
         buildFile = testProjectDir.newFile("build.gradle");
+        copyLocalPropertiesIfExists(rootDir);
     }
 
     @Test
@@ -74,11 +73,13 @@ public class AndroidFeaturePluginTest {
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +
+                        "    maven { url 'https://maven.google.com' }\n" +
                         "    mavenCentral()\n" +
+                        "    jcenter()\n" +
                         "}\n" +
                         "\n" +
                         "android {\n" +
-                        "    compileSdkVersion 24\n" +
+                        "    compileSdkVersion " + compileSdkVersion + "\n" +
                         "    buildToolsVersion '" + buildToolsVersion + "'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
@@ -91,7 +92,7 @@ public class AndroidFeaturePluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"test\" " +
+                "<manifest package=\"test.test\" " +
                             "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
@@ -146,11 +147,13 @@ public class AndroidFeaturePluginTest {
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +
+                        "    maven { url 'https://maven.google.com' }\n" +
                         "    mavenCentral()\n" +
+                        "    jcenter()\n" +
                         "}\n" +
                         "\n" +
                         "android {\n" +
-                        "    compileSdkVersion 24\n" +
+                        "    compileSdkVersion " + compileSdkVersion + "\n" +
                         "    buildToolsVersion '" + buildToolsVersion + "'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
@@ -167,7 +170,7 @@ public class AndroidFeaturePluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"test\" " +
+                "<manifest package=\"test.test\" " +
                             "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
@@ -231,11 +234,13 @@ public class AndroidFeaturePluginTest {
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +
+                        "    maven { url 'https://maven.google.com' }\n" +
                         "    mavenCentral()\n" +
+                        "    jcenter()\n" +
                         "}\n" +
                         "\n" +
                         "android {\n" +
-                        "    compileSdkVersion 23\n" +
+                        "    compileSdkVersion " + compileSdkVersion + "\n" +
                         "    buildToolsVersion '" + buildToolsVersion + "'\n" +
                         "    \n" +
                         "    defaultConfig {\n" +
@@ -254,7 +259,7 @@ public class AndroidFeaturePluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"test\" " +
+                "<manifest package=\"test.test\" " +
                             "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");

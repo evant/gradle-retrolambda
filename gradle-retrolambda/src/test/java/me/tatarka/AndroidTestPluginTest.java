@@ -16,9 +16,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static me.tatarka.TestHelpers.getPluginClasspath;
-import static me.tatarka.TestHelpers.newestSupportedAndroidPluginVersion;
-import static me.tatarka.TestHelpers.writeFile;
+import static me.tatarka.TestHelpers.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
@@ -39,7 +37,7 @@ public class AndroidTestPluginTest {
     private final String buildToolsVersion;
     private File rootDir;
 
-    public AndroidTestPluginTest(String androidVersion, String gradleVersion, String buildToolsVersion) {
+    public AndroidTestPluginTest(String androidVersion, String gradleVersion, String buildToolsVersion, String kotlinVersion) {
         this.androidVersion = androidVersion;
         this.gradleVersion = gradleVersion;
         this.buildToolsVersion = buildToolsVersion;
@@ -49,6 +47,7 @@ public class AndroidTestPluginTest {
     public void setup() throws Exception {
         rootDir = testProjectDir.getRoot();
         testProjectDir.newFile("build.gradle");
+        copyLocalPropertiesIfExists(rootDir);
     }
 
     @Test
@@ -79,6 +78,7 @@ public class AndroidTestPluginTest {
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +
+                        "    maven { url 'https://maven.google.com' }\n" +
                         "    mavenCentral()\n" +
                         "}\n" +
                         "\n" +
@@ -133,6 +133,7 @@ public class AndroidTestPluginTest {
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +
+                        "    maven { url 'https://maven.google.com' }\n" +
                         "    mavenCentral()\n" +
                         "}\n" +
                         "\n" +

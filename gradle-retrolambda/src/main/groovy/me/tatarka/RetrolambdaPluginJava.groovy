@@ -40,7 +40,7 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                 if (retrolambda.isIncluded(set.name)) {
                     def name = RetrolambdaUtil.capitalize(set.name)
                     def taskName = "compileRetrolambda$name"
-                    def oldOutputDir = set.output.classesDir
+                    def oldOutputDir = RetrolambdaUtil.javaOutputDir(set)
                     def newOutputDir = project.file("$project.buildDir/retrolambda/$set.name")
 
                     def compileJavaTask = project.tasks.getByName(set.compileJavaTaskName) as JavaCompile
@@ -82,7 +82,7 @@ public class RetrolambdaPluginJava implements Plugin<Project> {
                     if (oldJdkPath != null) {
                         def oldJava = "$oldJdkPath/bin/java"
                         if (!checkIfExecutableExists(oldJava)) {
-                            throw new ProjectConfigurationException("Cannot find executable: $oldJava", null)
+                            throw new ProjectConfigurationException("Cannot find executable: $oldJava", (Throwable) null)
                         }
                         task.executable oldJava
                     }

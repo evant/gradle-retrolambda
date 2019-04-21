@@ -15,11 +15,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static me.tatarka.TestHelpers.findFile;
-import static me.tatarka.TestHelpers.getPluginClasspath;
-import static me.tatarka.TestHelpers.newestSupportedAndroidPluginVersion;
-import static me.tatarka.TestHelpers.oldestSupportedAndroidPluginVersion;
-import static me.tatarka.TestHelpers.writeFile;
+import static me.tatarka.TestHelpers.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
@@ -38,19 +34,22 @@ public class AndroidAppPluginTest {
     private final String androidVersion;
     private final String gradleVersion;
     private final String buildToolsVersion;
+    private final String kotlinVersion;
     private File rootDir;
     private File buildFile;
 
-    public AndroidAppPluginTest(String androidVersion, String gradleVersion, String buildToolsVersion) {
+    public AndroidAppPluginTest(String androidVersion, String gradleVersion, String buildToolsVersion, String kotlinVersion) {
         this.androidVersion = androidVersion;
         this.gradleVersion = gradleVersion;
         this.buildToolsVersion = buildToolsVersion;
+        this.kotlinVersion = kotlinVersion;
     }
 
     @Before
     public void setup() throws Exception {
         rootDir = testProjectDir.getRoot();
         buildFile = testProjectDir.newFile("build.gradle");
+        copyLocalPropertiesIfExists(rootDir);
     }
 
     @Test
@@ -75,6 +74,7 @@ public class AndroidAppPluginTest {
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +
+                        "    maven { url 'https://maven.google.com' }\n" +
                         "    mavenCentral()\n" +
                         "}\n" +
                         "\n" +
@@ -92,7 +92,7 @@ public class AndroidAppPluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"test\" " +
+                "<manifest package=\"test.test\" " +
                             "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
@@ -147,6 +147,7 @@ public class AndroidAppPluginTest {
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +
+                        "    maven { url 'https://maven.google.com' }\n" +
                         "    mavenCentral()\n" +
                         "}\n" +
                         "\n" +
@@ -164,7 +165,7 @@ public class AndroidAppPluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"test\" " +
+                "<manifest package=\"test.test\" " +
                             "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
@@ -240,6 +241,7 @@ public class AndroidAppPluginTest {
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +
+                        "    maven { url 'https://maven.google.com' }\n" +
                         "    mavenCentral()\n" +
                         "}\n" +
                         "\n" +
@@ -257,7 +259,7 @@ public class AndroidAppPluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"test\" " +
+                "<manifest package=\"test.test\" " +
                             "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
@@ -293,13 +295,15 @@ public class AndroidAppPluginTest {
         assertThat(lambdaClassFile).exists();
 
         // delete the java file
-        javaFile.delete();
+        if (!javaFile.delete()) {
+            throw new Exception("Failed to delete file: " + javaFile);
+        }
 
         errorOutput = new StringWriter();
         result = GradleRunner.create()
                 .withGradleVersion(gradleVersion)
                 .withProjectDir(rootDir)
-                .withArguments("assembleDebug", "--stacktrace", "-Pandroid.enableAapt2=false")
+                .withArguments("assembleDebug", "--stacktrace", "-Pandroid.enableAapt2=false", "--debug")
                 .forwardStdError(errorOutput)
                 .build();
 
@@ -329,6 +333,7 @@ public class AndroidAppPluginTest {
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +
+                        "    maven { url 'https://maven.google.com' }\n" +
                         "    mavenCentral()\n" +
                         "}\n" +
                         "\n" +
@@ -350,7 +355,7 @@ public class AndroidAppPluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"test\" " +
+                "<manifest package=\"test.test\" " +
                             "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");
@@ -414,6 +419,7 @@ public class AndroidAppPluginTest {
                         "apply plugin: 'me.tatarka.retrolambda'\n" +
                         "\n" +
                         "repositories {\n" +
+                        "    maven { url 'https://maven.google.com' }\n" +
                         "    mavenCentral()\n" +
                         "}\n" +
                         "\n" +
@@ -494,7 +500,7 @@ public class AndroidAppPluginTest {
                         "    dependencies {\n" +
                         "        classpath files(" + getPluginClasspath() + ")\n" +
                         "        classpath 'com.android.tools.build:gradle:" + androidVersion + "'\n" +
-                        "        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.0'" +
+                        "        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:" + kotlinVersion + "'" +
                         "    }\n" +
                         "}\n" +
                         "\n" +
@@ -503,6 +509,7 @@ public class AndroidAppPluginTest {
                         "apply plugin: 'kotlin-android'\n" +
                         "\n" +
                         "repositories {\n" +
+                        "    maven { url 'https://maven.google.com' }\n" +
                         "    mavenCentral()\n" +
                         "}\n" +
                         "\n" +
@@ -523,7 +530,7 @@ public class AndroidAppPluginTest {
 
         writeFile(manifestFile,
                 //language="XML"
-                "<manifest package=\"test\" " +
+                "<manifest package=\"test.test\" " +
                             "xmlns:android=\"http://schemas.android.com/apk/res/android\">\n" +
                         "    <application/>\n" +
                         "</manifest>");

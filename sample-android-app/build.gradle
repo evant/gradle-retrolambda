@@ -14,6 +14,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 
 repositories {
+    google()
     jcenter()
 }
 
@@ -25,12 +26,12 @@ dependencies {
     annotationProcessor "com.google.dagger:dagger-compiler:2.6"
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
-    api 'com.android.support:appcompat-v7:25.3.1'
+    api 'com.android.support:appcompat-v7:26.0.0'
 
-    androidTestImplementation  'com.android.support:support-annotations:25.3.1'
-    androidTestImplementation 'com.android.support.test:runner:0.5'
-    androidTestImplementation 'com.android.support.test:rules:0.5'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2'
+    androidTestImplementation  'com.android.support:support-annotations:26.0.0'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     androidTestImplementation 'org.assertj:assertj-core:2.5.0'
 
     testImplementation 'junit:junit:4.12'
@@ -39,13 +40,12 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    compileSdkVersion 26
 
     defaultConfig {
         applicationId "me.tatarka.retrolambda.sample.app"
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

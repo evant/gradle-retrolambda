@@ -55,13 +55,13 @@ class RetrolambdaTask extends DefaultTask {
         def retrolambda = project.extensions.getByType(RetrolambdaExtension)
 
         List<InputFileDetails> changes = []
-        inputs.outOfDate { changes += it }
+        inputs.outOfDate { changes.add(it) }
 
         // Ensure output is cleared if build is not incremental.
         if (inputs.incremental && !changes.isEmpty() && !retrolambda.incremental) {
             outputDir.eachFile { it.delete() }
         } else {
-            changes.each { InputFileDetails change ->
+            for (InputFileDetails change : changes) {
                 if (change.modified) deleteRelated(toOutput(change.file))
             }
         }
@@ -90,11 +90,11 @@ class RetrolambdaTask extends DefaultTask {
         }
     }
 
-    def File toOutput(File file) {
+    File toOutput(File file) {
         return outputDir.toPath().resolve(inputDir.toPath().relativize(file.toPath())).toFile()
     }
 
-    def deleteRelated(File file) {
+    void deleteRelated(File file) {
         def className = file.name.replaceFirst(/\.class$/, '')
         // Delete any generated Lambda classes
         project.logger.debug("Deleting related for " + className + " in " + file.parentFile)

@@ -1,5 +1,7 @@
 package me.tatarka;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -47,27 +49,38 @@ public class TestHelpers {
         }
     }
 
+    public static String[] oldestSupportedGradleVersion() {
+        return new String[]{"2.6"};
+    }
+
+    public static String[] newestSupportedGradleVersion() {
+        return new String[]{"5.1.1"};
+    }
+
     public static String[] oldestSupportedAndroidPluginVersion() {
         return new String[]{
                 /*androidPluginVersion=*/"1.5.0",
-                /*gradleVersion=*/"2.5",
-                /*buildToolsVersion=*/"24.0.3"
+                /*gradleVersion=*/"2.6",
+                /*buildToolsVersion=*/"24.0.3",
+                /*kotlinVersion=*/"1.1.0",
         };
     }
 
     public static String[] oldestSupportedAndroidFeaturePluginVersion() {
         return new String[]{
-                /*androidPluginVersion=*/"3.0.0-alpha3",
-                /*gradleVersion=*/"4.0-milestone-1",
-                /*buildToolsVersion=*/"25.0.2"
+                /*androidPluginVersion=*/"3.1.0",
+                /*gradleVersion=*/"4.4",
+                /*buildToolsVersion=*/"26.0.2",
+                /*kotlinVersion=*/"1.1.0",
         };
     }
 
     public static String[] newestSupportedAndroidPluginVersion() {
         return new String[]{
                 /*androidPluginVersion=*/currentAndroidPluginVersion(),
-                /*gradleVersion=*/"4.1-milestone-1",
-                /*buildToolsVersion=*/"26.0.0"
+                /*gradleVersion=*/"5.4",
+                /*buildToolsVersion=*/"28.0.3",
+                /*kotlinVersion=*/"1.3.10",
         };
     }
 
@@ -95,5 +108,12 @@ public class TestHelpers {
             }
         });
         return result[0];
+    }
+
+    public static void copyLocalPropertiesIfExists(File destinationDir) throws IOException {
+        File localProperties = new File("../local.properties");
+        if (localProperties.exists()) {
+            FileUtils.copyFile(localProperties, new File(destinationDir, "local.properties"));
+        }
     }
 }

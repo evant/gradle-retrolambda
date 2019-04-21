@@ -58,7 +58,7 @@ class RetrolambdaExec {
             if (!retrolambda.onJava8) {
                 def java = "${retrolambda.tryGetJdk()}/bin/java"
                 if (!checkIfExecutableExists(java)) {
-                    throw new ProjectConfigurationException("Cannot find executable: $java", null)
+                    throw new ProjectConfigurationException("Cannot find executable: $java", (Throwable) null)
                 }
                 exec.executable java
             }
