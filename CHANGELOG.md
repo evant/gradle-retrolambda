@@ -1,3 +1,7 @@
+#### 3.7.1
+ 2019-04-21
+- Support gradle 5.0+
+
 #### 3.7.0
 _2017-07-23_
 - Support android gradle plugin 3.0
