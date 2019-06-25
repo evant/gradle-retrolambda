@@ -119,14 +119,14 @@ class RetrolambdaTransform extends Transform {
             throw new ProjectConfigurationException('Missing variant for output dir: ' + outputDir, (Throwable) null)
         }
 
-        FileCollection classpathFiles = variant.javaCompile.classpath
+        FileCollection classpathFiles = variant.javaCompileProvider.get().classpath
         for (TransformInput input : referencedInputs) {
             classpathFiles += project.files(input.directoryInputs*.file)
         }
 
         // bootClasspath isn't set until the last possible moment because it's expensive to look
         // up the android sdk path.
-        String bootClasspath = getBootClasspath(variant.javaCompile.options)
+        String bootClasspath = getBootClasspath(variant.javaCompileProvider.get().options)
         if (bootClasspath) {
             classpathFiles += project.files(bootClasspath.tokenize(File.pathSeparator))
         } else {

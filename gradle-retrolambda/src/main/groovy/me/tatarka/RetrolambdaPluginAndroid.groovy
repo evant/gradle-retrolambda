@@ -30,6 +30,7 @@ import groovy.transform.CompileStatic
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 
@@ -53,7 +54,7 @@ class RetrolambdaPluginAndroid implements Plugin<Project> {
                 configureCompileJavaTask(project, variant, transform)
             }
             android.unitTestVariants.all { UnitTestVariant variant ->
-                configureUnitTestTask(project, variant.name, variant.javaCompile)
+                configureUnitTestTask(project, variant.name, variant.javaCompileProvider)
             }
         } else if (project.plugins.hasPlugin(TestPlugin)) {
             def android = project.extensions.getByType(TestExtension)
@@ -73,7 +74,7 @@ class RetrolambdaPluginAndroid implements Plugin<Project> {
                 configureCompileJavaTask(project, variant, transform)
             }
             android.unitTestVariants.all { UnitTestVariant variant ->
-                configureUnitTestTask(project, variant.name, variant.javaCompile)
+                configureUnitTestTask(project, variant.name, variant.javaCompileProvider)
             }
         } else {
             //the Feature plugin doesn't exist for older versions of AGP, so we need to check
@@ -94,7 +95,7 @@ class RetrolambdaPluginAndroid implements Plugin<Project> {
                     configureCompileJavaTask(project, variant, transform)
                 }
                 android.unitTestVariants.all { UnitTestVariant variant ->
-                    configureUnitTestTask(project, variant.name, variant.javaCompile)
+                    configureUnitTestTask(project, variant.name, variant.javaCompileProvider)
                 }
             } catch( ClassNotFoundException e ) {
                 //Feature plugin doesn't exist
@@ -103,27 +104,27 @@ class RetrolambdaPluginAndroid implements Plugin<Project> {
     }
 
     private static configureCompileJavaTask(Project project, BaseVariant variant, RetrolambdaTransform transform) {
-        variant.javaCompile.doFirst {
+        variant.javaCompileProvider.get().doFirst {
             def retrolambda = project.extensions.getByType(RetrolambdaExtension)
             def rt = "$retrolambda.jdk/jre/lib/rt.jar"
 
-            variant.javaCompile.classpath = variant.javaCompile.classpath + project.files(rt)
-            ensureCompileOnJava8(retrolambda, variant.javaCompile)
+            variant.javaCompileProvider.get().classpath = variant.javaCompileProvider.get().classpath + project.files(rt)
+            ensureCompileOnJava8(retrolambda, variant.javaCompileProvider.get())
         }
 
         transform.putVariant(variant)
     }
 
     private
-    static configureUnitTestTask(Project project, String variant, JavaCompile javaCompileTask) {
-        javaCompileTask.doFirst {
+    static configureUnitTestTask(Project project, String variant, TaskProvider<JavaCompile> javaCompileTaskProvider) {
+        javaCompileTaskProvider.get().doFirst {
             def retrolambda = project.extensions.getByType(RetrolambdaExtension)
             def rt = "$retrolambda.jdk/jre/lib/rt.jar"
 
             // We need to add the rt to the classpath to support lambdas in the tests themselves
-            javaCompileTask.classpath = javaCompileTask.classpath + project.files(rt)
+            javaCompileTaskProvider.get().classpath = javaCompileTaskProvider.get().classpath + project.files(rt)
 
-            ensureCompileOnJava8(retrolambda, javaCompileTask)
+            ensureCompileOnJava8(retrolambda, javaCompileTaskProvider.get())
         }
 
         Test runTask = (Test) project.tasks.findByName("test${RetrolambdaUtil.capitalize(variant)}UnitTest")
